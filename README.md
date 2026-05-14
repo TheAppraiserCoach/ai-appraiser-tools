@@ -10,6 +10,7 @@ Every tool runs entirely in the browser — no signup, no data leaves the user's
 |---|---|
 | [Depreciated Cost Calculator](./depreciated-cost-calculator/) | Drop in an appraisal PDF, get suggested adjustment ranges for GLA, basement, and garage derived from the report's own Cost Approach. |
 | [133-Step QC Reviewer (prompt template)](./qc-reviewer/) | Pre-submission QC checklist. Copy the prompt into Claude.ai or ChatGPT, attach your appraisal PDF, get severity-rated concerns with step references. Requires a paid AI subscription. |
+| [Revision Response Writer (prompt template)](./revision-writer/) | Drafts addendum-ready responses to AMC / underwriter revision requests. Categorizes each item (already addressed / correction / clarification / misunderstanding / out-of-scope) and writes in appraiser voice with appropriate standards citations. Requires a paid AI subscription. |
 
 ## Using the tools
 
