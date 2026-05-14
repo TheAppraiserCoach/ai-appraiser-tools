@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Depreciated Cost Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg: #fafafa;
+    --accent: #2c5aa0;
+    --good: #2e7d32;
+    --warn: #c62828;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    margin: 0;
+    line-height: 1.5;
+  }
+  header {
+    background: white;
+    border-bottom: 1px solid var(--line);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  header img.logo {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: 6px;
+  }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p  { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  main { max-width: 920px; margin: 0 auto; padding: 1.5rem; }
+  section {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  section h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .step-num {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    text-align: center;
+    line-height: 1.5rem;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+  }
+  #dropzone {
+    border: 2px dashed var(--line);
+    border-radius: 6px;
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  #dropzone:hover, #dropzone.dragover {
+    border-color: var(--accent);
+    background: #f0f5ff;
+    color: var(--accent);
+  }
+  #file-input { display: none; }
+  .extract-status {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  .extract-status.good { background: #e8f5e9; color: var(--good); }
+  .extract-status.warn { background: #fff3e0; color: var(--warn); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+  }
+  th, td {
+    padding: 0.5rem 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.95rem;
+  }
+  th {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.adj-pos { color: var(--good); font-weight: 600; }
+  td.adj-neg { color: var(--warn); font-weight: 600; }
+  input[type="number"], input[type="text"] {
+    width: 100%;
+    max-width: 9rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="number"].small { max-width: 5rem; }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: 12rem 1fr 1fr;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .field-row > label { margin: 0; }
+  .factor-row {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .factor-row .hint { color: var(--muted); font-size: 0.85rem; }
+  button {
+    background: var(--accent);
+    color: white;
+    border: 0;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  button:hover { opacity: 0.9; }
+  button.ghost {
+    background: white;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .comp-card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: #fcfcfc;
+  }
+  .comp-card h3 {
+    margin: 0 0 0.75rem;
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .comp-card h3 button {
+    background: transparent;
+    color: var(--warn);
+    padding: 0.15rem 0.4rem;
+    font-size: 0.85rem;
+  }
+  .comp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem 1rem;
+  }
+  textarea {
+    width: 100%;
+    min-height: 12rem;
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .results-summary {
+    background: #f0f5ff;
+    border-left: 3px solid var(--accent);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0 4px 4px 0;
+  }
+  .results-summary strong { color: var(--accent); }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    padding: 2rem 1rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>Depreciated Cost Calculator</h1>
+    <p>Drop in an appraisal report, get estimated depreciated cost adjustments for elements of comparison.</p>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <h2><span class="step-num">1</span>Upload appraisal PDF</h2>
+  <div id="dropzone" onclick="document.getElementById('file-input').click()">
+    Drag an appraisal PDF here, or click to browse
+  </div>
+  <input type="file" id="file-input" accept=".pdf">
+  <div id="extract-status" class="extract-status" style="display:none;"></div>
+  <details id="raw-text-details" style="margin-top:0.75rem; display:none;">
+    <summary style="cursor:pointer; color:var(--muted); font-size:0.85rem;">Show what PDF.js extracted (for debugging)</summary>
+    <textarea id="raw-text" readonly style="margin-top:0.5rem; min-height:14rem; font-family: monospace; font-size:0.75rem;"></textarea>
+  </details>
+</section>
+
+<section id="subject-section">
+  <h2><span class="step-num">2</span>Subject — Cost Approach inputs</h2>
+  <p style="color:var(--muted);font-size:0.9rem;margin:0 0 0.75rem;">Auto-filled from the PDF when possible. You can edit any value.</p>
+
+  <div class="field-row">
+    <label>Dwelling</label>
+    <div><input type="number" id="dw_sqft" class="small" placeholder="sqft"> sqft</div>
+    <div>@ $<input type="number" id="dw_rate" class="small" step="0.01" placeholder="rate">/sqft</div>
+  </div>
+  <div class="field-row">
+    <label>Basement (unfinished)</label>
+    <div><input type="number" id="bs_sqft" class="small" placeholder="sqft"> sqft</div>
+    <div>@ $<input type="number" id="bs_rate" class="small" step="0.01" placeholder="rate">/sqft</div>
+  </div>
+  <div class="field-row">
+    <label>Basement finish</label>
+    <div><input type="number" id="bf_sqft" class="small" placeholder="sqft"> sqft</div>
+    <div>@ $<input type="number" id="bf_rate" class="small" step="0.01" placeholder="rate (often missing — enter manually)">/sqft</div>
+  </div>
+  <div class="field-row">
+    <label>Garage</label>
+    <div><input type="number" id="gr_sqft" class="small" placeholder="sqft"> sqft</div>
+    <div>@ $<input type="number" id="gr_rate" class="small" step="0.01" placeholder="rate">/sqft</div>
+  </div>
+  <div class="field-row">
+    <label>Effective age</label>
+    <div><input type="number" id="eff_age" class="small" placeholder="yrs"> years</div>
+    <div></div>
+  </div>
+  <div class="field-row">
+    <label>Total economic life</label>
+    <div><input type="number" id="econ_life" class="small" placeholder="yrs" value="60"> years</div>
+    <div></div>
+  </div>
+
+  <div class="factor-row">
+    <label style="margin:0;">Marginal cost factor:</label>
+    <input type="number" id="marginal_factor" class="small" step="0.01" value="0.71" min="0.5" max="1">
+    <span class="hint">(industry typical 0.65–0.75 — average cost &times; this factor = marginal cost per added unit)</span>
+  </div>
+</section>
+
+<section>
+  <h2><span class="step-num">3</span>Comparable properties</h2>
+  <p style="color:var(--muted);font-size:0.9rem;margin:0 0 0.75rem;">Enter each comp's features. The tool computes the delta vs subject and the resulting adjustment.</p>
+  <div id="comp-list"></div>
+  <button class="ghost" onclick="addComp()">+ Add comparable</button>
+</section>
+
+<section id="results-section">
+  <h2><span class="step-num">4</span>Computed adjustments</h2>
+  <button onclick="compute()">Compute adjustments</button>
+  <div id="results"></div>
+</section>
+
+<section id="narrative-section" style="display:none;">
+  <h2><span class="step-num">5</span>Suggested addendum narrative</h2>
+  <p style="color:var(--muted);font-size:0.9rem;margin:0 0 0.5rem;">Adapted from the depreciated cost method. Edit before pasting into your report.</p>
+  <textarea id="narrative" readonly></textarea>
+  <button class="ghost" style="margin-top:0.5rem;" onclick="copyNarrative()">Copy to clipboard</button>
+</section>
+
+</main>
+
+<footer>
+  <p style="margin:0 0 0.5rem;font-size:0.95rem;color:var(--ink);">
+    Built by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:600;">The Appraiser Coach</a> — free for any appraiser to use.
+    For more tools, coaching, and the community building this with us:
+    <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener" style="color:var(--accent);">theappraisercoach.com&nbsp;→</a>
+  </p>
+  <p style="margin:0;font-size:0.8rem;">
+    Methodology: Cost Approach to Sales Comparison adjustments via marginal cost &times; remaining-life depreciation. USPAP-recognized; this tool is a calculation aid, not appraisal judgment.
+    Open source &mdash; <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener" style="color:var(--muted);">view source on GitHub</a>.
+  </p>
+</footer>
+
+<script>
+// PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+// ---------------- PDF parsing ----------------
+
+async function extractPdfText(file) {
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = "";
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    // Sort by visual position (top-down, left-right) before joining,
+    // so the text reads in natural reading order regardless of PDF stream order.
+    const items = content.items.slice().sort((a, b) => {
+      const ya = a.transform ? a.transform[5] : 0;
+      const yb = b.transform ? b.transform[5] : 0;
+      if (Math.abs(ya - yb) > 2) return yb - ya; // larger Y is higher on page (PDF coords)
+      const xa = a.transform ? a.transform[4] : 0;
+      const xb = b.transform ? b.transform[4] : 0;
+      return xa - xb;
+    });
+    text += items.map(item => item.str).join(" ") + "\n";
+  }
+  // Normalize whitespace (collapse runs of whitespace including non-breaking)
+  return text.replace(/[  -​  　\t\f\v]/g, " ").replace(/ {2,}/g, " ");
+}
+
+function parseCostApproach(text) {
+  const result = {};
+
+  // Helper: match a Cost-Approach line. The signature is unique because of
+  // the "@" symbol — that only appears on the cost-rate lines, NOT on the
+  // subject-description "Basement Area X sq.ft." or "Basement Finish 0 %"
+  // lines. Requiring "@" lets us skip the false matches and lock onto the
+  // right one.
+  function findLine(labelPattern) {
+    const re = new RegExp(
+      labelPattern.source +
+      "[\\s\\S]{0,150}?" +                  // up to 150 chars between label and sqft
+      "([\\d,]+)" +                          // sqft
+      "\\s*(?:Sq\\.?\\s*Ft\\.?)" +           // "Sq.Ft." / "Sq Ft" / "SqFt" etc.
+      "[\\s\\S]{0,40}?" +                    // up to 40 chars between Sq.Ft. and @
+      "@" +                                  // mandatory @ — the discriminator
+      "\\s*\\$?\\s*" +                       // optional whitespace and $
+      "([\\d.,]+)",                          // rate
+      "i"
+    );
+    return text.match(re);
+  }
+
+  let m = findLine(/DWELLING/);
+  if (m) {
+    result.dw_sqft = parseFloat(m[1].replace(/,/g, ""));
+    result.dw_rate = parseFloat(m[2].replace(/,/g, ""));
+  }
+
+  m = findLine(/Basement/);
+  if (m) {
+    result.bs_sqft = parseFloat(m[1].replace(/,/g, ""));
+    result.bs_rate = parseFloat(m[2].replace(/,/g, ""));
+  }
+
+  m = findLine(/Garage\/?\s*Carport/);
+  if (m) {
+    result.gr_sqft = parseFloat(m[1].replace(/,/g, ""));
+    result.gr_rate = parseFloat(m[2].replace(/,/g, ""));
+  }
+
+  // Effective Age — appears in subject description AND sometimes cost approach
+  m = text.match(/Effective\s+Age\s*\(?Yrs?\)?\s*([\d.]+)/i);
+  if (m) result.eff_age = parseFloat(m[1]);
+
+  // Economic life — wide tolerance for "(HUD and VA only)" and whitespace
+  m = text.match(/(?:Remaining\s+)?Economic\s+Life[^0-9]{0,120}(\d+)\s*Years?/i);
+  if (m) result.econ_life = parseFloat(m[1]);
+
+  return result;
+}
+
+function parseSubjectFeatures(text) {
+  // Try to grab subject GLA from sales grid header for a sanity check
+  const result = {};
+  const m = text.match(/Gross Living Area[^\d]*([\d,]+)\s*sq\.?\s*ft/i);
+  if (m) result.subjGLA = parseFloat(m[1].replace(/,/g, ""));
+  return result;
+}
+
+// ---------------- Comp grid auto-extract ----------------
+// The 1004 sales grid encodes features:
+//   Basement: "1500sf0sfin"  → 1500 sqft total, 0 sqft finished
+//             "0sf"          → no basement
+//   Garage:   "2ga2dw"       → 2 attached garage stalls + 2 driveway
+//             "2gd1dw"       → 2 detached garage stalls + 1 driveway
+//             "1cp"          → 1 carport
+// The grid spans multiple pages when there are 4+ comps; the subject column
+// is repeated on each page, so we dedupe.
+
+function parseComps(text) {
+  // Find each sales-grid page by anchoring on a row UNIQUE to the grid
+  // ("Sale Price/Gross Liv. Area" — only appears as a row label there).
+  // For each page, we extract the named row's content and find values.
+  const pageStarts = [];
+  const pageAnchor = /Sale Price\/?\s*Gross Liv\.?\s*Area/gi;
+  let m;
+  while ((m = pageAnchor.exec(text)) !== null) pageStarts.push(m.index);
+
+  const pages = pageStarts.map((s, i) =>
+    text.slice(s, pageStarts[i + 1] ?? s + 8000)
+  );
+
+  // Extract a single row's worth of values within one page slice.
+  // labelRe: e.g. /Gross Living Area/  — must match the row label
+  // valueRe: pattern with global flag; captures values from that row's line(s)
+  function rowValues(page, labelRe, valueRe) {
+    // Capture from the label up to the next line break OR the next major row label
+    const re = new RegExp(labelRe.source + "([^\\n]+)", "i");
+    const lm = page.match(re);
+    if (!lm) return [];
+    return [...lm[1].matchAll(valueRe)];
+  }
+
+  const glas = [];
+  const basements = [];
+  const garageStalls = [];
+
+  pages.forEach((page, idx) => {
+    // GLA — value is a number followed by "sq.ft."; lookbehind rejects
+    // numbers that are part of a larger token (adjustment cells like +18,900
+    // are preceded by +/- or digits, so we don't latch onto them).
+    const glaVals = rowValues(page, /Gross Living Area/, /(?<![+\-\d,])([\d,]+)\s*sq\.?\s*ft/gi)
+      .map(mm => parseFloat(mm[1].replace(/,/g, "")));
+
+    const bsVals = rowValues(page, /Basement\s*&?\s*Finished/, /(\d+)sf(?:(\d+)sfin)?/g)
+      .map(mm => ({ total: parseInt(mm[1]), finished: mm[2] ? parseInt(mm[2]) : 0 }));
+
+    const grVals = rowValues(page, /Garage\/?\s*Carport/, /(\d+)\s*(?:ga|gd|gbi|cp)(?![a-z])/gi)
+      .map(mm => parseInt(mm[1]));
+
+    if (idx === 0) {
+      glas.push(...glaVals);
+      basements.push(...bsVals);
+      garageStalls.push(...grVals);
+    } else {
+      // Subsequent grid pages repeat the subject column; skip it.
+      glas.push(...glaVals.slice(1));
+      basements.push(...bsVals.slice(1));
+      garageStalls.push(...grVals.slice(1));
+    }
+  });
+
+  // First item of each array is subject; rest are comps.
+  const subjectGarageStalls = garageStalls[0];
+  const compCount = Math.max(glas.length - 1, basements.length - 1, garageStalls.length - 1, 0);
+  const comps = [];
+  for (let i = 0; i < compCount; i++) {
+    comps.push({
+      gla:               glas[i + 1] ?? null,
+      basement_total:    basements[i + 1]?.total ?? null,
+      basement_finished: basements[i + 1]?.finished ?? null,
+      garage_stalls:     garageStalls[i + 1] ?? null,
+    });
+  }
+
+  return { comps, subjectGarageStalls, pagesFound: pages.length };
+}
+
+// ---------------- File handling ----------------
+
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("file-input");
+const status = document.getElementById("extract-status");
+
+["dragenter", "dragover"].forEach(ev =>
+  dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add("dragover"); }));
+["dragleave", "drop"].forEach(ev =>
+  dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove("dragover"); }));
+
+dropzone.addEventListener("drop", e => {
+  e.preventDefault();
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener("change", e => {
+  if (e.target.files.length) handleFile(e.target.files[0]);
+});
+
+async function handleFile(file) {
+  if (!file.name.toLowerCase().endsWith(".pdf")) {
+    showStatus("That's not a PDF.", "warn");
+    return;
+  }
+  showStatus("Reading PDF…", "good");
+  try {
+    const text = await extractPdfText(file);
+    // Always populate the debug textarea so we can diagnose if extraction
+    // looks right but parsing misses values.
+    const rawArea = document.getElementById("raw-text");
+    rawArea.value = text;
+    document.getElementById("raw-text-details").style.display = "block";
+
+    const cost = parseCostApproach(text);
+    const subj = parseSubjectFeatures(text);
+    fillFields(cost);
+    const filled = Object.keys(cost).length;
+
+    // Auto-extract comps from the sales grid
+    const compExtract = parseComps(text);
+    let compMsg = "";
+    if (compExtract.comps.length > 0) {
+      // Subject garage sqft / stalls gives us a per-stall ratio for converting
+      // comp stall counts to garage sqft for the calculator.
+      const ratio = (cost.gr_sqft && compExtract.subjectGarageStalls)
+        ? cost.gr_sqft / compExtract.subjectGarageStalls
+        : 243; // residential default
+      populateComps(compExtract.comps, ratio);
+      compMsg = ` Auto-loaded ${compExtract.comps.length} comparable${compExtract.comps.length === 1 ? "" : "s"} from the sales grid.`;
+    }
+
+    if (filled === 0) {
+      showStatus("PDF read OK but no cost approach numbers detected. Click 'Show what PDF.js extracted' below to see what was read; enter the values manually for now." + compMsg, "warn");
+    } else {
+      const note = subj.subjGLA && cost.dw_sqft && Math.abs(subj.subjGLA - cost.dw_sqft) > 5
+        ? ` Note: cost approach dwelling sqft (${cost.dw_sqft}) differs from sales grid GLA (${subj.subjGLA}).`
+        : "";
+      showStatus(`Extracted ${filled} cost-approach values.${compMsg} Review below, edit if needed.${note}`, "good");
+    }
+  } catch (err) {
+    showStatus("Couldn't read PDF: " + err.message, "warn");
+  }
+}
+
+function showStatus(msg, kind) {
+  status.textContent = msg;
+  status.className = "extract-status " + kind;
+  status.style.display = "block";
+}
+
+function fillFields(data) {
+  for (const [key, val] of Object.entries(data)) {
+    const el = document.getElementById(key);
+    if (el && val !== undefined) el.value = val;
+  }
+}
+
+// ---------------- Comparable management ----------------
+
+let compCounter = 0;
+
+function addComp(prefill) {
+  compCounter++;
+  const div = document.createElement("div");
+  div.className = "comp-card";
+  div.dataset.id = compCounter;
+  const p = prefill || {};
+  div.innerHTML = `
+    <h3>
+      <span>Comp ${compCounter}: <input type="text" placeholder="address (optional)" style="max-width:18rem;font-weight:normal;" value="${escapeHtml(p.address || '')}"></span>
+      <button onclick="this.closest('.comp-card').remove()">remove</button>
+    </h3>
+    <div class="comp-grid">
+      <div><label>GLA (sqft)</label><input type="number" class="comp-gla" placeholder="e.g. 1640" value="${p.gla ?? ''}"></div>
+      <div><label>Basement unfinished (sqft)</label><input type="number" class="comp-bs" placeholder="e.g. 0" value="${p.basement_total ?? ''}"></div>
+      <div><label>Basement finished (sqft)</label><input type="number" class="comp-bf" placeholder="e.g. 0" value="${p.basement_finished ?? ''}"></div>
+      <div><label>Garage (sqft)</label><input type="number" class="comp-gr" placeholder="e.g. 486" value="${p.garage_sqft ?? ''}"></div>
+    </div>
+  `;
+  document.getElementById("comp-list").appendChild(div);
+}
+
+function populateComps(comps, garageSqftPerStall) {
+  // Clear existing cards and replace with extracted comps.
+  document.getElementById("comp-list").innerHTML = "";
+  compCounter = 0;
+  for (const c of comps) {
+    const garage_sqft = c.garage_stalls != null
+      ? Math.round(c.garage_stalls * garageSqftPerStall)
+      : null;
+    addComp({
+      gla:               c.gla,
+      basement_total:    c.basement_total,
+      basement_finished: c.basement_finished,
+      garage_sqft:       garage_sqft,
+    });
+  }
+}
+
+addComp(); addComp(); addComp();
+
+// ---------------- Computation ----------------
+
+function compute() {
+  const subj = {
+    dw_sqft:  parseFloat(document.getElementById("dw_sqft").value) || 0,
+    dw_rate:  parseFloat(document.getElementById("dw_rate").value) || 0,
+    bs_sqft:  parseFloat(document.getElementById("bs_sqft").value) || 0,
+    bs_rate:  parseFloat(document.getElementById("bs_rate").value) || 0,
+    bf_sqft:  parseFloat(document.getElementById("bf_sqft").value) || 0,
+    bf_rate:  parseFloat(document.getElementById("bf_rate").value) || 0,
+    gr_sqft:  parseFloat(document.getElementById("gr_sqft").value) || 0,
+    gr_rate:  parseFloat(document.getElementById("gr_rate").value) || 0,
+    eff_age:  parseFloat(document.getElementById("eff_age").value) || 0,
+    econ_life:parseFloat(document.getElementById("econ_life").value) || 60,
+  };
+  const factor = parseFloat(document.getElementById("marginal_factor").value) || 0.71;
+  const remainingPct = Math.max(0, 1 - subj.eff_age / subj.econ_life);
+
+  // Three points: low (0.65), mid (user factor), high (0.75)
+  const LOW_FACTOR = 0.65;
+  const HIGH_FACTOR = 0.75;
+  function unitRate(avgRate, f) { return avgRate * f * remainingPct; }
+  const features = ["GLA", "Basement (unf.)", "Basement finish", "Garage"];
+  const avgRates = {
+    GLA: subj.dw_rate, "Basement (unf.)": subj.bs_rate,
+    "Basement finish": subj.bf_rate, Garage: subj.gr_rate,
+  };
+  const subjValues = {
+    GLA: subj.dw_sqft, "Basement (unf.)": subj.bs_sqft,
+    "Basement finish": subj.bf_sqft, Garage: subj.gr_sqft,
+  };
+  const marginals = {}, marginalsLow = {}, marginalsHigh = {};
+  for (const f of features) {
+    marginals[f]     = unitRate(avgRates[f], factor);
+    marginalsLow[f]  = unitRate(avgRates[f], LOW_FACTOR);
+    marginalsHigh[f] = unitRate(avgRates[f], HIGH_FACTOR);
+  }
+
+  const compCards = document.querySelectorAll(".comp-card");
+  if (compCards.length === 0) { document.getElementById("results").innerHTML = "<p>Add at least one comparable.</p>"; return; }
+
+  // -------- Headline: suggested per-feature adjustment rates ----------
+
+  function rateLine(label, mid, low, high, perStall) {
+    if (avgRates[label === "Above-grade GLA" ? "GLA"
+                : label === "Basement (unfinished)" ? "Basement (unf.)"
+                : label === "Basement finish" ? "Basement finish"
+                : "Garage"] === 0) {
+      return `<li><strong>${label}:</strong> <span style="color:var(--warn);">not detected — enter rate manually in step 2 above</span></li>`;
+    }
+    const perStallNote = perStall ? ` (≈ ${perStall} per stall)` : "";
+    return `<li><strong>${label}:</strong> $${low.toFixed(0)}–$${high.toFixed(0)} per sqft <span class="hint">(midpoint $${mid.toFixed(0)})</span>${perStallNote}</li>`;
+  }
+
+  const stallsForGarage = subj.gr_sqft && subjGarageStalls() ? subj.gr_sqft / subjGarageStalls() : 0;
+  const perStallLow  = stallsForGarage ? `$${(marginalsLow["Garage"]  * stallsForGarage).toFixed(0)}` : null;
+  const perStallHigh = stallsForGarage ? `$${(marginalsHigh["Garage"] * stallsForGarage).toFixed(0)}` : null;
+  const perStallRange = perStallLow && perStallHigh ? `${perStallLow}–${perStallHigh}` : null;
+
+  let headlineHtml = `
+    <div class="results-summary">
+      <h3 style="margin:0 0 0.5rem;font-size:1rem;color:var(--accent);">Suggested adjustment rates (from this report's cost approach)</h3>
+      <ul style="margin:0;padding-left:1.25rem;line-height:1.7;">
+        ${rateLine("Above-grade GLA", marginals["GLA"], marginalsLow["GLA"], marginalsHigh["GLA"])}
+        ${rateLine("Basement (unfinished)", marginals["Basement (unf.)"], marginalsLow["Basement (unf.)"], marginalsHigh["Basement (unf.)"])}
+        ${avgRates["Basement finish"] > 0 ? rateLine("Basement finish", marginals["Basement finish"], marginalsLow["Basement finish"], marginalsHigh["Basement finish"]) : ""}
+        ${rateLine("Garage", marginals["Garage"], marginalsLow["Garage"], marginalsHigh["Garage"], perStallRange)}
+      </ul>
+      <p style="margin:0.75rem 0 0;color:var(--muted);font-size:0.85rem;">
+        Range reflects the marginal-cost factor (0.65 low → 0.75 high) typical in residential cost literature.
+        Applied to the cost approach's average rates &times; remaining-life percentage <strong>${(remainingPct*100).toFixed(0)}%</strong>
+        (effective age ${subj.eff_age} / economic life ${subj.econ_life}).
+      </p>
+    </div>
+  `;
+
+  // -------- Per-comp plain-English adjustments ----------
+
+  let perCompHtml = `<h3 style="margin:1rem 0 0.5rem;font-size:1rem;color:var(--accent);">Suggested adjustments per comparable</h3>`;
+  const compTotals = [];
+  compCards.forEach(card => {
+    const id = card.dataset.id;
+    const addrInput = card.querySelector("h3 input");
+    const label = (addrInput.value || `Comp ${id}`).trim();
+    const compVals = {
+      GLA:               parseFloat(card.querySelector(".comp-gla").value) || 0,
+      "Basement (unf.)": parseFloat(card.querySelector(".comp-bs").value)  || 0,
+      "Basement finish": parseFloat(card.querySelector(".comp-bf").value)  || 0,
+      Garage:            parseFloat(card.querySelector(".comp-gr").value)  || 0,
+    };
+
+    let totalMid = 0, totalLow = 0, totalHigh = 0;
+    const lines = [];
+    for (const f of features) {
+      const subjVal = subjValues[f];
+      const compVal = compVals[f];
+      const delta = compVal - subjVal;
+      if (delta === 0) continue;                              // no difference, no adjustment
+      if (marginals[f] === 0 && avgRates[f] === 0) continue;  // can't compute, skip
+      if (marginals[f] === 0) {
+        // rate missing
+        const featLabel = featureFriendly(f);
+        lines.push(`<li><strong>${featLabel}:</strong> comp has ${delta > 0 ? "+" : ""}${fmt(delta)} sqft vs subject — <span style="color:var(--warn);">rate missing, can't compute</span></li>`);
+        continue;
+      }
+      const adjMid  = -delta * marginals[f];
+      // Range: if delta is positive (comp larger), low end is the smaller magnitude (uses lower marginal),
+      // high end uses higher marginal. For negative delta the direction is reversed; use signed range.
+      const adjA = -delta * marginalsLow[f];
+      const adjB = -delta * marginalsHigh[f];
+      const adjLow  = Math.min(adjA, adjB);
+      const adjHigh = Math.max(adjA, adjB);
+      totalMid  += adjMid;
+      totalLow  += adjLow;
+      totalHigh += adjHigh;
+      const featLabel = featureFriendly(f);
+      const direction = delta > 0 ? `Comp has ${fmt(delta)} more sqft` : `Comp has ${fmt(-delta)} less sqft`;
+      const adjClass = adjMid > 0 ? "adj-pos" : adjMid < 0 ? "adj-neg" : "";
+      lines.push(`<li><strong>${featLabel}:</strong> ${direction} → suggested adjustment <span class="${adjClass}">${fmtUSDRange(adjLow, adjHigh)}</span> <span class="hint">(mid ${fmtUSD(adjMid)})</span></li>`);
+    }
+    if (lines.length === 0) {
+      lines.push(`<li class="hint">No construction-related differences with the subject — no cost-derived adjustments.</li>`);
+    }
+    const netClass = totalMid > 0 ? "adj-pos" : totalMid < 0 ? "adj-neg" : "";
+    perCompHtml += `
+      <div class="comp-card" style="background:#fcfcfc;">
+        <h3 style="margin:0 0 0.5rem;font-size:0.95rem;">${escapeHtml(label)}</h3>
+        <ul style="margin:0;padding-left:1.25rem;line-height:1.7;">${lines.join("")}</ul>
+        <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--line);font-size:0.95rem;">
+          <strong>Net cost-derived adjustment for ${escapeHtml(label)}:</strong>
+          <span class="${netClass}" style="font-weight:700;">${fmtUSDRange(totalLow, totalHigh)}</span>
+          <span class="hint">(mid ${fmtUSD(totalMid)})</span>
+        </div>
+      </div>`;
+    compTotals.push({ label, totalMid, totalLow, totalHigh });
+  });
+
+  // -------- Collapsible: detailed math table ----------
+
+  let mathHtml = `<table><thead><tr>
+    <th>Comp</th><th>Feature</th><th class="num">Subject</th><th class="num">Comp</th>
+    <th class="num">Δ</th><th class="num">$/unit (mid)</th><th class="num">Adjustment (mid)</th>
+  </tr></thead><tbody>`;
+  compCards.forEach(card => {
+    const id = card.dataset.id;
+    const addrInput = card.querySelector("h3 input");
+    const label = (addrInput.value || `Comp ${id}`).trim();
+    const compVals = {
+      GLA:               parseFloat(card.querySelector(".comp-gla").value) || 0,
+      "Basement (unf.)": parseFloat(card.querySelector(".comp-bs").value)  || 0,
+      "Basement finish": parseFloat(card.querySelector(".comp-bf").value)  || 0,
+      Garage:            parseFloat(card.querySelector(".comp-gr").value)  || 0,
+    };
+    let firstRow = true;
+    for (const f of features) {
+      const subjVal = subjValues[f];
+      const compVal = compVals[f];
+      const delta = compVal - subjVal;
+      const marginal = marginals[f];
+      if (delta === 0 || marginal === 0) continue;
+      const adj = -delta * marginal;
+      const adjClass = adj > 0 ? "adj-pos" : adj < 0 ? "adj-neg" : "";
+      mathHtml += `<tr>
+        <td>${firstRow ? `<strong>${escapeHtml(label)}</strong>` : ""}</td>
+        <td>${f}</td>
+        <td class="num">${fmt(subjVal)}</td>
+        <td class="num">${fmt(compVal)}</td>
+        <td class="num">${delta > 0 ? "+" : ""}${fmt(delta)}</td>
+        <td class="num">$${marginal.toFixed(2)}</td>
+        <td class="num ${adjClass}">${fmtUSD(adj)}</td>
+      </tr>`;
+      firstRow = false;
+    }
+  });
+  mathHtml += "</tbody></table>";
+
+  const mathBlock = `
+    <details style="margin-top:1rem;">
+      <summary style="cursor:pointer;color:var(--muted);font-size:0.9rem;">Show the math (per-feature breakdown at the midpoint factor ${factor})</summary>
+      <div style="margin-top:0.5rem;">${mathHtml}</div>
+    </details>`;
+
+  document.getElementById("results").innerHTML = headlineHtml + perCompHtml + mathBlock;
+
+  // Narrative — shorter, more direct
+  const narr = buildNarrative(subj, factor, remainingPct, marginals, marginalsLow, marginalsHigh, compTotals);
+  document.getElementById("narrative").value = narr;
+  document.getElementById("narrative-section").style.display = "block";
+}
+
+function featureFriendly(f) {
+  return ({ "GLA": "Above-grade GLA",
+            "Basement (unf.)": "Basement (unfinished)",
+            "Basement finish": "Basement finish",
+            "Garage": "Garage" }[f]) || f;
+}
+
+function subjGarageStalls() {
+  // Infer from subject garage sqft if we have a sane per-stall default;
+  // user can override by editing the form. Returns subject stall count or null.
+  const sqft = parseFloat(document.getElementById("gr_sqft").value) || 0;
+  if (!sqft) return null;
+  return Math.max(1, Math.round(sqft / 243));
+}
+
+function fmtUSDRange(low, high) {
+  // Always show low to high inclusive, with proper signs.
+  if (Math.round(low) === Math.round(high)) return fmtUSD(low);
+  return `${fmtUSD(low)} to ${fmtUSD(high)}`;
+}
+
+function buildNarrative(subj, factor, remainingPct, marginals, marginalsLow, marginalsHigh, compTotals) {
+  const lines = [
+    `Support for Sales Comparison Adjustments — Depreciated Cost Method`,
+    ``,
+    `Adjustments for construction-related elements of comparison (gross living area, basement, garage) were developed using the depreciated cost method. Cost-new figures were taken from the cost approach in this report; marginal cost was extracted from the average cost per unit using a factor of ${factor.toFixed(2)} (within the 0.65–0.75 range typical in residential cost literature). Depreciation was applied using the age-life method: effective age ${subj.eff_age} divided by economic life ${subj.econ_life} years (${(remainingPct*100).toFixed(0)}% remaining-life percentage).`,
+    ``,
+    `Per-unit contributory values:`,
+    `  • Above-grade GLA: $${marginalsLow["GLA"].toFixed(0)}–$${marginalsHigh["GLA"].toFixed(0)}/sqft (midpoint $${marginals["GLA"].toFixed(0)})`,
+    `  • Basement (unfinished): $${marginalsLow["Basement (unf.)"].toFixed(0)}–$${marginalsHigh["Basement (unf.)"].toFixed(0)}/sqft (midpoint $${marginals["Basement (unf.)"].toFixed(0)})`,
+    `  • Garage: $${marginalsLow["Garage"].toFixed(0)}–$${marginalsHigh["Garage"].toFixed(0)}/sqft (midpoint $${marginals["Garage"].toFixed(0)})`,
+    ``,
+    `Net suggested adjustment range per comparable:`,
+    ...compTotals.map(c => `  • ${c.label}: ${fmtUSDRange(c.totalLow, c.totalHigh)} (midpoint ${fmtUSD(c.totalMid)})`),
+    ``,
+    `Paired sales analysis was considered; however, in the available market data, truly comparable paired sales isolating these features were not available without introducing confounding variables that would themselves require estimation. The depreciated cost method was determined to be the more reliable and defensible basis for these adjustments. Both methods involve judgment and neither is without limitation.`,
+  ];
+  return lines.join("\n");
+}
+
+function copyNarrative() {
+  const ta = document.getElementById("narrative");
+  ta.select();
+  document.execCommand("copy");
+  ta.setSelectionRange(0, 0);
+  ta.blur();
+}
+
+// ---------------- Helpers ----------------
+
+function fmt(n) { return Number.isInteger(n) ? n.toLocaleString() : n.toFixed(0).toLocaleString(); }
+function fmtUSD(n) {
+  const abs = Math.abs(Math.round(n));
+  const s = "$" + abs.toLocaleString();
+  return n < 0 ? "−" + s : n > 0 ? "+" + s : s;
+}
+function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+</script>
+
+</body>
+</html>
