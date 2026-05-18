@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automating TOTAL with AI — A Project Prometheus White Paper</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg: #fafafa;
+    --accent: #2c5aa0;
+    --accent-bg: #f0f5ff;
+    --brand: #5a3a2a;
+    --brand-bg: #f5efe7;
+    --good: #2e7d32;
+    --warn: #c62828;
+    --warn-bg: #fff3e0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    margin: 0;
+    line-height: 1.6;
+  }
+  header {
+    background: white;
+    border-bottom: 1px solid var(--line);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  header img.logo {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: 6px;
+  }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p  { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link {
+    color: var(--accent);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  header a.home-link:hover { text-decoration: underline; }
+  main { max-width: 820px; margin: 0 auto; padding: 1.5rem; }
+  .doc-block {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.25rem;
+  }
+  h2 {
+    margin: 2rem 0 0.75rem;
+    font-size: 1.2rem;
+    color: var(--accent);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.35rem;
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    margin: 1.25rem 0 0.5rem;
+    font-size: 1.02rem;
+    color: var(--ink);
+  }
+  p { margin: 0.6rem 0; }
+  ul, ol { padding-left: 1.5rem; line-height: 1.6; }
+  ul li, ol li { margin-bottom: 0.35rem; }
+  code {
+    background: #f0f0f0;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.92em;
+  }
+  .disclaimer {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn);
+    padding: 1rem 1.25rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1.25rem 0;
+  }
+  .disclaimer h3 {
+    margin-top: 0;
+    color: var(--warn);
+    font-size: 1rem;
+  }
+  .disclaimer ul { margin: 0.5rem 0; }
+  .toc {
+    background: var(--accent-bg);
+    border-left: 4px solid var(--accent);
+    padding: 1rem 1.25rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1.25rem 0;
+  }
+  .toc h3 { margin-top: 0; color: var(--accent); font-size: 1rem; }
+  .toc ol { margin: 0.5rem 0; padding-left: 1.5rem; }
+  .toc li { margin-bottom: 0.2rem; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  table.tradeoff {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+  }
+  table.tradeoff th, table.tradeoff td {
+    border: 1px solid var(--line);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-size: 0.92rem;
+    vertical-align: top;
+  }
+  table.tradeoff th {
+    background: #f5f5f5;
+    font-weight: 600;
+  }
+  .meta-line {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-bottom: 1rem;
+  }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 2rem 1rem;
+  }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>Automating TOTAL with AI</h1>
+    <p>A Project Prometheus white paper — how an AI agent can read and write TOTAL appraisal reports. Educational reference only.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+
+<div class="doc-block">
+
+<p class="meta-line">A Project Prometheus white paper. Published by The Appraiser Coach. Educational reference — not a build guide, not a product release.</p>
+
+<div class="disclaimer">
+  <h3>Read this first — disclaimer</h3>
+  <ul>
+    <li><strong>This is a white paper, not a software release.</strong> No source code is published here. No compiled binaries are distributed. No installer exists. There is no "download and run" path.</li>
+    <li><strong>No warranty, no tech support.</strong> If you decide to attempt something like what is described here, you do so entirely at your own risk and responsibility. The Appraiser Coach, Dustin Harris, and any contributors mentioned are not your engineers and will not troubleshoot your build.</li>
+    <li><strong>You must remain in compliance with every applicable software license.</strong> That includes — but is not limited to — a la mode's TOTAL end-user license agreement, Microsoft .NET licensing, Python's license, and any AI provider's terms of service. If you don't have a legally licensed copy of TOTAL on your own machine, this document is purely academic for you. The recommended commercial integration path is a la mode's <a href="https://blogs.alamode.com/a-la-modes-new-total-store-and-api-bring-robust-third-party-integration-to/" target="_blank" rel="noopener">TOTAL Store / VIP API partner program</a>; pursue that if you are building a commercial product.</li>
+    <li><strong>Nothing here is legal advice.</strong> Consult an attorney about your specific situation before acting on anything described in this document.</li>
+  </ul>
+</div>
+
+<div class="toc">
+  <h3>Contents</h3>
+  <ol>
+    <li><a href="#problem">The problem we tried to solve</a></li>
+    <li><a href="#path1">Path 1 — the screen-reader approach</a></li>
+    <li><a href="#path2">Path 2 — direct <code>.zap</code> read/write</a></li>
+    <li><a href="#enables">What this enabled</a></li>
+    <li><a href="#outline">High-level architecture outline</a></li>
+    <li><a href="#dead-ends">What did not work</a></li>
+    <li><a href="#takeaway">Take-aways for the appraiser community</a></li>
+  </ol>
+</div>
+
+<h2 id="problem">1. The problem we tried to solve</h2>
+
+<p>Residential appraisal in the United States is overwhelmingly written in one piece of software: a la mode's TOTAL. TOTAL is mature, feature-rich, and the de-facto standard for over 100,000 working appraisers. It is also, from the perspective of an appraiser who wants to add AI automation to their workflow, a closed black box. There is no public API. The published file format (<code>.zap</code>) is encrypted. The recommended integration path — TOTAL Store / VIP — requires a vendor partnership and an access token that individual appraisers cannot obtain.</p>
+
+<p>This created a hard wall for Project Prometheus. The thesis behind Prometheus was that an AI agent could take over the mechanical portions of an appraisal workflow — order intake, comp research, field-mapping, pre-fill of report shells, quality control — leaving the appraiser to focus on the parts that require human judgment. Most of those mechanical tasks are about getting data <em>into</em> a TOTAL report. With no way to programmatically write to a TOTAL report, the rest of the system was moot. We had to solve the TOTAL-write problem before anything else mattered.</p>
+
+<p>We tried two approaches. The first was the obvious one. It worked, technically, and we abandoned it. The second is the one we kept.</p>
+
+<h2 id="path1">2. Path 1 — the screen-reader approach</h2>
+
+<p>The first approach was visual UI automation. The idea was straightforward: run TOTAL on a Windows machine the way a human runs it, and have an AI agent operate the user interface using the same affordances a human would — keyboard, mouse, screen reading. There is decent open-source tooling for this: <code>pywinauto</code> for Win32 control-level interaction, <code>pyautogui</code> for pixel-and-coordinate fallback, and various agent frameworks that connect an LLM to those tools and a screenshot of the live window. The agent looks at the screen, decides what to click, clicks it, types the value, and verifies visually that it landed.</p>
+
+<p>It worked. It also did not scale. The limits showed up quickly:</p>
+
+<ul>
+  <li><strong>Fragility.</strong> Any TOTAL UI change — even between minor versions — broke our scripts. A repositioned button or a renamed field meant the agent could no longer find what it was looking for. We were one a la mode update away from rebuilding everything.</li>
+  <li><strong>Speed.</strong> Each field interaction took multiple seconds: focus the window, locate the field, click, wait for it to accept focus, type the value, verify, move on. A 1004 report has 130+ fillable fields. A full pre-fill took close to an hour in the best case.</li>
+  <li><strong>Hallucinations.</strong> A vision-capable agent occasionally clicked the wrong tab, picked the wrong field, or typed a value into the comp 2 column when it was supposed to go into comp 1. Even a 5% error rate is unacceptable when each error becomes a USPAP-relevant defect that the appraiser then has to find and fix.</li>
+  <li><strong>Modal dialogs and focus loss.</strong> TOTAL pops up modal dialogs for many actions (save confirmation, contact-picker, MISMO validation). Each of these is a state the script has to anticipate and handle. We accumulated a long list of dialog handlers, and we kept finding new ones.</li>
+  <li><strong>Verifiability.</strong> Even after the agent claimed to fill a field, the only way to confirm it actually saved was to re-read it visually. That doubled the per-field time and added another opportunity for misreading.</li>
+  <li><strong>Resource intensity.</strong> Running TOTAL in a Windows VM with a full graphical session, kept alive 24/7 so the agent could connect, is expensive in both compute and operator attention. The VM crashed. Chrome's CDP tunnel dropped. TOTAL hung. Each failure was its own debug session.</li>
+</ul>
+
+<p>The screen-reader path is a reasonable fallback for tasks that genuinely require the UI — flows that hit dialog boxes the data layer can't replicate, MFA portal uploads, the "Send to Vendor" trigger if you're integrating with TOTAL Store via the VIP API later. For everything else, we needed a path that did not require the UI to be involved at all.</p>
+
+<h2 id="path2">3. Path 2 — direct <code>.zap</code> read/write</h2>
+
+<p>The breakthrough was realizing that TOTAL's <code>.zap</code> file format, while encrypted, is fundamentally just a ZIP archive with a known encryption key — and the bundled .NET assemblies inside any licensed TOTAL installation already contain the code that handles both the unzip and the rezip. Doug, who runs the IT for our operation, discovered that you can call those bundled assemblies directly from a small C# program, without TOTAL itself being open, without the encryption key ever appearing in our code, and without reverse-engineering anything proprietary.</p>
+
+<p>The specific pieces involved are TOTAL's own .NET classes:</p>
+
+<ul>
+  <li><strong>Reading:</strong> <code>alamode.Appraisal.Business.ReportData.ZipReader</code> provides methods like <code>GetXmlDocument("ReportData.XML")</code>, <code>ExtractFile</code>, <code>ExtractFiles</code>, <code>HasFile</code>, and <code>GetComment</code>. These work password-less because TOTAL's native zip library — <code>dznscore.dll</code> — auto-applies the universal encryption key transparently when called from inside a TOTAL installation. The key is never in our code. We never extract it, copy it, or distribute it.</li>
+  <li><strong>Writing:</strong> <code>alamode.Common.Library.Zip.ZipAllFoldersAndFiles(folderPath, comment, password=null, zipFilename, excludeExtension)</code> produces a valid encrypted <code>.zap</code> file that TOTAL itself opens cleanly. We verified the round-trip end-to-end: extract a report, modify its <code>ReportData.XML</code>, repack, open in TOTAL, all 4,681 field nodes intact, marker we added still present.</li>
+</ul>
+
+<p>The conceptual model: a <code>.zap</code> is a directory tree containing an XML file (<code>ReportData.XML</code>), a metadata file (<code>RepInfo.xml</code>), and a workfile folder with embedded attachments. The XML lists every form field on every page of the report. Setting a field is a matter of finding the right <code>FieldName</code> in the XML and editing its <code>EditContent</code> text node. Clone a template, set the fields, save the file, done. TOTAL opens the result as a normal report.</p>
+
+<p>This approach has none of the drawbacks of the screen-reader path:</p>
+
+<ul>
+  <li><strong>Speed.</strong> Setting all 130 fields takes well under a second.</li>
+  <li><strong>Verifiability.</strong> You can read every field back after writing it. The agent's success criteria are unambiguous.</li>
+  <li><strong>No UI dependency.</strong> No Windows GUI session, no TOTAL running, no modal dialogs. Just file I/O on the user's machine.</li>
+  <li><strong>Robustness across TOTAL versions.</strong> The XML schema for fields has been stable across multiple major versions of TOTAL because TOTAL itself depends on it. UI layouts change; field names don't.</li>
+  <li><strong>No reverse engineering.</strong> Every API call is a documented .NET method on assemblies that ship with a legally-licensed TOTAL installation, callable through normal .NET reflection.</li>
+</ul>
+
+<h3>The compliance posture, in plain language</h3>
+
+<p>This is a back door in the sense that it is not the integration path a la mode advertises. It is not a back door in the sense of breaking, bypassing, or evading any technical protection mechanism. The encryption key stays inside TOTAL's own code. The DLLs being called are on the user's own machine, installed by the user's own legitimately licensed copy of TOTAL. The data being read and written is the user's own appraisal data. No part of this approach copies, redistributes, decompiles, or reverse-engineers TOTAL itself.</p>
+
+<p>It is, in principle, similar to writing an Excel macro: the macro doesn't ship with Excel, but it operates inside a legally-installed Excel using Excel's own object model. Whether a la mode's specific EULA permits this kind of programmatic use of bundled assemblies is a question for an attorney and a la mode's licensing team — we are <em>not</em> publishing a definitive answer on that. We are publishing this white paper because the technical pattern is interesting and educational, and because appraisers who want to pursue serious AI integration should know it exists and what the trade-offs are.</p>
+
+<h2 id="enables">4. What this enabled</h2>
+
+<p>Once read and write at the <code>.zap</code> file layer were both solved, the rest of the Prometheus pipeline became tractable:</p>
+
+<ul>
+  <li><strong>Engagement letter to TOTAL in seconds.</strong> An AI agent parses the engagement letter PDF into a structured object, then maps that object directly to TOTAL field names and writes the report shell. What used to take five to ten minutes of typing happens in under a second.</li>
+  <li><strong>Round-trip verification.</strong> Every write is followed by a read-back. If a field didn't land where it was supposed to, the agent retries or escalates immediately, before the appraiser sees a broken report.</li>
+  <li><strong>Workfile embedding.</strong> Research files, GIS maps, the original engagement letter, and any other supporting documents can be embedded directly into the <code>.zap</code>'s Workfile panel — exactly where TOTAL expects them — so the appraiser doesn't have to leave TOTAL to find context.</li>
+  <li><strong>Pre-inspection report shell.</strong> By the time the appraiser arrives at the property for inspection, the report shell is already prefilled with everything the engagement letter and county records provided. The appraiser focuses on the parts of the work that require human judgment.</li>
+  <li><strong>Pipeline integration.</strong> All of this hooks into an AI agent ecosystem (Claude Code, OpenAI's agent SDKs, OpenClaw, or any framework that supports the Model Context Protocol) through a thin MCP server. The AI agent talks MCP; the MCP server talks to the C# tool; the C# tool talks to TOTAL's DLLs. Each layer is replaceable.</li>
+</ul>
+
+<h2 id="outline">5. High-level architecture outline</h2>
+
+<p>This is an outline, not a build guide. If you want to attempt something like this, you (or your developer) need the following — at minimum:</p>
+
+<ol>
+  <li><strong>A licensed copy of TOTAL installed on the machine where the automation will run.</strong> This is non-negotiable. The whole approach depends on TOTAL's own assemblies being present and operable. There is no "TOTAL-free" version of this.</li>
+  <li><strong>Microsoft .NET Framework 4.8 (x86)</strong> and a working C# compiler (<code>csc.exe</code> ships with .NET).</li>
+  <li><strong>A small C# program (call it <code>zap-tool.exe</code> or whatever you like) that loads the relevant TOTAL assemblies via .NET reflection and exposes CLI commands</strong> such as: <code>extract</code>, <code>repack</code>, <code>list-forms</code>, <code>list-fields</code>, <code>get-field</code>, <code>set-field</code>, <code>set-fields</code>, <code>clone-template</code>, <code>add-workfile</code>. Each command operates on a <code>.zap</code> file path. The implementation involves identifying the right <code>FieldName</code> in the extracted <code>ReportData.XML</code>, modifying the <code>EditContent</code> text node, and using the bundled rezip method to repack.</li>
+  <li><strong>A Python (or any language) wrapper that exposes those CLI commands as an MCP server.</strong> The MCP standard (<a href="https://docs.anthropic.com/en/docs/agents-and-tools/mcp" target="_blank" rel="noopener">Model Context Protocol</a>) defines how AI agents discover and call tools. The wrapper translates "MCP tool call from an AI agent" into "shell out to <code>zap-tool.exe</code> with the right arguments" and returns the result back to the agent as MCP output.</li>
+  <li><strong>An AI agent that can speak MCP.</strong> Claude Code, OpenClaw, custom agents using the Anthropic or OpenAI SDKs — anything that supports MCP. Connect the MCP server, give the agent a task ("here's an engagement letter PDF; build the report shell from our 1004 template"), and watch.</li>
+  <li><strong>A safe operating posture.</strong> Treat the AI agent as a junior assistant: every write is followed by a read-back, every action is logged, and humans verify before any external communication or report delivery. Project Prometheus runs a verification sweep after every build and refuses to mark an order complete if the verification fails.</li>
+</ol>
+
+<h3>Things to map out before writing any code</h3>
+
+<ul>
+  <li><strong>The field-name dictionary.</strong> TOTAL uses internal names like <code>SUBPROPADDRESS</code>, <code>BORROWER1</code>, <code>BCDATA</code>, <code>GSU_AD_ADDR1</code>. Every form has hundreds of them, and they are not documented externally. You discover them by extracting a known report and reading the XML. Plan for several weeks of pinning field bindings across the forms you care about.</li>
+  <li><strong>Cascade behavior.</strong> Some fields propagate automatically through TOTAL's "linked-field" cascade; others do not. The Assignment Tab cascade in particular handles a lot of derivation. Some fields look the same but behave differently. You will run experiments.</li>
+  <li><strong>Template hygiene.</strong> Real-world TOTAL templates often ship with stale data baked in from a prior assignment (Hawaii FEMA zones, Kauai census tracts, an old borrower name). Scrub those before writing your own data, or they will reappear in the final report.</li>
+  <li><strong>Form-specific differences.</strong> 1004, 1004D, 1073, 1025, 2055, GPAR, and the new UAD 3.6 dynamic URAR each have different field schemas. The 2055 doesn't have a sales-comparison grid. The 1004D doesn't have a cost approach. Map per form.</li>
+</ul>
+
+<h2 id="dead-ends">6. What did not work</h2>
+
+<p>For completeness, the paths we tried and rejected:</p>
+
+<table class="tradeoff">
+  <thead>
+    <tr><th>Approach</th><th>Why we tried it</th><th>Why we rejected it</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>alaReport.OpenReport(path)</code></td>
+      <td>Looked like the obvious managed-code entry point — the constructor exists, the method signature is public.</td>
+      <td>Hard-crashes the process on a licensed installation. Requires a full TOTAL runtime environment we could not synthesize headlessly. Weeks of reverse-engineering risk to make work, with no obvious benefit over the simpler ZipReader/ZipAllFoldersAndFiles approach.</td>
+    </tr>
+    <tr>
+      <td>TOTAL Store / VIP COM API (unregistered)</td>
+      <td>This is a la mode's official partner-integration path. If we could use it, we would.</td>
+      <td>Returns "Access denied" without a vendor authorization token. Reversing or fabricating the token would clearly violate the TOS. Individual appraisers cannot obtain a token. This path is appropriate for commercial integration vendors, not appraiser-tooling experimentation.</td>
+    </tr>
+    <tr>
+      <td>In-process injection into <code>WinTOTAL.exe</code></td>
+      <td>Considered briefly as a way to get inside the running process.</td>
+      <td>Rejected on principle — it would constitute reverse engineering, would violate any reasonable interpretation of the EULA, and is fragile across TOTAL versions.</td>
+    </tr>
+    <tr>
+      <td>UI automation via <code>pywinauto</code> / <code>pyautogui</code></td>
+      <td>The straightforward approach. Doesn't require any insight into TOTAL's internals.</td>
+      <td>Documented above (Path 1). Useful as a fallback for genuinely UI-only flows; not viable as the primary data-write mechanism.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="takeaway">7. Take-aways for the appraiser community</h2>
+
+<ul>
+  <li><strong>Programmatic TOTAL integration is possible without a vendor partnership</strong> if you have a legally-licensed copy of TOTAL and you accept the constraints described above (you do the engineering, you stay compliant with the EULA, you accept the risk).</li>
+  <li><strong>The official path — TOTAL Store / VIP API — exists and works.</strong> Commercial vendors who want a long-term integration should pursue it. It is the right path for a software business.</li>
+  <li><strong>For appraisers experimenting with AI to streamline their own practice</strong>, the direct-<code>.zap</code> approach is what made Project Prometheus practical. We're documenting it here so the next person doesn't have to rediscover it from scratch.</li>
+  <li><strong>UAD 3.6 (mandate November 2, 2026) will reshape this.</strong> The dynamic URAR format and the new MISMO 3.6 standard change the file shape and the field schema. Anyone planning serious work here should track the UAD 3.6 transition closely and budget for a rebuild.</li>
+  <li><strong>None of this replaces the appraiser.</strong> Every concept in this paper is plumbing — fast plumbing — that connects an appraiser's judgment to the report. The appraiser is still the appraiser. AI is the assistant.</li>
+</ul>
+
+<div class="disclaimer">
+  <h3>Repeat of the disclaimer</h3>
+  <ul>
+    <li>This document describes a pattern, not a product. There is no software to download, no installer, no compiled binaries, no source code, no tech support.</li>
+    <li>If you attempt to build something based on what's described here, you do so at your own risk. The Appraiser Coach, Dustin Harris, Doug, and anyone else mentioned in this document accept no responsibility for the outcome.</li>
+    <li>You remain solely responsible for compliance with every applicable software license, including a la mode's TOTAL EULA, .NET licensing, Python licensing, and any AI provider's terms of service.</li>
+    <li>Nothing in this document is legal advice. Consult an attorney about your own situation.</li>
+    <li>If your intended use is commercial, the recommended path is a la mode's TOTAL Store partner program.</li>
+  </ul>
+</div>
+
+</div>
+
+</main>
+
+<footer>
+  <p class="cta-line">Published by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a> as part of Project Prometheus. For coaching, training, and the community building these workflows: <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">theappraisercoach.com →</a></p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Educational reference. No source code, no compiled binaries, no warranty, no tech support. View this site's source on <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">GitHub</a>.</p>
+</footer>
+
+</body>
+</html>

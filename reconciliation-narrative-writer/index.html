@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reconciliation Narrative Writer — by The Appraiser Coach</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg: #fafafa;
+    --accent: #2c5aa0;
+    --accent-bg: #f0f5ff;
+    --brand: #5a3a2a;
+    --brand-bg: #f5efe7;
+    --good: #2e7d32;
+    --warn: #c62828;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    margin: 0;
+    line-height: 1.5;
+  }
+  header {
+    background: white;
+    border-bottom: 1px solid var(--line);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  header img.logo {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: 6px;
+  }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p  { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link {
+    color: var(--accent);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  header a.home-link:hover { text-decoration: underline; }
+  main { max-width: 920px; margin: 0 auto; padding: 1.5rem; }
+  section {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  section h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .step-num {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    text-align: center;
+    line-height: 1.5rem;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+  }
+  .copy-zone {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1.25rem;
+  }
+  .copy-zone h2 { color: var(--accent); margin-top: 0; }
+  button.copy-btn {
+    background: var(--accent);
+    color: white;
+    border: 0;
+    padding: 0.85rem 1.75rem;
+    border-radius: 6px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button.copy-btn:hover { background: #1d4080; }
+  button.copy-btn.copied { background: var(--good); }
+  .copy-status {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--good);
+    min-height: 1.25rem;
+  }
+  ol.steps { padding-left: 1.5rem; line-height: 1.7; }
+  ol.steps li { margin-bottom: 0.4rem; }
+  ol.steps strong { color: var(--ink); }
+  ul.bullets { padding-left: 1.25rem; line-height: 1.65; }
+  ul.bullets li { margin-bottom: 0.3rem; }
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .status-grid div {
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: #fcfcfc;
+    border-left: 3px solid var(--accent);
+  }
+  .status-grid div.closed { border-left-color: var(--good); }
+  .status-grid div.pending { border-left-color: #f57f17; }
+  .status-grid div.active { border-left-color: var(--warn); }
+  .ai-pick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+  .ai-card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    background: #fcfcfc;
+  }
+  .ai-card h3 { margin: 0 0 0.25rem; font-size: 0.95rem; color: var(--accent); }
+  .ai-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  details.prompt-view {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    background: #fcfcfc;
+  }
+  details.prompt-view summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.25rem 0;
+  }
+  pre.prompt {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    max-height: 24rem;
+    overflow: auto;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  pre.example {
+    background: #fcfcfc;
+    border: 1px solid var(--line);
+    padding: 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  .warn-callout {
+    background: #fff3e0;
+    border-left: 3px solid #e65100;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.9rem;
+  }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 2rem 1rem;
+  }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>Reconciliation Narrative Writer</h1>
+    <p>Drop in a completed report PDF — or just a screenshot of the adjusted grid — and get a publication-ready reconciliation with weight suggestions and reasoning.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+
+<section>
+  <h2><span class="step-num">1</span>What this is</h2>
+  <p>A <strong>vision-required prompt template</strong> that reads your adjusted sales grid (from a PDF or a screenshot), classifies each comparable correctly, suggests reconciliation weights with reasoning, and drafts the reconciliation narrative.</p>
+  <p>The critical move it gets right that many appraisers + reviewers get wrong: <strong>only closed sales get reconciliation weight.</strong> Pendings and active listings support the value (market direction, upper bound) but don't anchor the reconciled value. Weights sum to 100% across closed sales only.</p>
+  <div class="status-grid">
+    <div class="closed"><strong>🟢 Closed sales</strong><br><small>Get weighted. Weights sum to 100%.</small></div>
+    <div class="pending"><strong>🟡 Pending</strong><br><small>Support market direction. NOT weighted.</small></div>
+    <div class="active"><strong>🔴 Active listings</strong><br><small>Support upper bound. NOT weighted.</small></div>
+  </div>
+  <p style="margin-top:1rem;">The AI reads the grid carefully — comp status indicators (s = sold/closed, p = pending, list dates without close dates = active), date formats, contract vs settlement dates — and tells you what it found before suggesting weights, so you can verify it read the grid correctly.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">2</span>What you give it</h2>
+  <p><strong>Required:</strong> one of these, attached to the chat:</p>
+  <ul class="bullets">
+    <li>A PDF of the completed appraisal (the AI finds the sales grid inside)</li>
+    <li>OR a screenshot / image of just the sales grid (the AI reads it as-is)</li>
+  </ul>
+  <p style="margin-top:0.75rem;"><strong>Optional</strong> — type these in chat under the prompt if you want them reflected:</p>
+  <ul class="bullets">
+    <li>Indicated Value by Cost Approach (or "not developed" / "not required for VA")</li>
+    <li>Indicated Value by Income Approach (or "not developed")</li>
+    <li>Your own weight preferences (e.g., "I'm leaning 35% on Comp 1, 35% on Comp 3, 30% on Comp 2 — please draft the narrative around that")</li>
+    <li>Type of value: as-is / subject-to-completion / subject-to-repairs</li>
+    <li>Final reconciled value if you've already decided it (the AI will draft around your number)</li>
+  </ul>
+  <div class="warn-callout">
+    <strong>The AI's suggested weights are starting points.</strong> You — the appraiser — own the final weighting decision. The tool's job is to draft defensible reasoning and write the narrative. Adjust weights and re-prompt if you disagree.
+  </div>
+</section>
+
+<div class="copy-zone">
+  <h2>Copy the prompt</h2>
+  <p style="margin-bottom:1rem;">Click below, paste into Claude.ai or ChatGPT, attach the PDF or grid screenshot, hit send.</p>
+  <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">📋 Copy prompt to clipboard</button>
+  <div class="copy-status" id="copy-status"></div>
+</div>
+
+<section>
+  <h2><span class="step-num">3</span>How to use it</h2>
+  <ol class="steps">
+    <li>Click <strong>Copy prompt to clipboard</strong> above.</li>
+    <li>Open <strong>Claude.ai</strong> or <strong>ChatGPT</strong>.</li>
+    <li>Paste the prompt.</li>
+    <li><strong>Attach a PDF of the report</strong> (best — the AI sees the full context) <strong>OR paste a screenshot of just the grid</strong> (faster — works if you don't want to share the full report).</li>
+    <li>Optionally type your other inputs below the prompt (Cost/Income values, your preferred weights, type of value, etc.).</li>
+    <li>Send. Wait 30–90 seconds.</li>
+    <li>Verify the comp-status classifications. Adjust weights if needed. Paste the narrative into TOTAL.</li>
+  </ol>
+</section>
+
+<section>
+  <h2><span class="step-num">4</span>Which AI to use</h2>
+  <p>Vision-required for this one — the AI needs to read the grid from a PDF or image.</p>
+  <div class="ai-pick">
+    <div class="ai-card">
+      <h3>Claude.ai (Pro plan)</h3>
+      <p>Recommended. <strong>Opus</strong> for grids with lots of comps or unusual layouts; <strong>Sonnet</strong> for routine.</p>
+    </div>
+    <div class="ai-card">
+      <h3>ChatGPT (Plus plan)</h3>
+      <p>Also works with the current top vision model.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="step-num">5</span>What the output looks like</h2>
+  <pre class="example">## Grid Read
+
+Comps identified:
+- **Comp 1** — 47 Lilac Dr — CLOSED 09/2025 — adjusted sale price $494,100 (gross adj 17.3%)
+- **Comp 2** — 246 Ponderosa Dr — CLOSED 04/2025 — adjusted sale price $529,500 (gross adj 3.7%)
+- **Comp 3** — 585 Cedar Creek Dr — CLOSED 09/2025 — adjusted sale price $502,245 (gross adj 26.1%)
+- **Comp 4** — 79 Bearlake Dr — CLOSED 08/2025 — adjusted sale price $540,250 (gross adj 19.9%)
+- **Comp 5** — 170 Ponderosa Dr — ACTIVE LISTING (list date 04/2026) — adjusted list price $535,900 (gross adj 22.1%)
+
+Range of adjusted closed-sale values: $494,100 – $540,250
+Active listing (upper-bound reference): $535,900
+
+---
+
+## Suggested Weights
+
+Weights total 100% across closed sales only (Comp 5 is an active listing — no weight).
+
+- **Comp 2 — 35%** — Closest match to subject by GLA, basement configuration, and quality rating. Lowest gross adjustment (3.7%) of any comp; highest reliability. Recent sale (04/2025) within the relevant window.
+- **Comp 1 — 30%** — Same neighborhood, similar age, comparable basement size. Moderate gross adjustment (17.3%) primarily from quality. Sale date 09/2025 — most recent closed sale.
+- **Comp 4 — 20%** — Similar quality and condition; larger lot adjusted appropriately. Sale date 08/2025. Bracketing-supportive on the higher end of the range.
+- **Comp 3 — 15%** — Largest gross adjustment (26.1%) reduces reliability; useful for bracketing the lower end but receives the least weight.
+
+Comp 5 (active listing) is excluded from weighting per Fannie Mae and standard reconciliation practice. It is referenced in the narrative as support for the upper bound of value.
+
+---
+
+## Reconciliation Narrative
+
+The Sales Comparison Approach was the primary approach in the development of this appraisal. The Cost Approach was developed and indicates a value of $514,934 [or PLACEHOLDER if not provided]; it was given minimal weight due to inherent limitations in estimating depreciation and limited applicability to the subject's market. The Income Approach was not developed due to a lack of competing rental properties in the immediate market area.
+
+Within the Sales Comparison Approach, the appraiser relied on four closed sales (Comparables 1–4) and considered one active listing (Comparable 5) for support of the upper bound. The four closed sales bracket the final value opinion both unadjusted and after adjustment. The adjusted sale prices range from $494,100 to $540,250.
+
+Greatest weight was given to Comparable 2 (35%) as the most similar to the subject in size, basement, and quality, and as the closed sale requiring the smallest gross adjustment (3.7%). Comparable 1 received 30% based on similar physical characteristics and the most recent sale date among the closed comparables. Comparable 4 received 20% as a similar-quality property supporting the upper bracketing. Comparable 3 received 15%; the larger gross adjustment (26.1%) reduces its reliability, though it usefully brackets the lower end of the range. The active listing (Comparable 5) was reviewed for support but was not weighted in the final value opinion, consistent with standard reconciliation practice and the appraiser's reliance on closed-sale data.
+
+The indicated value by the Sales Comparison Approach is **$513,000** [or PLACEHOLDER for the appraiser's final value].
+
+The final reconciled value reflects the Sales Comparison Approach's primary weight with confirming support from the Cost Approach. The Income Approach was not relied upon. The value is presented on an "as-is" basis as of the effective date of this appraisal.</pre>
+  <p style="color:var(--muted);font-size:0.9rem;">Any value you didn't provide (Cost Approach indicated value, final value, etc.) appears as <code>[PLACEHOLDER]</code> — fill in before pasting into TOTAL.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">6</span>Read the prompt before you copy (optional)</h2>
+  <details class="prompt-view">
+    <summary>Show full prompt</summary>
+    <pre class="prompt" id="prompt-display"></pre>
+  </details>
+</section>
+
+</main>
+
+<footer>
+  <p class="cta-line">Built by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a> — free for any appraiser to use. For more tools, coaching, and the community building this with us: <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">theappraisercoach.com →</a></p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Open source — <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">view source on GitHub</a>. References USPAP Standards Rule 1-6 and 2-2(a)(viii), Fannie Mae Selling Guide B4-1.3.10 reconciliation guidance, and standard reconciliation practice. AI output is a drafting aid — the appraiser is responsible for the final weighting and reconciled value.</p>
+</footer>
+
+<script type="text/plain" id="rnw-prompt-source">
+# Role
+
+You are a residential appraisal reconciliation drafter. The user has attached EITHER a completed appraisal PDF OR a screenshot/image of just the adjusted sales grid. Your job: read the grid, classify each comparable correctly, suggest reconciliation weights, and draft the reconciliation narrative for the report.
+
+Begin immediately. Do not ask clarifying questions. Where you need information the user hasn't given (final reconciled value, Cost Approach value, etc.), use `[PLACEHOLDER: ...]` and continue.
+
+# Step 1 — Read the grid carefully
+
+For each comparable in the grid, identify:
+
+- **Address**
+- **Status** — Closed sale, Pending, or Active listing
+- **Sale / Contract / List date** in the format shown on the grid
+- **Sale price** (or list price for actives, contract price for pendings)
+- **Net adjustment $ and %**
+- **Gross adjustment $ and %**
+- **Adjusted sale price** (this exists only for closed sales — actives/pendings should not have a finalized adjusted price)
+
+## Status classification rules — read these carefully
+
+The grid uses several conventions to indicate comp status:
+
+- **Closed sale (settled):** Has a closing/settlement date. UAD shorthand often shows two dates like `s12/24;c09/24` (settled / contracted) or just a single sale date. May also be labeled "ArmLth," "Sale," "Closed," or "Settled." Has a final sale price. **These ARE weighted in reconciliation.**
+- **Pending sale (under contract, not closed):** Shows a contract date but no closing/settlement date. Often labeled "Pen," "Pending," "P," or `c<date>` with no `s<date>`. **NOT weighted in reconciliation** — supports market direction only.
+- **Active listing (for sale, no contract):** Shows a list date only. Often labeled "Active," "Listing," "L," `l<date>` (lowercase L), or "Active Listing." Price shown is the list price. **NOT weighted in reconciliation** — supports the law of substitution and the upper bound of value.
+
+Active and pending comps are typically placed at the END of the comp lineup (e.g., comps 5, 6) — but not always. Don't assume status from position alone; read the data.
+
+If you cannot determine status from the grid alone, write `[PLACEHOLDER: unable to determine status of Comp N — verify]` and proceed.
+
+# Step 2 — Output a "Grid Read" summary
+
+Before suggesting weights, list every comparable with the status and key data you identified. This lets the appraiser verify you read the grid correctly. Format:
+
+```
+## Grid Read
+
+Comps identified:
+- **Comp N** — <address> — <STATUS> <date> — adjusted sale price $<X> (gross adj <Y>%)
+- ...
+
+Range of adjusted closed-sale values: $<low> – $<high>
+Active / pending values (for support, not weighted): $<list/contract price>
+```
+
+# Step 3 — Suggest weights
+
+Weights MUST sum to 100% **across closed sales only.** Active and pending comps receive 0% weight. If you assign any weight to a non-closed comp, the reconciliation is wrong.
+
+For each closed comp, give a weight and a brief reason (1-2 sentences). Weighting reasoning typically considers:
+
+- **Similarity to the subject** — GLA, basement, quality, condition, age — most similar = highest weight
+- **Gross adjustment %** — lower gross % = more reliable = higher weight
+- **Proximity** — closer to subject = generally better
+- **Recency** — most recent closed sale = better data
+- **Bracketing support** — at least one comp above and one below the subject's value
+- **Data source reliability** — MLS-verified > public-records-only
+
+If the user has provided their own preferred weights, USE those and explain the reasoning behind them rather than overriding.
+
+Format:
+
+```
+## Suggested Weights
+
+Weights total 100% across closed sales only. (Active/pending comps are not weighted.)
+
+- **Comp N — X%** — <reasoning>
+- ...
+```
+
+End the weights section with a one-line note explaining why active/pending comps were excluded from weighting (they are referenced as support, not as the value anchor).
+
+# Step 4 — Draft the reconciliation narrative
+
+Three-paragraph minimum, in this structure:
+
+**Paragraph 1 — Approach reconciliation.** State which approach is primary (Sales Comparison for residential). State whether the Cost Approach and Income Approach were developed and what weight, if any, they received. If a value was provided for Cost Approach, include it. If not, use `[PLACEHOLDER: Cost Approach indicated value]`. The Cost Approach is NOT required for VA — if the report is VA and the Cost Approach was not developed, state that explicitly. The Income Approach is typically not developed for SFR residential — note absence of competing rentals when applicable.
+
+**Paragraph 2 — Sales Comparison reconciliation within.** State the number of closed sales relied upon. State the adjusted sale price range. Address bracketing. Explain the weighting of each closed comp using the reasoning from Step 3. Reference active/pending comps explicitly as support, not as weighted contributors.
+
+**Paragraph 3 — Final value and type of value.** State the indicated value by Sales Comparison (or `[PLACEHOLDER]` if not provided). State the final reconciled value if provided (or `[PLACEHOLDER]`). State the type of value: "as-is" / "subject-to-completion" / "subject-to-repairs" — use the user's input if provided, otherwise default to "as-is" and tag the appraiser to verify.
+
+# Hard rules
+
+- **NEVER weight an active or pending comp.** They support market direction or upper bound. They are not weighted in reconciliation. This is the most common reviewer kickback on reconciliations — get it right.
+- **Weights MUST sum to exactly 100%** across closed sales.
+- **Never invent specific values.** If the user didn't provide a final reconciled value, use `[PLACEHOLDER]`. Don't pick a number for them.
+- **No marketing language.** No "desirable," "prime," "premier," "luxurious," "outstanding," etc. Third-person, factual, report voice only.
+- **Cite the standards by name only** if you reference USPAP, Fannie Mae Selling Guide, etc. Don't cite specific section numbers unless you are confident they are current and correct.
+- **Address bracketing explicitly** — Fannie Mae expects to see that the comps bracket the final value. If they don't, flag it as a concern in the Weights section rather than glossing over it.
+
+# Output format
+
+Return exactly three sections in this order, separated by `---` horizontal rules:
+
+```
+## Grid Read
+[bullet list]
+
+---
+
+## Suggested Weights
+[bullet list + note]
+
+---
+
+## Reconciliation Narrative
+[3 paragraphs of report-ready prose]
+```
+
+No introduction, no commentary, no questions, no summary. Three sections only.
+
+# What NOT to do
+
+- Do not ask the user for input before producing output. Use placeholders.
+- Do not include disclaimers like "I am not an appraiser."
+- Do not produce a summary outside the three sections.
+- Do not weight active or pending comps under any circumstances.
+- Do not invent reconciled values, Cost Approach values, Income Approach values, or final values.
+- Do not flag concerns as if you were the QC reviewer — this is a drafter, not a reviewer. If you notice something genuinely wrong (e.g., a closed comp shows weight but should be excluded for some reason), surface it in the Suggested Weights reasoning, not as a separate "concerns" list.
+</script>
+
+<script>
+function getPromptText() {
+  return document.getElementById("rnw-prompt-source").textContent.trim();
+}
+
+document.getElementById("prompt-display").textContent = getPromptText();
+
+async function copyPrompt() {
+  const text = getPromptText();
+  const btn = document.getElementById("copy-btn");
+  const status = document.getElementById("copy-status");
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "✓ Copied!";
+    btn.classList.add("copied");
+    status.textContent = `${text.length.toLocaleString()} characters copied. Paste into Claude.ai or ChatGPT, attach the PDF or grid screenshot, send.`;
+    setTimeout(() => {
+      btn.textContent = "📋 Copy prompt to clipboard";
+      btn.classList.remove("copied");
+    }, 4000);
+  } catch (err) {
+    status.textContent = "Couldn't auto-copy. Open the 'Show full prompt' section below, select all (Ctrl/Cmd+A), and copy manually.";
+  }
+}
+</script>
+
+</body>
+</html>

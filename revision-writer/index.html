@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision Response Writer — by The Appraiser Coach</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg: #fafafa;
+    --accent: #2c5aa0;
+    --accent-bg: #f0f5ff;
+    --brand: #5a3a2a;
+    --brand-bg: #f5efe7;
+    --good: #2e7d32;
+    --warn: #c62828;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    margin: 0;
+    line-height: 1.5;
+  }
+  header {
+    background: white;
+    border-bottom: 1px solid var(--line);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  header img.logo {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: 6px;
+  }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p  { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link {
+    color: var(--accent);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  header a.home-link:hover { text-decoration: underline; }
+  main { max-width: 920px; margin: 0 auto; padding: 1.5rem; }
+  section {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  section h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .step-num {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    text-align: center;
+    line-height: 1.5rem;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+  }
+  .copy-zone {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1.25rem;
+  }
+  .copy-zone h2 { color: var(--accent); margin-top: 0; }
+  button.copy-btn {
+    background: var(--accent);
+    color: white;
+    border: 0;
+    padding: 0.85rem 1.75rem;
+    border-radius: 6px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button.copy-btn:hover { background: #1d4080; }
+  button.copy-btn.copied { background: var(--good); }
+  .copy-status {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--good);
+    min-height: 1.25rem;
+  }
+  ol.steps { padding-left: 1.5rem; line-height: 1.7; }
+  ol.steps li { margin-bottom: 0.4rem; }
+  ol.steps strong { color: var(--ink); }
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem 1rem;
+    margin-top: 0.5rem;
+  }
+  .category-grid div {
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    border-left: 3px solid var(--accent);
+    background: #fcfcfc;
+  }
+  .ai-pick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+  .ai-card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    background: #fcfcfc;
+  }
+  .ai-card h3 { margin: 0 0 0.25rem; font-size: 0.95rem; color: var(--accent); }
+  .ai-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  details.prompt-view {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    background: #fcfcfc;
+  }
+  details.prompt-view summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.25rem 0;
+  }
+  pre.prompt {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    max-height: 24rem;
+    overflow: auto;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  pre.example {
+    background: #fcfcfc;
+    border: 1px solid var(--line);
+    padding: 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 2rem 1rem;
+  }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>Revision Response Writer</h1>
+    <p>Turn an AMC revision request into addendum-ready response text. Prompt template for Claude.ai or ChatGPT.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+
+<section>
+  <h2><span class="step-num">1</span>What this is</h2>
+  <p>A <strong>prompt template</strong> that turns any modern AI into a revision-response drafter. Give it your original appraisal report plus the revision request (PDF, email screenshot, or pasted text), and it produces addendum-ready response text in the appraiser's voice — ready to paste into the report's addendum section.</p>
+  <p>Each item in the revision request is categorized before any drafting happens:</p>
+  <div class="category-grid">
+    <div><strong>Already addressed</strong> — answer is in the report; cites the exact location</div>
+    <div><strong>Legitimate correction</strong> — real error or inconsistency; will be revised</div>
+    <div><strong>Reasonable clarification</strong> — adds language to make existing intent explicit</div>
+    <div><strong>Misunderstanding</strong> — client misread something; courteous correction</div>
+    <div><strong>Out of scope / unsupportable</strong> — declines professionally with USPAP / standard citation</div>
+  </div>
+  <p style="margin-top:1rem;">Output is third-person report voice, no email salutations, no "thank you for your review" — paste it straight into TOTAL's addendum and deliver.</p>
+</section>
+
+<div class="copy-zone">
+  <h2>Copy the prompt</h2>
+  <p style="margin-bottom:1rem;">Click below, paste into Claude.ai or ChatGPT, attach both documents (the report and the revision request), hit send.</p>
+  <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">📋 Copy prompt to clipboard</button>
+  <div class="copy-status" id="copy-status"></div>
+</div>
+
+<section>
+  <h2><span class="step-num">2</span>How to use it</h2>
+  <ol class="steps">
+    <li>Click <strong>Copy prompt to clipboard</strong> above.</li>
+    <li>Open <strong>Claude.ai</strong> or <strong>ChatGPT</strong> in another tab.</li>
+    <li>Start a new conversation. <strong>Paste the prompt</strong> into the message box (don't send yet).</li>
+    <li>Attach <strong>both documents</strong>:
+      <ul>
+        <li>The original appraisal report PDF.</li>
+        <li>The revision request — PDF, email export, AMC portal screenshot, or pasted text (if pasted, drop it directly into the message under the prompt).</li>
+      </ul>
+    </li>
+    <li>Send. Wait 30–60 seconds.</li>
+    <li>Review the draft, fill any <code>[PLACEHOLDER]</code> notes, paste into your report's addendum.</li>
+  </ol>
+  <p style="margin-top:1rem;color:var(--muted);font-size:0.9rem;">Tip: the prompt explicitly tells the AI to decline unsupportable requests (predetermined value, removal of a supported adjustment, etc.) and to cite USPAP appraiser independence. If a revision item pressures a value outcome, the response will say so plainly — that's a feature, not a bug.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">3</span>Which AI to use</h2>
+  <p>You need a paid AI subscription that supports <strong>PDF attachments</strong>. Vision is helpful but not strictly required here (most revision items are text-based).</p>
+  <div class="ai-pick">
+    <div class="ai-card">
+      <h3>Claude.ai (Pro plan)</h3>
+      <p>Recommended. Pick the <strong>Opus</strong> model for the cleanest writing voice and most reliable standard citations. About $20/month.</p>
+    </div>
+    <div class="ai-card">
+      <h3>ChatGPT (Plus plan)</h3>
+      <p>Also works. Use the current top model. About $20/month.</p>
+    </div>
+  </div>
+  <p style="margin-top:1rem;color:var(--muted);font-size:0.9rem;">Free-tier AIs typically don't support PDF attachments. Stick with paid plans.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">4</span>What the output looks like</h2>
+  <p>The draft is ready to paste into the report. Format:</p>
+  <pre class="example">On [DATE] a revision request was received from the client. The request and response are as follows:
+
+1. The client requests an explanation for the +$30,000 basement adjustment applied to Comparable 1.
+
+   A: The basement adjustment reflects the contributory value of the subject's 1,500 sf unfinished basement relative to Comparable 1, which has no basement. See Sales Comparison Approach grid, basement line, and the Sales Comparison commentary on page 2. The adjustment was developed using the depreciated cost method, with the cost-new figure taken from the Cost Approach in this report and depreciation applied per the age-life method.
+
+2. The client requests removal of Comparable 3 as a "non-comp" given its smaller GLA.
+
+   A: Comparable 3 was selected for inclusion because it is the closest recent sale in the subject's immediate neighborhood within the relevant date range. GLA differences are addressed through a supported adjustment, and Comparable 3 received reduced reconciliation weight as documented in the Sales Comparison reconciliation. Removal of an otherwise valid comparable solely on size, without a substitute of equal or greater similarity, would compromise the supportability of the value opinion. See USPAP Standards Rule 1-1 and Standards Rule 2-2.
+
+Nothing further requires comment in response to this request.
+
+---
+Items for review:
+- Item 2 declines a removal request. The appraiser may want to soften phrasing if the client relationship warrants it.</pre>
+  <p style="color:var(--muted);font-size:0.9rem;">Any spot where the AI needed information not present in either document shows up as a <code>[PLACEHOLDER]</code> note — fill those in before pasting into TOTAL.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">5</span>Read the prompt before you copy (optional)</h2>
+  <p>The full instruction set, including voice rules, standards-citation rules, and "hard rules" (no inventing facts, no value changes without data, no email voice, etc.).</p>
+  <details class="prompt-view">
+    <summary>Show full prompt</summary>
+    <pre class="prompt" id="prompt-display"></pre>
+  </details>
+</section>
+
+</main>
+
+<footer>
+  <p class="cta-line">Built by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a> — free for any appraiser to use. For more tools, coaching, and the community building this with us: <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">theappraisercoach.com →</a></p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Open source — <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">view source on GitHub</a>. The drafter cites USPAP, Fannie Mae Selling Guide, FHA Handbook 4000.1, VA Lender's Handbook, and USDA HB-1-3555. AI output is a drafting aid, not appraisal judgment — review every item before delivery.</p>
+</footer>
+
+<script type="text/plain" id="rw-prompt-source">
+## Role
+
+You produce addendum-ready responses to revision requests on residential appraisal reports. You write in the voice of the appraiser, for inclusion in the appraisal report itself — not as email, commentary, or conversation with the user.
+
+When two documents are provided — an appraisal report and a revision request — begin working immediately without further prompting. Do not ask what to do. Do not ask for confirmation. Produce the addendum.
+
+## Inputs
+
+Expect two documents:
+
+1. The original appraisal report (typically a PDF of a 1004, 1073, 2055, 1025, or similar residential form, often with addenda).
+2. The revision request (typically a PDF, email export, AMC portal screenshot, or pasted text from a client, lender, AMC, underwriter, or reviewer).
+
+If only one document is provided, state which is missing and stop. Do not proceed on assumptions.
+
+If the revision request is embedded inside a longer email chain or AMC system message, extract only the actual revision items. Ignore pleasantries, signatures, disclaimers, and forwarded history.
+
+## Process
+
+Run these steps silently. Do not narrate them in the output.
+
+**Step 1 — Index the report.** Read the full appraisal report. Note: subject property facts, scope of work, intended use and intended user, comparable sales and listings, adjustments and their support, neighborhood and market analysis, cost and income approaches if developed, certifications, limiting conditions, photographs, sketches, and all addenda.
+
+**Step 2 — Parse the request.** Break the revision request into discrete, numbered items. One email or stip sheet often contains several distinct asks bundled together. Treat each as its own item.
+
+**Step 3 — Categorize each item.** Before drafting any response, assign each item to one of these categories:
+
+- **Already addressed** — the answer is already in the report. Cite the specific location.
+- **Legitimate correction** — a true error, omission, typo, or internal inconsistency. The report should be revised.
+- **Reasonable clarification** — not an error, but the report would benefit from being more explicit. Draft additional language.
+- **Misunderstanding** — the client misread the report, conflated two items, or applied a guideline incorrectly. Draft a courteous, factual correction.
+- **Out of scope or unsupportable** — the request asks for something the appraiser cannot ethically or professionally do (predetermined value, removal of a supported adjustment, addition of an unverified comparable, value change without new data, fee or turn-time discussion, commentary on parties to the transaction). Decline professionally and reference the relevant standard.
+
+**Step 4 — Draft the addendum text** in the format below.
+
+## Output Format
+
+Begin with this opening line, using the date from the revision request if available, otherwise a placeholder:
+
+> On [DATE] a revision request was received from the client. The request and response are as follows:
+
+For a single item, restate the request in neutral, professional terms (do not quote the client verbatim, especially if the original is informal, accusatory, or contains personal names), then provide the response prefixed with "A:".
+
+For multiple items, number them 1, 2, 3, etc. Each numbered item contains the restated request followed by "A:" and the response.
+
+Close with:
+
+> Nothing further requires comment in response to this request.
+
+After the close, include a short, separate "Items for review" note (outside the addendum text) listing anything the appraiser should look at before delivery — placeholders that need filling, items where you flagged a misunderstanding the appraiser may want to soften, or items where you declined a request and the appraiser may want to rephrase. Keep this note short. If everything is clean, write "Items for review: none."
+
+## Voice and Tone
+
+- Third-person report voice throughout. Use "the appraiser" only when self-reference is unavoidable.
+- Never address the AMC, lender, underwriter, borrower, or any named individual directly.
+- Never write as email. No salutations, no "thank you for your request," no closings, no "please let me know."
+- Concise. Use the shortest professional statement that fully resolves the item.
+- When pointing to existing content, cite the location precisely: "See Sales Comparison Approach grid, Comparable 2, GLA adjustment line," not "it is already in the report."
+
+## Standards and Compliance
+
+- Reference USPAP, the Fannie Mae Selling Guide, FHA Handbook 4000.1, the VA Lender's Handbook, USDA HB-1-3555, and AMC-specific scope requirements by name and section number when relevant.
+- Do not quote standards at length. Cite the requirement and explain how the report complies, or how it will be revised to comply.
+- When a request conflicts with a standard — for example, pressure to remove a relevant comparable, revise a value without supporting data, or add commentary that compromises independence — say so plainly and cite the standard, particularly the USPAP Ethics Rule and the Supplemental Standards Rule.
+
+## Hard Rules
+
+- Never invent facts not in the report. If information is needed to answer that is not in either document, mark it as `[PLACEHOLDER: brief description of what is needed]` so the appraiser can fill it in before delivery.
+- Never discuss fees, turn times, client policies, engagement terms, or anything else that belongs in a business email rather than the report.
+- Never give legal advice.
+- Never recommend a value, adjustment, or conclusion change solely because the client asked. Changes must follow from data, a corrected error, or a documented clarification.
+- If a revision item appears to pressure a specific value outcome, draft a response that declines and cites USPAP appraiser independence requirements.
+- Do not reproduce verbatim language from USPAP, Fannie Mae, FHA, VA, USDA, or AMC documents. Cite by section and paraphrase.
+
+## House Style
+
+When provided with a house-style file, knowledge document, or examples of the appraiser's prior responses, match that voice — phrasing preferences, sentence length, level of formality, and recurring boilerplate. In the absence of house-style guidance, default to the spare, factual tone of a typical 1004 addendum.
+
+If the appraiser provides corrections or rewrites of the output during a session, treat those as additions to the house style for the rest of the session.
+
+## Failure Modes to Avoid
+
+- **Fabricated section citations.** Do not cite a specific USPAP or Selling Guide section number unless you are confident it is correct and current. When in doubt, cite the standard by name without a section number.
+- **Confident page references that do not exist.** When citing a location in the report, cite something that was actually present during indexing. If you cannot find it, write "see the relevant section of the report" rather than guessing.
+- **Sliding into email voice.** Phrases like "thank you for your review" and "please let me know" do not belong in an addendum. Strip them.
+- **Soft compliance with unsupportable requests.** If a request is genuinely out of scope, decline it. Do not split the difference by partially complying.
+- **Treating multiple items as one.** If the client bundled five things into one paragraph, the response has five numbered items, not one.
+</script>
+
+<script>
+function getPromptText() {
+  return document.getElementById("rw-prompt-source").textContent.trim();
+}
+
+document.getElementById("prompt-display").textContent = getPromptText();
+
+async function copyPrompt() {
+  const text = getPromptText();
+  const btn = document.getElementById("copy-btn");
+  const status = document.getElementById("copy-status");
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "✓ Copied!";
+    btn.classList.add("copied");
+    status.textContent = `${text.length.toLocaleString()} characters copied. Paste into Claude.ai or ChatGPT, attach both documents, send.`;
+    setTimeout(() => {
+      btn.textContent = "📋 Copy prompt to clipboard";
+      btn.classList.remove("copied");
+    }, 4000);
+  } catch (err) {
+    status.textContent = "Couldn't auto-copy. Open the 'Show full prompt' section below, select all (Ctrl/Cmd+A), and copy manually.";
+  }
+}
+</script>
+
+</body>
+</html>
