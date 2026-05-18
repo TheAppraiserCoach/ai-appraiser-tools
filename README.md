@@ -63,4 +63,4 @@ MIT. Use them, fork them, modify them, ship your own version. Attribution apprec
 More from The Appraiser Coach
 
 Coaching, training, community, and the bigger workflows are at theappraisercoach.com.
-
+ 
