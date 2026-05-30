@@ -17,6 +17,10 @@ Every tool runs entirely in the browser — no signup, no data leaves the user's
 | [Reconciliation Narrative Writer (prompt template, vision-required)](./reconciliation-narrative-writer/) | Drop in a completed report PDF or grid screenshot. Reads the adjusted grid, classifies each comp (closed / pending / active), suggests reconciliation weights summing to 100% across closed sales only, and drafts the three-paragraph reconciliation narrative. Requires a paid AI subscription with a vision-capable model. |
 | [Interactive Appraisal Report](./interactive-appraisal-report/) | A password-protected, interactive website that replaces the static PDF for private appraisal clients. Includes 15 clickable sections — value summary, neighborhood map, market analysis charts, sales comparison grid, cost approach visualization, photo gallery, building sketch, FAQ, and more. Hosted for 90 days with a built-in Save PDF button. Branded to the appraiser.  |
 | [Comp Verification (prompt template)](./comp-verification/) | Drafts verification emails to listing agents — one per agent, combining their comps. Asks about concessions, buyer-agent compensation, multiple offers, related parties, and close price/date confirmation. Paste your comps into Claude.ai or ChatGPT, get ready-to-send emails. Requires a paid AI subscription. |
+| [AI Voice Agent Builder (prompt template)](./voice-agent-builder/) |
+Walks you through building a phone agent that answers calls when you
+cannot, on the platform of your choice. Includes a build-coach prompt
+and a ready-to-edit agent script. Bring your own AI chat. |
 
 ## Using the tools
 
