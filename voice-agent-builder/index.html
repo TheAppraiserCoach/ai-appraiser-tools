@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Voice Agent Builder — by The Appraiser Coach</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg: #fafafa;
+    --accent: #2c5aa0;
+    --accent-bg: #f0f5ff;
+    --brand: #5a3a2a;
+    --brand-bg: #f5efe7;
+    --good: #2e7d32;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); margin: 0; line-height: 1.5; }
+  header { background: white; border-bottom: 1px solid var(--line); padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1.25rem; }
+  header img.logo { width: 72px; height: 72px; flex-shrink: 0; border-radius: 6px; }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link { color: var(--accent); font-size: 0.9rem; text-decoration: none; }
+  header a.home-link:hover { text-decoration: underline; }
+  main { max-width: 920px; margin: 0 auto; padding: 1.5rem; }
+  section { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+  section h2 { margin: 0 0 0.75rem; font-size: 1.05rem; font-weight: 600; color: var(--accent); }
+  .step-num { display: inline-block; background: var(--accent); color: white; border-radius: 50%; width: 1.5rem; height: 1.5rem; text-align: center; line-height: 1.5rem; font-size: 0.85rem; margin-right: 0.5rem; }
+  .copy-zone { background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1.25rem; }
+  .copy-zone h2 { color: var(--accent); margin-top: 0; }
+  button.copy-btn { background: var(--accent); color: white; border: 0; padding: 0.85rem 1.75rem; border-radius: 6px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  button.copy-btn:hover { background: #1d4080; }
+  button.copy-btn.copied { background: var(--good); }
+  button.copy-btn.small { padding: 0.55rem 1.1rem; font-size: 0.92rem; }
+  .copy-status { margin-top: 0.75rem; font-size: 0.9rem; color: var(--good); min-height: 1.25rem; }
+  ol.steps { padding-left: 1.5rem; line-height: 1.7; }
+  ol.steps li { margin-bottom: 0.5rem; }
+  ol.steps strong { color: var(--ink); }
+  ul.plain { padding-left: 1.25rem; line-height: 1.6; }
+  ul.plain li { margin-bottom: 0.35rem; }
+  .platforms { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
+  .plat-card { border: 1px solid var(--line); border-radius: 6px; padding: 0.85rem 1rem; background: #fcfcfc; }
+  .plat-card h3 { margin: 0 0 0.25rem; font-size: 0.95rem; color: var(--accent); }
+  .plat-card p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+  details.prompt-view { border: 1px solid var(--line); border-radius: 6px; padding: 0.5rem 1rem; background: #fcfcfc; margin-top: 0.75rem; }
+  details.prompt-view summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: 0.95rem; padding: 0.25rem 0; }
+  pre.prompt { background: white; border: 1px solid var(--line); border-radius: 4px; padding: 1rem; margin-top: 0.75rem; max-height: 24rem; overflow: auto; font-size: 0.8rem; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
+  .note { background: var(--brand-bg); border: 1px solid #e6d6c2; border-radius: 6px; padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--brand); }
+  .note b { color: var(--brand); }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 2rem 1rem; }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  @media (max-width: 620px) { .platforms { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>AI Voice Agent Builder</h1>
+    <p>Stand up a phone agent that answers calls while you're on an inspection — books appointments, answers common questions, and hands off to you when needed. Step-by-step, on whatever platform you choose.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+
+<section>
+  <h2><span class="step-num">1</span>What this is</h2>
+  <p>A voice agent is an AI that answers your business phone. When you can't pick up — you're on an inspection, driving, or just heads-down — it greets the caller, answers the questions you'd normally answer (turn times, fees, coverage area, what's needed to get started), captures their info, and offers to pass them through to you. It's the same idea as a self-checkout: faster for the caller, and it takes the routine calls off your plate.</p>
+  <p style="margin-bottom:0">This page gives you <strong>two prompts</strong>: one that walks you through <em>building</em> the agent on the platform of your choice, and a ready-to-edit <em>script</em> for the agent itself. Both are free. You bring your own AI chat (Claude or ChatGPT) and a voice platform.</p>
+</section>
+
+<div class="copy-zone">
+  <h2>Copy the build-coach prompt</h2>
+  <p style="margin:0 0 1rem;color:var(--muted)">Paste it into Claude or ChatGPT and it will walk you through building your voice agent, start to finish.</p>
+  <button class="copy-btn" id="copy-build" onclick="copyBlock('build-prompt-source','copy-build','status-build','Paste into Claude.ai or ChatGPT and answer its questions.')">📋 Copy build-coach prompt</button>
+  <div class="copy-status" id="status-build"></div>
+</div>
+
+<section>
+  <h2><span class="step-num">2</span>The build, in plain steps</h2>
+  <p>However you build it, the steps are the same — only the buttons differ between platforms:</p>
+  <ol class="steps">
+    <li><strong>Pick a platform</strong> (see options below) and create an account.</li>
+    <li><strong>Get a phone number</strong> — buy one in the platform, or point an existing number to it.</li>
+    <li><strong>Write the greeting</strong> — exactly how it answers every call. <b>Disclose it's an AI</b> right up front (more on that below).</li>
+    <li><strong>Write the agent's prompt / "goals"</strong> — this is the most important part. It's the agent's personality and rules. Use the ready-made script below as your starting point, then have Claude/ChatGPT tailor it.</li>
+    <li><strong>Build a knowledge base</strong> — feed it what it should know: crawl your website, upload an FAQ doc, add your hours/fees/coverage area. You can keep separate knowledge bases (e.g. one for customers, one for staff questions).</li>
+    <li><strong>Pick and tune the voice</strong> — most platforms use ElevenLabs voices. Slow it to ~90% for a more natural pace, and raise "interrupt sensitivity" so it stops talking the moment the caller speaks.</li>
+    <li><strong>Set a max call length</strong> — caps your cost so nobody can run up tokens with an hour-long call.</li>
+    <li><strong>Attach the phone number, then call it</strong> and test. Adjust the prompt and voice until it feels right.</li>
+    <li><strong>Watch the call logs</strong> to see what's being asked and keep improving the knowledge base.</li>
+  </ol>
+  <p class="note" style="margin-top:1rem"><b>Tip from the session:</b> punctuation controls pacing — a comma makes it pause, a period makes a longer stop. If it sounds rushed or robotic, check the punctuation in your greeting and prompt. And when you're stuck, screenshot the screen into Claude and ask why it sounds off.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">3</span>Be honest that it's a bot</h2>
+  <p>The strong recommendation from the session: <strong>lead with transparency.</strong> People don't mind talking to an AI — they mind being <em>tricked</em>. Have the agent introduce itself as an AI assistant in its first sentence ("Hi, this is [Name], an AI assistant for [Company]…") and always give callers an easy way to reach a human. It sets the tone, avoids annoyance, and it's just the right thing to do.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">4</span>Ready-to-edit agent script</h2>
+  <p>This is a starting "personality + rules" prompt for an appraisal-office phone agent. Paste it into your platform's prompt/goals field and edit the bracketed parts. Then ask Claude/ChatGPT to refine it for your specific business.</p>
+  <button class="copy-btn small" id="copy-persona" onclick="copyBlock('persona-prompt-source','copy-persona','status-persona','Paste into your platform\'s agent prompt / goals field, then edit the [brackets].')">📋 Copy agent script</button>
+  <div class="copy-status" id="status-persona"></div>
+  <details class="prompt-view">
+    <summary>Preview the agent script</summary>
+    <pre class="prompt" id="persona-display"></pre>
+  </details>
+</section>
+
+<section>
+  <h2><span class="step-num">5</span>Where to build it</h2>
+  <p>You don't need any one product — these all do the same job. Pick whatever fits your budget and comfort:</p>
+  <div class="platforms">
+    <div class="plat-card"><h3>Go High Level</h3><p>An all-in-one CRM that bundles the phone number, voice, and AI in one place — easiest if you want everything connected. Has ongoing per-minute + monthly costs.</p></div>
+    <div class="plat-card"><h3>Synthflow</h3><p>The most popular pick for a standalone voice agent without a full CRM. Beginner-friendly.</p></div>
+    <div class="plat-card"><h3>Retell AI</h3><p>Quick to set up a solid voice agent on a single number.</p></div>
+    <div class="plat-card"><h3>Vapi</h3><p>More developer-oriented; great if you (or a helper) are comfortable with technical setup.</p></div>
+    <div class="plat-card"><h3>Bland AI</h3><p>Built for call centers and large scale, but works fine on one number too.</p></div>
+    <div class="plat-card"><h3>Roll your own</h3><p>Go straight to ElevenLabs (voice) + Twilio (phone number) and connect them with n8n or Zapier. Most control, lowest middleman cost.</p></div>
+  </div>
+  <p class="note" style="margin-top:1rem">Expect ongoing costs no matter the platform: a monthly fee, a per-minute phone charge, and AI/voice tokens per call. For typical low call volume it's usually modest — but it's not a flat fee, so check the pricing before you scale.</p>
+</section>
+
+</main>
+
+<footer>
+  <p class="cta-line">Built by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a> — free for any appraiser to use. Voice-agent walkthrough taught by guest instructor <strong>Ryan Anderson</strong> at the Appraiser AI Academy. For more tools, coaching, and the community: <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">theappraisercoach.com →</a></p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Open source — <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">view source on GitHub</a>. Platforms and pricing change fast; verify current details with each provider. Always disclose that callers are speaking with an AI.</p>
+</footer>
+
+<script type="text/plain" id="build-prompt-source">
+# ROLE
+
+You are my voice-agent build coach. I'm a real estate appraiser (or small-business owner) and I want to set up an AI agent that answers my business phone when I can't. Walk me through building it on the platform I choose, one step at a time. Ask me questions when you need information; don't assume.
+
+# FIRST, ASK ME
+
+1. What do I want the agent to do? (e.g., answer common questions, give turn times/fees, take a message, book an inspection, transfer to me)
+2. What platform am I using, or should you recommend one? Options I'm considering: Go High Level, Synthflow, Retell AI, Vapi, Bland AI, or rolling my own with ElevenLabs + Twilio. If I'm not sure, recommend one based on my comfort level and budget and explain why.
+3. A few details about my business: name, what I do, my service area, typical turn times and fees (or tell me to fill these in later), my website URL, and my hours.
+
+# THEN, COACH ME THROUGH THESE STEPS (one at a time, waiting for me)
+
+1. Account + phone number — getting a number or pointing my existing one at the agent.
+2. Greeting — the exact first sentence it says on every call. It MUST disclose it's an AI ("Hi, this is [Name], an AI assistant for [Company]…"). Help me write it.
+3. The agent prompt / "goals" — its personality and rules. Help me write a clear prompt: who it is, what it can and can't say, when to take a message, when to offer a transfer to a human, and the explicit rule that it never quotes a property value or commits me to a fee/date it isn't sure about. Keep it concise and use natural punctuation (commas/periods control how it paces speech).
+4. Knowledge base — what to feed it: crawl my website, upload an FAQ document, add hours/fees/coverage. Help me draft an FAQ document if I don't have one.
+5. Voice — choosing and tuning it (slow to ~90% for natural pace, raise interrupt sensitivity so it stops when the caller speaks).
+6. Cost controls — set a maximum call length so a long call can't run up tokens.
+7. Attach the number and test — give me a checklist of things to try on a test call and what to listen for.
+8. Monitor + improve — using the call logs to spot missing answers and update the knowledge base.
+
+# RULES FOR YOU
+
+- Be concrete and platform-aware. If I name a platform, give me the actual menu/button names where you can; if you're unsure of the current UI, say so and describe what to look for.
+- Keep transparency front and center: the agent should always reveal it's an AI and offer a path to a human.
+- Don't overwhelm me — one step at a time, confirm I've done it, then move on.
+- If I get stuck, tell me to screenshot the screen into Claude/ChatGPT and ask what's wrong; that works well for these tools.
+</script>
+
+<script type="text/plain" id="persona-prompt-source">
+You are [AGENT NAME], the AI phone assistant for [COMPANY NAME], a real estate appraisal company serving [SERVICE AREA].
+
+# IDENTITY & TRANSPARENCY
+- On the first sentence of every call, introduce yourself and make clear you are an AI: "Hi, this is [AGENT NAME], the AI assistant for [COMPANY NAME]. How can I help you today?"
+- If anyone asks whether you're a real person, say plainly that you're an AI assistant. Never pretend to be human.
+- At any point, if the caller wants a person, offer to take a message for [OWNER NAME] or transfer them.
+
+# WHAT YOU CAN HELP WITH
+- General questions about ordering an appraisal: what's needed to get started, typical turn time ([FILL IN], e.g. "usually 3–5 business days after inspection"), fee ranges ([FILL IN] or "it depends on the property — I can have [OWNER NAME] confirm"), the areas we cover ([SERVICE AREA]), and our hours ([HOURS]).
+- Taking a message: capture the caller's name, phone number, property address, and what they need, and confirm it back to them.
+- Basic questions about what it takes to become an appraiser, if asked. [Optional — remove if not wanted.]
+
+# RULES — IMPORTANT
+- Never quote or estimate a property's value. If asked, explain that the value comes from a completed appraisal and offer to start an order or take a message.
+- Never commit to a specific fee, turn time, or appointment that you aren't certain of. Offer to have [OWNER NAME] confirm.
+- Don't make up information. If you don't know, say so and offer to take a message or transfer.
+- Keep answers short and natural for a phone call. Use commas and periods deliberately — they control your pacing.
+- Be warm, professional, and efficient. Don't ramble.
+
+# WHEN TO HAND OFF
+- If the caller asks for a human, has a complaint, wants to negotiate fees, or has a situation outside the above, offer to transfer to [OWNER NAME] or take a detailed message.
+</script>
+
+<script>
+function getText(id) { return document.getElementById(id).textContent.trim(); }
+document.getElementById("persona-display").textContent = getText("persona-prompt-source");
+
+async function copyBlock(sourceId, btnId, statusId, msg) {
+  const text = getText(sourceId);
+  const btn = document.getElementById(btnId);
+  const status = document.getElementById(statusId);
+  try {
+    await navigator.clipboard.writeText(text);
+    const original = btn.textContent;
+    btn.textContent = "✓ Copied!";
+    btn.classList.add("copied");
+    status.textContent = `${text.length.toLocaleString()} characters copied. ${msg}`;
+    setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 4000);
+  } catch (err) {
+    status.textContent = "Couldn't auto-copy. Select the preview text and copy it manually (Ctrl/Cmd+A, Ctrl/Cmd+C).";
+  }
+}
+</script>
+
+</body>
+</html>
