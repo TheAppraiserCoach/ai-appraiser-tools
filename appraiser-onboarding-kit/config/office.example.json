@@ -1,0 +1,161 @@
+{
+  "_README": "Copy this file to office.json and fill it in. office.json is gitignored — it holds YOUR office's real names, emails, and folder IDs, and must never be committed or shared. Everything the system says to a new hire comes from this file.",
+  "office": {
+    "name": "Example Appraisal Group",
+    "short_name": "Example Appraisal",
+    "role_title": "Appraisal Trainee",
+    "city_state": "Boise, ID",
+    "state": "ID",
+    "website": "https://example-appraisal.com",
+    "reply_to": "office@example-appraisal.com",
+    "emoji": "🏠",
+    "brand_color": "#2f4a6d",
+    "brand_color_dark": "#22374f"
+  },
+  "people": {
+    "_comment": "Who gets notified. Any entry may be left blank to skip that notification. 'owner' always gets everything.",
+    "owner": {
+      "name": "Jane Appraiser",
+      "email": "owner@example-appraisal.com",
+      "phone": "208-555-0100",
+      "title": "Owner / Certified Residential Appraiser"
+    },
+    "bookkeeper": {
+      "name": "Bookkeeper",
+      "email": "",
+      "_comment": "Gets the tax/payment paperwork. Leave email blank if the owner handles payroll."
+    },
+    "supervisor": {
+      "name": "",
+      "email": "",
+      "_comment": "For trainee/supervisory appraiser arrangements. Leave blank if not applicable."
+    }
+  },
+  "hire_types": {
+    "_comment": "Which onboarding tracks this office uses. Each hire is assigned one track when you start them; the track decides which agreement, which tax forms, and which training modules they get. Turn off what you don't use. If only one is on, you never have to say which — the system uses it.",
+    "w2_employee": {
+      "enabled": true,
+      "label": "W-2 Employee",
+      "agreement": "employment-agreement.md",
+      "tax_forms": [
+        "W-4",
+        "I-9"
+      ],
+      "requires_inperson_id_check": true,
+      "_comment": "I-9 requires physically inspecting the new hire's ID in person. Federal requirement, no way around it.",
+      "training_modules": [
+        "01-welcome-and-role.md",
+        "02-uspap-and-ethics.md",
+        "03-confidentiality-and-data.md",
+        "04-independence-and-pressure.md",
+        "05-office-workflow.md",
+        "06-getting-paid.md"
+      ],
+      "contractor": false
+    },
+    "contractor_1099": {
+      "enabled": true,
+      "label": "1099 Independent Contractor",
+      "agreement": "independent-contractor-agreement.md",
+      "tax_forms": [
+        "W-9"
+      ],
+      "requires_inperson_id_check": false,
+      "_comment": "Most fee appraisers and field inspectors. NO I-9, NO W-4 — a contractor is not an employee. Misclassifying an employee as a contractor is a real legal exposure; if you control their hours and how they work, they are probably an employee.",
+      "training_modules": [
+        "01-welcome-and-role.md",
+        "02-uspap-and-ethics.md",
+        "03-confidentiality-and-data.md",
+        "04-independence-and-pressure.md",
+        "05-office-workflow.md",
+        "06-getting-paid-contractor.md"
+      ],
+      "contractor": true,
+      "_comment_training": "Contractors get the invoicing module (06-getting-paid-contractor.md) instead of the employee timesheet one. Telling a 1099 contractor to submit hours and never work off the clock contradicts the agreement they just signed — and reads as evidence they were really an employee."
+    },
+    "contractor_foreign": {
+      "enabled": false,
+      "label": "Foreign Contractor (outside the US)",
+      "agreement": "independent-contractor-agreement.md",
+      "tax_forms": [
+        "W-8BEN"
+      ],
+      "requires_inperson_id_check": false,
+      "_comment": "Overseas VAs and remote staff who are not US persons. W-8BEN, not W-9. No I-9 (that form is only for work performed inside the US).",
+      "training_modules": [
+        "01-welcome-and-role.md",
+        "02-uspap-and-ethics.md",
+        "03-confidentiality-and-data.md",
+        "04-independence-and-pressure.md",
+        "05-office-workflow.md",
+        "06-getting-paid-contractor.md"
+      ],
+      "contractor": true,
+      "_comment_training": "Contractors get the invoicing module (06-getting-paid-contractor.md) instead of the employee timesheet one. Telling a 1099 contractor to submit hours and never work off the clock contradicts the agreement they just signed — and reads as evidence they were really an employee."
+    }
+  },
+  "training": {
+    "_comment": "Modules are markdown files in content/training/, compiled to the course. Order here is the order the hire sees. Set required_score to the number of quiz questions that must be right (default: all of them).",
+    "modules": [
+      "01-welcome-and-role.md",
+      "02-uspap-and-ethics.md",
+      "03-confidentiality-and-data.md",
+      "04-independence-and-pressure.md",
+      "05-office-workflow.md",
+      "06-getting-paid.md"
+    ],
+    "require_perfect_score": true
+  },
+  "payroll": {
+    "_comment": "Used by training module 06 (Getting Paid). Describe YOUR pay process in plain language — the hire is quizzed on it, so it has to be accurate.",
+    "cadence": "every other Friday",
+    "deadline": "3:00 PM on payday Friday",
+    "submit_method": "Email your hours to the office at owner@example-appraisal.com.",
+    "pay_lag": "about a week after you submit",
+    "contractor": {
+      "_comment": "Used by the contractor training module and the contractor agreement. Leave any field blank and it falls back to the employee wording above, which will read wrong to a 1099 contractor.",
+      "cadence": "every other Friday",
+      "deadline": "the Monday before the payment run",
+      "submit_method": "Email your invoice as a PDF to owner@example-appraisal.com, one line per assignment.",
+      "pay_lag": "about a week after we receive it"
+    }
+  },
+  "storage": {
+    "_comment": "Where completed records are filed. Set mode to 'local' to keep everything on this machine (simplest, no Google account needed), or 'google' to file into Google Drive + a tracker Sheet.",
+    "mode": "local",
+    "local_root": "./records",
+    "google": {
+      "account": "",
+      "employees_folder_id": "",
+      "tracker_sheet_id": "",
+      "tracker_tab": "Hires"
+    }
+  },
+  "email": {
+    "_comment": "How the system sends the welcome link and notifications. mode 'gog' uses the gog CLI; 'smtp' uses any mail server (Gmail app password works); 'none' prints the messages instead of sending, useful for testing.",
+    "mode": "none",
+    "from_name": "Example Appraisal Group",
+    "smtp": {
+      "host": "smtp.gmail.com",
+      "port": 587,
+      "username": "",
+      "password_env": "ONBOARDING_SMTP_PASSWORD",
+      "_comment": "Never put the password here. Set it as an environment variable named above."
+    },
+    "gog": {
+      "binary": "gog",
+      "account": ""
+    }
+  },
+  "server": {
+    "_comment": "public_url is what gets put in the hire's welcome email. With a Cloudflare quick tunnel it changes each run — the send-welcome step reads it live, so you don't have to edit this every time.",
+    "port": 8620,
+    "public_url": "http://localhost:8620"
+  },
+  "legal": {
+    "_comment": "READ THIS. The agreement templates in content/agreements/ are starting points written for a small US appraisal office, NOT legal advice and NOT reviewed for your state. Have your attorney read whichever one you use before a real person signs it. at_will applies to W-2 employment only.",
+    "at_will": true,
+    "governing_state": "ID",
+    "reviewed_by_attorney": false
+  }
+}

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{office_name}} — Onboarding Training</title>
+<style>
+  :root{--ink:#20242b;--muted:#68707c;--line:#dfe3e9;--bg:#f5f6f8;--card:#fff;
+        --brand:{{brand_color}};--brand2:{{brand_color_dark}};--good:#2e7d32;--warn:#b03030;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);
+       background:var(--bg);margin:0;line-height:1.55;}
+  header{background:var(--brand);color:#fff;padding:1rem 1.2rem;display:flex;align-items:center;gap:.6rem;}
+  header .mark{font-size:1.5rem;} header h1{margin:0;font-size:1.1rem;font-weight:650;}
+  main{max-width:720px;margin:0 auto;padding:1.1rem;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.3rem 1.5rem;margin-bottom:1rem;}
+  h2{color:var(--brand);margin:.1rem 0 .6rem;font-size:1.25rem;}
+  h4{margin:1rem 0 .3rem;}
+  p{margin:.45rem 0;} ul{margin:.4rem 0;padding-left:1.3rem;} li{margin:.25rem 0;}
+  .fld{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin:.7rem 0 .15rem;}
+  input[type=text]{width:100%;padding:.6rem .7rem;border:1px solid var(--line);border-radius:8px;font-size:1rem;}
+  .btn{background:var(--brand);color:#fff;border:none;border-radius:8px;padding:.65rem 1.1rem;
+       font-size:.95rem;font-weight:600;cursor:pointer;}
+  .btn:hover{background:var(--brand2);} .btn:disabled{opacity:.5;cursor:default;}
+  .btn.ghost{background:#eef1f5;color:var(--brand);}
+  .btn.sec{background:#fff;color:var(--brand);border:1px solid var(--brand);}
+  .navrow{display:flex;gap:.7rem;align-items:center;margin-top:1rem;} .sp{flex:1;}
+  .mod{display:flex;align-items:center;gap:.9rem;border:1px solid var(--line);border-radius:11px;padding:.8rem 1rem;margin:.55rem 0;}
+  .mod.done{background:#f2f8f2;border-color:#cfe6cf;}
+  .mod .n{width:32px;height:32px;border-radius:50%;background:#eef1f5;color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;}
+  .mod.done .n{background:var(--good);color:#fff;}
+  .mod .t{flex:1;} .mod .t b{display:block;font-size:.98rem;} .mod .t small{color:var(--muted);}
+  .prog{height:8px;background:#e7eaef;border-radius:5px;overflow:hidden;margin:.6rem 0 1rem;}
+  .prog>i{display:block;height:100%;background:var(--brand);transition:.25s;}
+  .q{border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;margin:.7rem 0;}
+  .opt{display:block;padding:.4rem .5rem;border-radius:7px;margin:.2rem 0;cursor:pointer;}
+  .opt:hover{background:#f2f4f7;}
+  .opt.right{background:#e7f4e7;} .opt.wrong{background:#fbe9e9;}
+  .result .big{font-size:2rem;text-align:center;margin:.4rem 0;}
+  .pass{color:var(--good);} .fail{color:var(--warn);}
+  .banner{background:#f2f4f7;border:1px solid var(--line);border-radius:9px;padding:.7rem .9rem;font-size:.92rem;margin:.6rem 0;}
+  .muted{color:var(--muted);font-size:.9rem;}
+</style>
+</head>
+<body>
+<header><span class="mark">{{emoji}}</span><h1>{{office_name}} — Onboarding Training</h1></header>
+<main id="app"></main>
+
+<script>
+let DATA=null, HIRE=null, MOD=null, LI=0;
+const LS="kit_training_progress", SUBMITTED="kit_training_done";
+const g=id=>document.getElementById(id);
+const app=()=>g('app');
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const passNeed=m=>DATA.require_perfect?m.quiz.length:Math.ceil(m.quiz.length*0.8);
+const allModulesDone=()=>{const pr=progress();return DATA&&DATA.modules.every(m=>pr[m.id]);};
+
+function progress(){try{return JSON.parse(localStorage.getItem(LS)||"{}");}catch(e){return {};}}
+function saveProgress(p){try{localStorage.setItem(LS,JSON.stringify(p));}catch(e){}}
+function loadHire(){try{return JSON.parse(localStorage.getItem('kit_hire')||'null')||{};}catch(e){return {};}}
+function saveHire(o){const h={...loadHire(),...o};try{localStorage.setItem('kit_hire',JSON.stringify(h));}catch(e){}return h;}
+function prefill(map){const h=loadHire();for(const id in map){if(h[map[id]]&&g(id))g(id).value=h[map[id]];}}
+function ingestParams(){const q=new URLSearchParams(location.search);
+  const m={fn:'first_name',ln:'last_name',em:'email',sd:'start_date',ht:'hire_type'};
+  const cur=loadHire();const add={};for(const k in m){const v=q.get(k);if(v&&!cur[m[k]])add[m[k]]=v;}
+  if(Object.keys(add).length)saveHire(add);}
+
+// Cross-device resume: pull server-side progress so a device switch never costs finished modules.
+async function syncProgress(){
+  try{
+    const em=(loadHire().email||'').trim(); if(!em)return;
+    const p=await (await fetch('/progress?em='+encodeURIComponent(em))).json();
+    if(!p.known)return;
+    const cur=loadHire(),add={};
+    ['first_name','last_name','start_date','hire_type'].forEach(k=>{if(p[k]&&!cur[k])add[k]=p[k];});
+    if(Object.keys(add).length)saveHire(add);
+    const local=progress();let changed=false;
+    Object.entries(p.modules||{}).forEach(([id,score])=>{
+      if(!local[id]){const[s,t]=String(score).split('/');
+        local[id]={score:+s||0,total:+t||0,at:'(from another device)'};changed=true;}
+    });
+    if(changed)saveProgress(local);
+    if(p.training_done)localStorage.setItem(SUBMITTED,'1');
+    if(p.agreement_done)localStorage.setItem('kit_agreement_done','1');
+    if(p.paperwork_done)localStorage.setItem('kit_paperwork_done','1');
+  }catch(e){}
+}
+
+// Certificate submit: resolves true only if the server FILED it. SUBMITTED set only then,
+// so a network blip is retryable instead of silently losing the certificate. keepalive lets
+// the goNext safety-net request survive navigation.
+function submitCertificate(attestText){
+  const p=progress(), results={};
+  DATA.modules.forEach(m=>{const r=p[m.id];results[m.id]=r?`${r.score}/${r.total}`:'';});
+  return fetch('/complete',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({...loadHire(), module:'ALL', results, attestation:true, attestation_text:attestText})})
+    .then(r=>{if(r.ok)localStorage.setItem(SUBMITTED,'1');return r.ok;})
+    .catch(()=>false);
+}
+function goNext(url){
+  try{ if(!localStorage.getItem(SUBMITTED)&&allModulesDone())
+        submitCertificate('Completed all '+DATA.modules.length+' modules; continued to the next onboarding step on '+new Date().toLocaleString()+'.'); }catch(e){}
+  window.location.href=url;
+}
+
+async function boot(){
+  try{ingestParams();}catch(e){}
+  await syncProgress();
+  try{
+    // Course varies by track: a contractor gets the invoicing module where an employee
+    // gets the timesheet one. syncProgress() has already run, so hire_type is known here
+    // even on a second device.
+    const ht=(loadHire().hire_type||'').trim();
+    DATA=await (await fetch('/content.json'+(ht?'?ht='+encodeURIComponent(ht):''))).json();
+  }catch(e){
+    app().innerHTML=`<div class="card"><h2>Couldn't load the training</h2>
+      <p>Your connection hiccupped while loading. Check your signal and try again — nothing is lost.</p>
+      <div class="navrow"><span class="sp"></span><button class="btn" onclick="boot()">Try again</button></div></div>`;
+    return;
+  }
+  const h=loadHire();
+  if(h.first_name&&h.last_name&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(h.email||'')){HIRE=h;renderMenu();}
+  else renderStart();
+}
+
+function renderStart(){
+  app().innerHTML=`<div class="card">
+    <h2>Welcome {{emoji}}</h2>
+    <p>This training gets you ready for your first day at {{office_name}}. Short modules,
+    each ending in a quiz. Take your time — you can stop and come back on any device.</p>
+    <label class="fld">First name</label><input type="text" id="fn">
+    <label class="fld">Last name</label><input type="text" id="ln">
+    <label class="fld">Email</label><input type="text" id="em" placeholder="you@email.com">
+    <label class="fld">Start date (if you know it)</label><input type="text" id="sd" placeholder="e.g. 8/15/2026">
+    <div class="navrow"><span class="sp"></span><button class="btn" onclick="startHire()">Start training →</button></div>
+  </div>`;
+  prefill({fn:'first_name',ln:'last_name',em:'email',sd:'start_date'});
+}
+async function startHire(){
+  const fn=g('fn').value.trim(), ln=g('ln').value.trim(), em=g('em').value.trim();
+  if(!fn||!ln){alert("Please enter your first and last name.");return;}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){alert("Please enter a valid email — it goes on your training record.");return;}
+  HIRE=saveHire({first_name:fn,last_name:ln,email:em,start_date:g('sd').value.trim()});
+  await syncProgress();   // this email may have history from another device
+  renderMenu();
+}
+
+function renderMenu(){
+  const p=progress();
+  const doneN=DATA.modules.filter(m=>p[m.id]).length, all=doneN===DATA.modules.length;
+  const rows=DATA.modules.map((m,i)=>{
+    const d=p[m.id];
+    return `<div class="mod ${d?'done':''}">
+      <div class="n">${d?'✓':i+1}</div>
+      <div class="t"><b>${m.title.replace(/ — .*$/,'')}</b>
+        <small>${m.lessons.length} short lessons · ${m.quiz.length}-question quiz${d?` · passed ${d.score}/${d.total}`:''}</small></div>
+      ${d?'':`<button class="btn" onclick="openModule(${i})">${doneN===i?'Continue':'Open'}</button>`}
+    </div>`;
+  }).join('');
+  app().innerHTML=`<div class="card">
+    <h2>${esc(HIRE.first_name)}'s training</h2>
+    <div class="prog"><i style="width:${doneN/DATA.modules.length*100}%"></i></div>
+    <p class="muted" style="margin-top:-.4rem">${doneN} of ${DATA.modules.length} modules complete.</p>
+    ${rows}
+    ${all?`<div class="banner" style="background:#eef7ee;border-color:#bfe0c0;">
+        All modules passed. One last step: your attestation.</div>
+      <div class="navrow"><span class="sp"></span>
+        ${localStorage.getItem(SUBMITTED)
+          ?`<button class="btn" onclick="goNext('/onboarding')">Back to my checklist →</button>`
+          :`<button class="btn" onclick="renderAttestation()">Finish training →</button>`}</div>`:''}
+  </div>`;
+  window.scrollTo(0,0);
+}
+
+function openModule(i){ MOD=DATA.modules[i]; LI=0; renderLesson(); }
+function renderLesson(){
+  const total=MOD.lessons.length, l=MOD.lessons[LI];
+  app().innerHTML=`<div class="card">
+    <p class="muted">${MOD.title.replace(/ — .*$/,'')} · lesson ${LI+1} of ${total}</p>
+    <h2>${l.title}</h2>
+    ${l.html}
+    <div class="navrow">
+      <button class="btn ghost" onclick="${LI>0?'prevLesson()':'renderMenu()'}">← ${LI>0?'Back':'All modules'}</button>
+      <span class="sp"></span>
+      <button class="btn" onclick="nextLesson()">${LI<total-1?'Next →':'Go to quiz →'}</button></div>
+  </div>`;
+  window.scrollTo(0,0);
+}
+function prevLesson(){ if(LI>0){LI--;renderLesson();} }
+function nextLesson(){ if(LI<MOD.lessons.length-1){LI++;renderLesson();} else renderQuiz(); }
+
+function renderQuiz(){
+  const qs=MOD.quiz.map((qq,qi)=>`<div class="q" id="q${qi}"><b>${qi+1}. ${qq.q}</b>${
+    qq.options.map((o,oi)=>`<label class="opt"><input type="radio" name="q${qi}" value="${oi}">${o}</label>`).join('')
+  }</div>`).join('');
+  app().innerHTML=`<div class="card">
+    <h2>${MOD.title.replace(/ — .*$/,'')} — Quiz</h2>
+    <p class="muted">Answer all ${MOD.quiz.length}. You must get <strong>${passNeed(MOD)} correct</strong> to pass.</p>
+    ${qs}
+    <div class="navrow"><button class="btn ghost" onclick="renderLesson()">← Back to lessons</button>
+      <span class="sp"></span><button class="btn" onclick="gradeQuiz()">Submit answers</button></div>
+  </div>`;
+  window.scrollTo(0,0);
+}
+function gradeQuiz(){
+  let score=0, answered=0;
+  MOD.quiz.forEach((qq,qi)=>{
+    const sel=document.querySelector(`input[name=q${qi}]:checked`);
+    if(sel){answered++;const oi=+sel.value;
+      const opts=document.querySelectorAll(`#q${qi} .opt`);
+      opts[qq.correct].classList.add('right');
+      if(oi===qq.correct)score++;else opts[oi].classList.add('wrong');
+    }
+  });
+  if(answered<MOD.quiz.length){alert("Please answer every question.");return;}
+  // lock the graded attempt — answers are revealed now
+  document.querySelectorAll('.q input[type=radio]').forEach(r=>r.disabled=true);
+  document.querySelectorAll('.navrow .btn').forEach(b=>b.disabled=true);
+  const passed=score>=passNeed(MOD);
+  const box=document.createElement('div'); box.className='card result';
+  box.innerHTML=`<div class="big ${passed?'pass':'fail'}">${score} / ${MOD.quiz.length}</div>
+    <p class="${passed?'pass':'fail'}" style="text-align:center;"><strong>${passed?'Passed! ✓':'Not quite — review and retake.'}</strong></p>
+    <div class="navrow"><span class="sp"></span>
+    ${passed?`<button class="btn" onclick="passModule(${score})">Continue →</button>`
+             :`<button class="btn sec" onclick="renderLesson()">Review lessons</button>
+               <button class="btn" onclick="renderQuiz()">Retake quiz</button>`}</div>`;
+  app().appendChild(box); box.scrollIntoView({behavior:'smooth'});
+}
+function passModule(score){
+  const p=progress(); p[MOD.id]={score:score,total:MOD.quiz.length,at:new Date().toISOString()}; saveProgress(p);
+  fetch('/complete',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({...loadHire(), module:MOD.id, score:score, total:MOD.quiz.length})}).catch(()=>{});
+  renderMenu();
+}
+
+function renderAttestation(){
+  const name=`${HIRE.first_name} ${HIRE.last_name}`;
+  app().innerHTML=`<div class="card">
+    <h2>One last step — your attestation</h2>
+    <p>Before we record your training as complete, confirm the statement below. It becomes
+    part of your permanent training record.</p>
+    <div class="banner">
+      "I, <strong>${esc(name)}</strong>, certify that I personally read and completed all
+      ${DATA.modules.length} {{office_name}} training modules and passed each quiz myself.
+      The information I entered, including my name and email, is accurate."
+    </div>
+    <label class="opt" style="cursor:pointer"><input type="checkbox" id="attest" onchange="g('attestBtn').disabled=!this.checked">
+      I have read the above and certify it is true.</label>
+    <div class="navrow"><button class="btn ghost" onclick="renderMenu()">← Back</button><span class="sp"></span>
+      <button class="btn" id="attestBtn" disabled onclick="finish()">Submit &amp; finish →</button></div>
+  </div>`;
+}
+async function finish(){
+  const name=`${HIRE.first_name} ${HIRE.last_name}`;
+  const when=new Date();
+  const btn=g('attestBtn'); if(btn){btn.disabled=true;btn.textContent='Recording…';}
+  const ok=await submitCertificate(`Certified by ${name} on ${when.toLocaleDateString()} at ${when.toLocaleTimeString()}.`);
+  if(!ok){
+    if(btn){btn.disabled=false;btn.textContent='Submit & finish →';}
+    const err=document.createElement('p'); err.className='fail';
+    err.textContent="That didn't go through — probably a connection blip. Please tap Submit again.";
+    app().querySelector('.card').appendChild(err);
+    return;
+  }
+  app().innerHTML=`<div class="card result">
+    <div class="big pass">🎉</div>
+    <h2 style="text-align:center;">Training complete!</h2>
+    <p style="text-align:center;">Nice work, ${esc(HIRE.first_name)}. Your certificate has been recorded and emailed.</p>
+    <p class="muted" style="text-align:center;">Taking you back to your onboarding checklist…</p>
+    <div class="navrow"><span class="sp"></span><a class="btn" style="text-decoration:none;" href="/onboarding">Back to my checklist →</a></div>
+  </div>`;
+  setTimeout(()=>{location.href='/onboarding';},1800);
+}
+boot();
+</script>
+</body>
+</html>

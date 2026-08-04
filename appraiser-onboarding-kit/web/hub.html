@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{office_name}} — Your Onboarding</title>
+<style>
+  :root{--ink:#20242b;--muted:#68707c;--line:#dfe3e9;--bg:#f5f6f8;--card:#fff;
+        --brand:{{brand_color}};--brand2:{{brand_color_dark}};--good:#2e7d32;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);
+       background:var(--bg);margin:0;line-height:1.55;}
+  header{background:var(--brand);color:#fff;padding:1rem 1.2rem;display:flex;align-items:center;gap:.6rem;}
+  header .mark{font-size:1.5rem;} header h1{margin:0;font-size:1.15rem;font-weight:650;}
+  header .who{margin-left:auto;font-size:.85rem;color:#e2e7ee;}
+  main{max-width:640px;margin:0 auto;padding:1.1rem;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.3rem 1.4rem;margin-bottom:1rem;}
+  h2{color:var(--brand);margin:.1rem 0 .5rem;font-size:1.3rem;}
+  p{margin:.4rem 0;}
+  .prog{height:8px;background:#e7eaef;border-radius:5px;overflow:hidden;margin:.5rem 0 1rem;}
+  .prog>i{display:block;height:100%;background:var(--brand);transition:.25s;}
+  .step{display:flex;align-items:center;gap:.9rem;border:1px solid var(--line);border-radius:11px;padding:.85rem 1rem;margin:.6rem 0;}
+  .step.done{background:#f2f8f2;border-color:#cfe6cf;}
+  .step .mark{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.05rem;}
+  .mark.no{background:#eef1f5;color:var(--brand);} .mark.yes{background:var(--good);color:#fff;}
+  .step .t{flex:1;} .step .t b{display:block;} .step .t small{color:var(--muted);}
+  .step a.go{background:var(--brand);color:#fff;text-decoration:none;border-radius:8px;padding:.5rem .9rem;font-weight:600;font-size:.92rem;white-space:nowrap;}
+  .step a.go:hover{background:var(--brand2);}
+  .step .doneLbl{color:var(--good);font-weight:700;font-size:.9rem;}
+  .allset{background:#eef7ee;border:1px solid #bfe0c0;border-radius:11px;padding:1rem 1.2rem;color:#22551f;}
+  .allset h3{margin:.1rem 0 .3rem;color:var(--good);}
+  .cta{display:block;width:100%;text-align:center;background:var(--brand);color:#fff;text-decoration:none;border-radius:9px;padding:.8rem;font-weight:600;margin-top:.6rem;}
+  .muted{color:var(--muted);font-size:.9rem;}
+</style>
+</head>
+<body>
+<header>
+  <span class="mark">{{emoji}}</span><h1>Your Onboarding</h1>
+  <span class="who" id="who"></span>
+</header>
+<main id="app"></main>
+
+<script>
+const HIRE_TYPES = {{hire_types_json}};
+const g=id=>document.getElementById(id);
+const app=()=>g('app');
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function loadHire(){try{return JSON.parse(localStorage.getItem('kit_hire')||'null')||{};}catch(e){return {};}}
+function saveHire(o){const h={...loadHire(),...o};try{localStorage.setItem('kit_hire',JSON.stringify(h));}catch(e){}return h;}
+// The welcome-email link carries identity (?fn=&ln=&em=&sd=&ht=) so nothing is retyped.
+function ingestParams(){const q=new URLSearchParams(location.search);
+  const map={fn:'first_name',ln:'last_name',em:'email',sd:'start_date',ht:'hire_type'};
+  const cur=loadHire();const add={};for(const k in map){const v=q.get(k);if(v&&!cur[map[k]])add[map[k]]=v;}
+  if(Object.keys(add).length)saveHire(add);}
+// Cross-device resume: the server remembers completions by email; localStorage is only a cache.
+async function syncProgress(){
+  try{
+    const em=(loadHire().email||'').trim(); if(!em)return;
+    const p=await (await fetch('/progress?em='+encodeURIComponent(em))).json();
+    if(!p.known)return;
+    const cur=loadHire(),add={};
+    ['first_name','last_name','start_date','hire_type'].forEach(k=>{if(p[k]&&!cur[k])add[k]=p[k];});
+    if(Object.keys(add).length)saveHire(add);
+    if(p.training_done)localStorage.setItem('kit_training_done','1');
+    if(p.agreement_done)localStorage.setItem('kit_agreement_done','1');
+    if(p.paperwork_done)localStorage.setItem('kit_paperwork_done','1');
+  }catch(e){}
+}
+function steps(){
+  const ht=HIRE_TYPES[loadHire().hire_type]||HIRE_TYPES['{{default_hire_type}}']||{tax_forms:[]};
+  return [
+    {flag:'kit_training_done', title:'Training', desc:'Short modules + quizzes', url:'/'},
+    {flag:'kit_agreement_done', title:'Your agreement', desc:'Read & e-sign', url:'/agreement-page'},
+    {flag:'kit_paperwork_done', title:'Paperwork', desc:(ht.tax_forms||[]).join(', ')||'Tax forms', url:'/paperwork'},
+  ];
+}
+const done=s=>!!localStorage.getItem(s.flag);
+function render(){
+  const h=loadHire(); const STEPS=steps();
+  g('who').textContent=h.first_name?`${h.first_name} ${h.last_name||''}`.trim():'';
+  const doneCount=STEPS.filter(done).length, all=doneCount===STEPS.length;
+  const next=STEPS.find(s=>!done(s));
+  const ht=HIRE_TYPES[h.hire_type]||{};
+  const rows=STEPS.map((s,i)=>{
+    const d=done(s);
+    return `<div class="step ${d?'done':''}">
+      <div class="mark ${d?'yes':'no'}">${d?'✓':i+1}</div>
+      <div class="t"><b>${esc(s.title)}</b><small>${esc(s.desc)}</small></div>
+      ${d?'<span class="doneLbl">Done</span>'
+         :`<a class="go" href="${s.url}">${next&&next.flag===s.flag?'Continue':'Start'}</a>`}
+    </div>`;
+  }).join('');
+  app().innerHTML=`<div class="card">
+    <h2>${h.first_name?`Welcome, ${esc(h.first_name)}!`:'Welcome!'}</h2>
+    <p class="muted">${doneCount} of ${STEPS.length} steps complete.</p>
+    <div class="prog"><i style="width:${doneCount/STEPS.length*100}%"></i></div>
+    ${rows}
+    ${all
+      ? `<div class="allset" style="margin-top:1rem;"><h3>🎉 You're all set!</h3>
+           <p>Every onboarding step is complete. Nice work!${ht.id_check
+             ? ' One last thing: bring your <strong>physical photo ID</strong> to your next shift for the in-person I-9 check — it\'s required by federal law.' : ''}</p></div>`
+      : `<a class="cta" href="${next.url}">Continue: ${esc(next.title)} →</a>`}
+  </div>
+  <p class="muted" style="text-align:center;">Questions? Reply to your welcome email or contact {{owner_name}}.</p>`;
+}
+(async()=>{ try{ingestParams();}catch(e){} await syncProgress(); render(); })();
+</script>
+</body>
+</html>

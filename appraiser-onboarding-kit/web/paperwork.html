@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{office_name}} — Paperwork</title>
+<style>
+  :root{--ink:#20242b;--muted:#68707c;--line:#dfe3e9;--bg:#f5f6f8;--card:#fff;
+        --brand:{{brand_color}};--brand2:{{brand_color_dark}};--good:#2e7d32;--warn:#b03030;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);
+       background:var(--bg);margin:0;line-height:1.55;}
+  header{background:var(--brand);color:#fff;padding:1rem 1.2rem;display:flex;align-items:center;gap:.6rem;}
+  header .mark{font-size:1.5rem;} header h1{margin:0;font-size:1.1rem;font-weight:650;}
+  main{max-width:680px;margin:0 auto;padding:1.1rem;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.3rem 1.5rem;margin-bottom:1rem;}
+  h2{color:var(--brand);margin:.1rem 0 .6rem;font-size:1.25rem;}
+  h3{font-size:1rem;margin:1.1rem 0 .3rem;}
+  .fld{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin:.7rem 0 .15rem;}
+  input[type=text]{width:100%;padding:.6rem .7rem;border:1px solid var(--line);border-radius:8px;font-size:1rem;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+  .btn{background:var(--brand);color:#fff;border:none;border-radius:8px;padding:.65rem 1.1rem;
+       font-size:.95rem;font-weight:600;cursor:pointer;}
+  .btn:hover{background:var(--brand2);} .btn:disabled{opacity:.5;cursor:default;}
+  .navrow{display:flex;gap:.7rem;align-items:center;margin-top:1rem;} .sp{flex:1;}
+  .dl a{display:inline-block;background:#eef1f5;color:var(--brand);text-decoration:none;
+        border-radius:8px;padding:.5rem .8rem;margin:.25rem .3rem .25rem 0;font-weight:600;font-size:.92rem;}
+  .up{border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem;margin:.55rem 0;}
+  .up b{display:block;font-size:.95rem;} .up small{color:var(--muted);}
+  .up input{margin-top:.4rem;}
+  .banner{background:#f2f4f7;border:1px solid var(--line);border-radius:9px;padding:.7rem .9rem;font-size:.92rem;margin:.6rem 0;}
+  .banner.pii{background:#fbf6ec;border-color:#e8d9b8;}
+  .result .big{font-size:2rem;text-align:center;margin:.4rem 0;}
+  .hint{color:var(--muted);font-size:.85rem;}
+</style>
+</head>
+<body>
+<header><span class="mark">{{emoji}}</span><h1>{{office_name}} — Paperwork</h1></header>
+<main id="app"></main>
+
+<script>
+const HIRE_TYPES={{hire_types_json}};
+const MAXBYTES=22*1024*1024;
+// Official sources only — bundled tax forms go stale; these don't.
+const FORM_INFO={
+  "W-4":{url:"https://www.irs.gov/pub/irs-pdf/fw4.pdf",desc:"federal tax withholding (IRS)"},
+  "I-9":{url:"https://www.uscis.gov/i-9",desc:"work authorization — fill & sign Section 1 (USCIS)"},
+  "W-9":{url:"https://www.irs.gov/pub/irs-pdf/fw9.pdf",desc:"taxpayer ID for contractors (IRS)"},
+  "W-8BEN":{url:"https://www.irs.gov/pub/irs-pdf/fw8ben.pdf",desc:"foreign status certification (IRS)"}
+};
+const g=id=>document.getElementById(id);
+const app=()=>g('app');
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function loadHire(){try{return JSON.parse(localStorage.getItem('kit_hire')||'null')||{};}catch(e){return {};}}
+function saveHire(o){const h={...loadHire(),...o};try{localStorage.setItem('kit_hire',JSON.stringify(h));}catch(e){}return h;}
+function prefill(map){const h=loadHire();for(const id in map){if(h[map[id]]&&g(id))g(id).value=h[map[id]];}}
+function ingestParams(){const q=new URLSearchParams(location.search);
+  const m={fn:'first_name',ln:'last_name',em:'email',sd:'start_date',ht:'hire_type'};
+  const cur=loadHire();const add={};for(const k in m){const v=q.get(k);if(v&&!cur[m[k]])add[m[k]]=v;}
+  if(Object.keys(add).length)saveHire(add);}
+async function syncProgress(){
+  try{
+    const em=(loadHire().email||'').trim(); if(!em)return;
+    const p=await (await fetch('/progress?em='+encodeURIComponent(em))).json();
+    if(!p.known)return;
+    const cur=loadHire(),add={};
+    ['first_name','last_name','start_date','hire_type'].forEach(k=>{if(p[k]&&!cur[k])add[k]=p[k];});
+    if(Object.keys(add).length)saveHire(add);
+    if(p.training_done)localStorage.setItem('kit_training_done','1');
+    if(p.agreement_done)localStorage.setItem('kit_agreement_done','1');
+    if(p.paperwork_done)localStorage.setItem('kit_paperwork_done','1');
+  }catch(e){}
+}
+function forms(){
+  const ht=HIRE_TYPES[loadHire().hire_type]||HIRE_TYPES['{{default_hire_type}}']||{tax_forms:[]};
+  return {list:ht.tax_forms||[], id_check:!!ht.id_check};
+}
+
+function renderStart(){
+  const f=forms();
+  const dls=f.list.map(n=>{const i=FORM_INFO[n]||{url:'#',desc:''};
+    return `<a href="${i.url}" target="_blank" rel="noopener">⬇ ${esc(n)}</a>`;}).join('');
+  const ups=f.list.map((n,idx)=>{const i=FORM_INFO[n]||{desc:''};
+    return `<div class="up"><b>Signed ${esc(n)}</b><small>${esc(i.desc)}</small>
+      <input type="file" id="f${idx}" accept="application/pdf,image/*"></div>`;}).join('');
+  app().innerHTML=`<div class="card">
+    <h2>Paperwork</h2>
+    <p>We need ${f.list.length===1?'one signed form':f.list.length+' signed forms'} before your
+    first payday. It takes about 10 minutes:</p>
+    <ol>
+      <li><strong>Download</strong> each form below (they open the official government sites).</li>
+      <li><strong>Fill it out and sign it</strong> — print &amp; sign, or fill on your device.</li>
+      <li><strong>Scan or photograph</strong> each signed form and upload it here.</li>
+    </ol>
+    <h3>1 · Download &amp; sign</h3>
+    <div class="dl">${dls}</div>
+    ${f.id_check?`<p class="hint">For the <strong>I-9</strong>: fill and sign Section 1. You'll bring your
+      <strong>physical ID to your next shift</strong> so it can be verified in person — that part is
+      required by federal law.</p>`:''}
+    <h3>2 · Tell us who you are</h3>
+    <div class="row2">
+      <div><label class="fld">First name</label><input type="text" id="fn"></div>
+      <div><label class="fld">Last name</label><input type="text" id="ln"></div>
+    </div>
+    <label class="fld">Email</label><input type="text" id="em" placeholder="you@email.com">
+    <label class="fld">Start date</label><input type="text" id="sd" placeholder="e.g. 8/15/2026">
+    <h3>3 · Upload your signed forms</h3>
+    <div class="banner pii">🔒 These forms carry sensitive info (SSN, tax details). They're filed to a
+      restricted folder and go <strong>only to the people who handle pay</strong> at {{office_name}}.</div>
+    ${ups}
+    <div class="navrow"><span class="sp"></span>
+      <button class="btn" id="subBtn" onclick="submit()">Submit my paperwork →</button></div>
+    <p class="hint" id="msg"></p>
+  </div>`;
+  prefill({fn:'first_name',ln:'last_name',em:'email',sd:'start_date'});
+}
+
+function readB64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(String(r.result).split(',')[1]||'');
+    r.onerror=rej; r.readAsDataURL(file);
+  });
+}
+
+async function submit(){
+  const fn=g('fn').value.trim(), ln=g('ln').value.trim(), em=g('em').value.trim(), sd=g('sd').value.trim();
+  if(!fn||!ln){alert("Please enter your first and last name.");return;}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){alert("Please enter a valid email.");return;}
+  const f=forms();
+  const missing=f.list.filter((n,idx)=>!g('f'+idx).files.length);
+  if(missing.length){alert("Please upload your signed "+missing.join(", ")+".");return;}
+  let total=0; f.list.forEach((n,idx)=>total+=g('f'+idx).files[0].size);
+  if(total>MAXBYTES){alert("Those files are large (over ~22 MB total). Try photographing at a lower resolution.");return;}
+  saveHire({first_name:fn,last_name:ln,email:em,start_date:sd});
+  g('subBtn').disabled=true; g('msg').textContent="Uploading… please keep this page open.";
+  try{
+    const files=[];
+    for(let idx=0;idx<f.list.length;idx++){
+      const file=g('f'+idx).files[0];
+      files.push({doc:f.list[idx],filename:file.name,content_b64:await readB64(file)});
+    }
+    const payload={first_name:fn,last_name:ln,email:em,start_date:sd,
+                   hire_type:loadHire().hire_type||'{{default_hire_type}}',files};
+    const r=await fetch('/paperwork-upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!r.ok)throw new Error('server '+r.status);
+    localStorage.setItem('kit_paperwork_done','1');
+    app().innerHTML=`<div class="card result">
+      <div class="big">✅</div>
+      <h2 style="text-align:center;">Paperwork received</h2>
+      <p style="text-align:center;">Thanks, ${esc(fn)}. Your signed forms have been filed.
+      ${f.id_check?'Remember to bring your <strong>physical ID to your next shift</strong> for the in-person I-9 check.':''}</p>
+      <p class="hint" style="text-align:center;">Taking you back to your onboarding checklist…</p>
+      <div class="navrow" style="margin-top:1rem;"><span class="sp"></span>
+        <a class="btn" style="text-decoration:none;" href="/onboarding">Back to my checklist →</a></div></div>`;
+    setTimeout(()=>{location.href='/onboarding';},1800);
+  }catch(e){
+    g('subBtn').disabled=false;
+    g('msg').textContent="Upload didn't go through. Please try again — nothing was lost.";
+  }
+}
+
+(async()=>{
+  try{ingestParams();}catch(e){}
+  await syncProgress();
+  if(localStorage.getItem('kit_paperwork_done')){
+    const h=loadHire();
+    app().innerHTML=`<div class="card result">
+      <div class="big">✅</div>
+      <h2 style="text-align:center;">Paperwork already in</h2>
+      <p style="text-align:center;">${h.first_name?esc(h.first_name)+', y':'Y'}our paperwork is already
+      filed — nothing more to upload.</p>
+      <div class="navrow"><span class="sp"></span>
+        <a class="btn" style="text-decoration:none;" href="/onboarding">Back to my checklist →</a></div>
+      <p class="hint" style="margin-top:.8rem;text-align:center;">Need to submit a corrected form?
+        <a href="#" onclick="renderStart();return false;">Upload replacements</a>.</p>
+    </div>`;
+    return;
+  }
+  renderStart();
+})();
+</script>
+</body>
+</html>

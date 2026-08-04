@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee &amp; Contractor Onboarding Kit — AI Appraiser Tools</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg: #fafafa;
+    --accent: #2c5aa0;
+    --brand: #5a3a2a;
+    --brand-bg: #f5efe7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    margin: 0;
+    line-height: 1.5;
+  }
+  header {
+    background: white;
+    border-bottom: 1px solid var(--line);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  header img.logo { width: 72px; height: 72px; flex-shrink: 0; border-radius: 6px; }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p  { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  main { max-width: 920px; margin: 0 auto; padding: 1.5rem; }
+  .back { display: inline-block; margin-bottom: 1rem; color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+  .back:hover { text-decoration: underline; }
+  .panel {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .panel h2 { margin: 0 0 0.5rem; font-size: 1.1rem; color: var(--accent); }
+  .panel h3 { margin: 1.25rem 0 0.4rem; font-size: 1rem; }
+  .panel p { margin: 0.5rem 0; }
+  .notice {
+    background: var(--brand-bg);
+    border: 1px solid #e0d3c2;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .notice strong { color: var(--brand); }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+  code { font-size: 0.85rem; }
+  table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--line); padding: 0.5rem 0.65rem; text-align: left; vertical-align: top; }
+  th { background: #f4f4f4; font-weight: 600; }
+  ol, ul { margin: 0.5rem 0; padding-left: 1.35rem; }
+  li { margin: 0.3rem 0; }
+  .cta {
+    background: var(--brand-bg);
+    border: 1px solid #e0d3c2;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  .cta h3 { margin: 0 0 0.5rem; color: var(--brand); font-size: 1.1rem; }
+  .cta a {
+    display: inline-block;
+    margin-top: 0.5rem;
+    background: var(--brand);
+    color: white;
+    padding: 0.6rem 1.25rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .cta a:hover { opacity: 0.9; }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 2rem 1rem; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>Employee &amp; Contractor Onboarding Kit</h1>
+    <p>Onboard a new person into your appraisal office with one command.</p>
+  </div>
+</header>
+
+<main>
+
+<a class="back" href="../">&larr; All AI Appraiser Tools</a>
+
+<div class="notice">
+  <p style="margin:0;"><strong>Heads up — this one is different.</strong> Every other tool
+  here runs in your browser with nothing to install. This one is a small application that
+  runs on your own computer, because it has to send email, store signed agreements, and
+  hold tax forms. Nothing goes to us and nothing goes to the cloud unless you set that up
+  yourself. Setting it up takes about fifteen minutes and is walked through step by step in
+  <a href="./SETUP.md">SETUP.md</a>.</p>
+</div>
+
+<div class="panel">
+  <h2>What it does</h2>
+  <p>You type their name, email, start date, pay, and whether they are an employee or a
+  contractor. They get an email with a link. Behind that link is everything: the training
+  with quizzes, the agreement to e-sign, the tax forms to upload. You get the finished
+  paperwork filed and a note when they're done.</p>
+
+<pre>python3 -m onboarding.send_welcome \
+    --first Jane --last Doe --email jane@example.com \
+    --start 2026-08-17 --pay "$22/hour" --type employee</pre>
+
+  <p>Leave off <code>--type</code> and it asks. Say <code>employee</code> or
+  <code>contractor</code> — you never have to remember a config key.</p>
+</div>
+
+<div class="panel">
+  <h2>What the new hire gets</h2>
+  <p>One link, personal to them. No account to create, nothing to retype. They can start on
+  their phone in the driveway and finish on a laptop that night — progress is keyed to their
+  email address, so switching devices resumes instead of restarting.</p>
+  <ol>
+    <li><strong>Training</strong> — six short modules, each ending in a quiz they have to
+    pass: welcome and role, USPAP and ethics, confidentiality and data, independence and
+    pressure, how work moves through the office, and getting paid. They earn a completion
+    certificate.</li>
+    <li><strong>Their agreement</strong> — read and e-signed in the browser, with a
+    timestamp and IP on the executed copy.</li>
+    <li><strong>Tax paperwork</strong> — the right forms for their track, uploaded signed.</li>
+  </ol>
+</div>
+
+<div class="panel">
+  <h2>Two tracks, because two kinds of hire</h2>
+  <table>
+    <tr><th></th><th>W-2 Employee</th><th>1099 Contractor</th></tr>
+    <tr><td>Agreement</td><td>Employment Agreement</td><td>Independent Contractor Agreement</td></tr>
+    <tr><td>Tax forms</td><td>W-4 + I-9 (in-person ID check)</td><td>W-9 (W-8BEN if not a US person)</td></tr>
+    <tr><td>"Getting paid" module</td><td>Timesheets, overtime, never off the clock</td><td>Invoicing, self-employment tax, your own expenses</td></tr>
+  </table>
+  <p>The track is chosen per hire, so an office that uses both never has to maintain two
+  setups. This matters beyond convenience: handing a 1099 contractor training that tells
+  them to submit hours and never work off the clock contradicts the agreement they just
+  signed, and reads as evidence they were really an employee.</p>
+  <p><strong>Classification is your call and your risk.</strong> These documents are
+  starting points written for a typical appraisal office. They have not been reviewed by an
+  attorney, and employment law varies by state. Have your own counsel read them before you
+  put a real person through this.</p>
+</div>
+
+<div class="panel">
+  <h2>Making it your office</h2>
+  <p>Every office-specific value lives in one file, <code>config/office.json</code> — your
+  name, your people, your phone number, your pay periods, which tracks you use. Nothing
+  else in the kit knows your office name. Copy the example, fill it in, and the training,
+  the agreements, and the emails all come out in your voice.</p>
+  <h3>Start here</h3>
+  <ul>
+    <li><a href="./README.md">README.md</a> — what it is and what it does</li>
+    <li><a href="./SETUP.md">SETUP.md</a> — install it, configure it, send your first hire</li>
+    <li><a href="./CLAUDE.md">CLAUDE.md</a> — point Claude Code at this folder and have it
+    set the whole thing up with you, in conversation</li>
+  </ul>
+</div>
+
+<div class="cta">
+  <h3>Want more than the tools?</h3>
+  <p style="margin:0;">Coaching, training, the community of appraisers building these tools alongside us, and the bigger workflows — all on the main site.</p>
+  <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">Visit theappraisercoach.com</a>
+</div>
+
+</main>
+
+<footer>
+  &copy; The Appraiser Coach &middot; Open source on <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">GitHub</a>
+</footer>
+
+</body>
+</html>

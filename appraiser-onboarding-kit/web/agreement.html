@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{office_name}} — Your Agreement</title>
+<style>
+  :root{--ink:#20242b;--muted:#68707c;--line:#dfe3e9;--bg:#f5f6f8;--card:#fff;
+        --brand:{{brand_color}};--brand2:{{brand_color_dark}};--good:#2e7d32;--warn:#b03030;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);
+       background:var(--bg);margin:0;line-height:1.55;}
+  header{background:var(--brand);color:#fff;padding:1rem 1.2rem;display:flex;align-items:center;gap:.6rem;}
+  header .mark{font-size:1.5rem;} header h1{margin:0;font-size:1.1rem;font-weight:650;}
+  main{max-width:720px;margin:0 auto;padding:1.1rem;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.3rem 1.5rem;margin-bottom:1rem;}
+  h2{color:var(--brand);margin:.1rem 0 .6rem;font-size:1.25rem;}
+  .fld{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin:.7rem 0 .15rem;}
+  input[type=text]{width:100%;padding:.6rem .7rem;border:1px solid var(--line);border-radius:8px;font-size:1rem;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+  .btn{background:var(--brand);color:#fff;border:none;border-radius:8px;padding:.65rem 1.1rem;
+       font-size:.95rem;font-weight:600;cursor:pointer;}
+  .btn:hover{background:var(--brand2);} .btn:disabled{opacity:.5;cursor:default;}
+  .btn.ghost{background:#eef1f5;color:var(--brand);}
+  .navrow{display:flex;gap:.7rem;align-items:center;margin-top:1rem;} .sp{flex:1;}
+  .seg label{display:inline-flex;align-items:center;gap:.35rem;margin-right:1.2rem;padding:.3rem 0;}
+  .banner{background:#f2f4f7;border:1px solid var(--line);border-radius:9px;padding:.7rem .9rem;font-size:.92rem;margin:.6rem 0;}
+  .doc{border:1px solid var(--line);border-radius:10px;background:#fcfcfd;max-height:55vh;overflow-y:auto;
+       padding:1rem 1.2rem;margin:.8rem 0;}
+  .doc h1{font-size:1.2rem;} .doc h2{font-size:1rem;color:var(--ink);margin-top:1rem;}
+  .opt{display:block;padding:.4rem .5rem;cursor:pointer;}
+  .result .big{font-size:2rem;text-align:center;margin:.4rem 0;}
+  .hint{color:var(--muted);font-size:.85rem;}
+  .err{color:var(--warn);font-weight:600;}
+</style>
+</head>
+<body>
+<header><span class="mark">{{emoji}}</span><h1>{{office_name}} — Your Agreement</h1></header>
+<main id="app"></main>
+
+<script>
+const HIRE_TYPES={{hire_types_json}};
+let HIRE=null, BODY=null, SCROLLED=false;
+const g=id=>document.getElementById(id);
+const app=()=>g('app');
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function loadHire(){try{return JSON.parse(localStorage.getItem('kit_hire')||'null')||{};}catch(e){return {};}}
+function saveHire(o){const h={...loadHire(),...o};try{localStorage.setItem('kit_hire',JSON.stringify(h));}catch(e){}return h;}
+function prefill(map){const h=loadHire();for(const id in map){if(h[map[id]]&&g(id))g(id).value=h[map[id]];}}
+function ingestParams(){const q=new URLSearchParams(location.search);
+  const m={fn:'first_name',ln:'last_name',em:'email',sd:'start_date',ht:'hire_type'};
+  const cur=loadHire();const add={};for(const k in m){const v=q.get(k);if(v&&!cur[m[k]])add[m[k]]=v;}
+  if(Object.keys(add).length)saveHire(add);}
+async function syncProgress(){
+  try{
+    const em=(loadHire().email||'').trim(); if(!em)return;
+    const p=await (await fetch('/progress?em='+encodeURIComponent(em))).json();
+    if(!p.known)return;
+    const cur=loadHire(),add={};
+    ['first_name','last_name','start_date','hire_type'].forEach(k=>{if(p[k]&&!cur[k])add[k]=p[k];});
+    if(Object.keys(add).length)saveHire(add);
+    if(p.training_done)localStorage.setItem('kit_training_done','1');
+    if(p.agreement_done)localStorage.setItem('kit_agreement_done','1');
+    if(p.paperwork_done)localStorage.setItem('kit_paperwork_done','1');
+  }catch(e){}
+}
+function hireType(){ return loadHire().hire_type||'{{default_hire_type}}'; }
+
+async function boot(){
+  try{ingestParams();}catch(e){}
+  await syncProgress();
+  if(localStorage.getItem('kit_agreement_done')){
+    const h=loadHire();
+    app().innerHTML=`<div class="card result">
+      <div class="big">✅</div>
+      <h2 style="text-align:center;">You already signed this</h2>
+      <p style="text-align:center;">${h.first_name?esc(h.first_name)+', y':'Y'}our agreement is
+      already signed and filed — no need to do it again.</p>
+      <div class="navrow"><span class="sp"></span>
+        <a class="btn" style="text-decoration:none;" href="/onboarding">Back to my checklist →</a></div>
+      <p class="hint" style="margin-top:.8rem;text-align:center;">Signed under the wrong name or need to redo it?
+        <a href="#" onclick="loadAndStart();return false;">Sign again</a>.</p>
+    </div>`;
+    return;
+  }
+  await loadAndStart();
+}
+async function loadAndStart(){
+  try{
+    const r=await fetch('/agreement?type='+encodeURIComponent(hireType()));
+    if(!r.ok)throw new Error(r.status);
+    BODY=await r.text();
+  }catch(e){
+    app().innerHTML=`<div class="card"><h2>Couldn't load the agreement</h2>
+      <p>Your connection hiccupped while loading. Check your signal and try again — nothing is lost.</p>
+      <div class="navrow"><span class="sp"></span><button class="btn" onclick="loadAndStart()">Try again</button></div></div>`;
+    return;
+  }
+  renderStart();
+}
+
+function renderStart(){
+  const ht=HIRE_TYPES[hireType()]||{label:''};
+  app().innerHTML=`<div class="card">
+    <h2>Your ${esc(ht.label.toLowerCase()||'')} agreement</h2>
+    <p>Enter your details, read the agreement, and sign at the bottom. A copy is filed to
+    your record and {{owner_name}} is notified.</p>
+    <div class="row2">
+      <div><label class="fld">First name</label><input type="text" id="fn"></div>
+      <div><label class="fld">Last name</label><input type="text" id="ln"></div>
+    </div>
+    <label class="fld">Email</label><input type="text" id="em" placeholder="you@email.com">
+    <label class="fld">Start date</label><input type="text" id="sd" placeholder="e.g. 8/15/2026">
+    <label class="fld">Home address (street, city, state, ZIP)</label><input type="text" id="addr">
+    <label class="fld">Are you 18 years of age or older?</label>
+    <div class="seg">
+      <label><input type="radio" name="age" value="adult" onchange="toggleMinor()">Yes, I'm 18+</label>
+      <label><input type="radio" name="age" value="minor" onchange="toggleMinor()">No, I'm under 18</label>
+    </div>
+    <div id="minorFields" style="display:none">
+      <div class="banner">Because you're under 18, a parent or legal guardian must co-sign.</div>
+      <div class="row2">
+        <div><label class="fld">Parent / guardian full name</label><input type="text" id="pn"></div>
+        <div><label class="fld">Relationship</label><input type="text" id="prel" placeholder="e.g. Mother"></div>
+      </div>
+    </div>
+    <div class="navrow"><span class="sp"></span><button class="btn" onclick="startSign()">Review &amp; sign →</button></div>
+  </div>`;
+  prefill({fn:'first_name',ln:'last_name',em:'email',sd:'start_date',addr:'employee_address'});
+}
+function toggleMinor(){
+  const v=document.querySelector('input[name=age]:checked');
+  g('minorFields').style.display=(v&&v.value==='minor')?'block':'none';
+}
+function startSign(){
+  const fn=g('fn').value.trim(), ln=g('ln').value.trim(), em=g('em').value.trim();
+  const sd=g('sd').value.trim(), addr=g('addr').value.trim();
+  const age=document.querySelector('input[name=age]:checked');
+  if(!fn||!ln){alert("Please enter your first and last name.");return;}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){alert("Please enter a valid email — it goes on your record.");return;}
+  if(!sd){alert("Please enter your start date.");return;}
+  if(!addr){alert("Please enter your home address — it appears on the agreement.");return;}
+  if(!age){alert("Please tell us whether you are 18 or older.");return;}
+  const isMinor=age.value==='minor';
+  let pn='',prel='';
+  if(isMinor){
+    pn=g('pn').value.trim(); prel=g('prel').value.trim();
+    if(!pn||!prel){alert("A parent/guardian name and relationship are required for signers under 18.");return;}
+  }
+  HIRE={first_name:fn,last_name:ln,email:em,start_date:sd,employee_address:addr,
+        hire_type:hireType(),is_minor:isMinor,parent_name:pn,parent_relationship:prel};
+  saveHire({first_name:fn,last_name:ln,email:em,start_date:sd,employee_address:addr});
+  renderDoc();
+}
+
+function renderDoc(){
+  SCROLLED=false;
+  app().innerHTML=`<div class="card">
+    <h2>Read your agreement</h2>
+    <p class="hint">Scroll to the end to unlock signing. Read it — this is a real agreement.</p>
+    <div class="doc" id="doc">${BODY}</div>
+    <div id="signArea">
+      <label class="fld">Type your full legal name as your signature</label>
+      <input type="text" id="esig" oninput="checkReady()" placeholder="${esc(HIRE.first_name)} ${esc(HIRE.last_name)}">
+      ${HIRE.is_minor?`
+      <label class="fld">Parent/guardian: type your full name as your signature</label>
+      <input type="text" id="psig" oninput="checkReady()" placeholder="${esc(HIRE.parent_name)}">
+      <label class="opt"><input type="checkbox" id="pconsent" onchange="checkReady()">
+        I am ${esc(HIRE.parent_name)}, the signer's ${esc(HIRE.parent_relationship).toLowerCase()},
+        and I consent to this agreement on their behalf.</label>`:''}
+      <label class="opt"><input type="checkbox" id="attest" onchange="checkReady()">
+        I have read this agreement and I agree to it. I understand this electronic signature
+        is legally binding.</label>
+      <div class="navrow"><button class="btn ghost" onclick="renderStart()">← Back</button>
+        <span class="sp"></span><button class="btn" id="signBtn" disabled onclick="submitSign()">Sign &amp; submit</button></div>
+      <p class="hint" id="lockNote"></p>
+    </div>
+  </div>`;
+  const doc=g('doc');
+  const check=()=>{ if(doc.scrollHeight-doc.scrollTop-doc.clientHeight<40){SCROLLED=true;checkReady();} };
+  doc.addEventListener('scroll',check);
+  setTimeout(check,300);   // short documents may not scroll at all
+  checkReady();
+}
+function checkReady(){
+  const sig=(g('esig')?.value||'').trim();
+  const att=g('attest')?.checked;
+  const minorOk=!HIRE.is_minor||((g('psig')?.value||'').trim()&&g('pconsent')?.checked);
+  const ready=SCROLLED&&sig&&att&&minorOk;
+  const btn=g('signBtn'); if(btn)btn.disabled=!ready;
+  const note=g('lockNote');
+  if(note){
+    if(!SCROLLED)note.textContent="Unlocks when you've scrolled to the end of the agreement.";
+    else if(!sig)note.textContent="Type your name as your signature to continue.";
+    else if(HIRE.is_minor&&!minorOk)note.textContent="Parent/guardian signature and consent are required.";
+    else if(!att)note.textContent="Check the agreement box to continue.";
+    else note.textContent="";
+  }
+}
+async function submitSign(){
+  const name=`${HIRE.first_name} ${HIRE.last_name}`;
+  const when=new Date();
+  const attestation_text=`Signed by ${name} on ${when.toLocaleDateString()} at ${when.toLocaleTimeString()}`
+    +(HIRE.is_minor?`, with parent/guardian ${HIRE.parent_name} (${HIRE.parent_relationship}) co-signing`:'')+`.`;
+  const payload={...HIRE,
+    signature_typed:g('esig').value.trim(),
+    parent_signature:HIRE.is_minor?(g('psig')?.value||'').trim():'',
+    completed_date:when.toISOString().slice(0,10),
+    attestation_text};
+  const btn=g('signBtn'); btn.disabled=true; btn.textContent='Filing…';
+  // Never claim a legal agreement is filed until the server says so.
+  let ok=false;
+  try{
+    const r=await fetch('/sign-agreement',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)});
+    ok=r.ok;
+  }catch(e){ok=false;}
+  if(!ok){
+    btn.disabled=false; btn.textContent='Sign & submit';
+    let err=g('signErr');
+    if(!err){err=document.createElement('p');err.id='signErr';err.className='err';
+      g('signArea').appendChild(err);}
+    err.textContent="That didn't go through — probably a connection blip. Your signature was NOT filed yet. Please tap Sign & submit again.";
+    return;
+  }
+  localStorage.setItem('kit_agreement_done','1');
+  app().innerHTML=`<div class="card result">
+    <div class="big">✅</div>
+    <h2 style="text-align:center;">Agreement signed</h2>
+    <p style="text-align:center;">Thanks, ${esc(HIRE.first_name)}. Your signed agreement has been
+    recorded and filed to your record.</p>
+    <p class="hint" style="text-align:center;">Taking you back to your onboarding checklist…</p>
+    <div class="navrow"><span class="sp"></span><a class="btn" style="text-decoration:none;" href="/onboarding">Back to my checklist →</a></div>
+  </div>`;
+  setTimeout(()=>{location.href='/onboarding';},1800);
+}
+boot();
+</script>
+</body>
+</html>

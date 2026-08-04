@@ -1,0 +1,18 @@
+# YOUR office's real details — names, emails, folder IDs. Never commit this.
+config/office.json
+
+# Completed onboarding records: tax forms, SSNs, bank details, signed agreements.
+# This must never end up in git, on GitHub, or in a backup you share.
+records/
+*.pdf
+
+# Runtime
+progress.json
+*.log
+__pycache__/
+*.pyc
+.DS_Store
+
+# Compiled courses — generated from YOUR office.json at server start, so they contain
+# your office name, your email, your phone. Never commit them.
+web/content*.json
