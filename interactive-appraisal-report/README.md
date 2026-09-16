@@ -1,3 +1,5 @@
+> ⚠️ **This one is a developer project, not a click-and-go tool.** It is the source code for a password-protected website version of an appraisal report. To use it you (or a developer, or an AI coding tool like Claude Code) will need to edit the report data and host the site. Try the live demo linked below first to see if it is worth it for your practice. [← Back to all tools](https://theappraisercoach.github.io/ai-appraiser-tools/)
+
 # Interactive Appraisal Report
 
 > A modern, password-protected, interactive web-based appraisal report — built as a premium alternative to static PDF delivery.
