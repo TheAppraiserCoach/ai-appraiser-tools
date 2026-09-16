@@ -1,3 +1,5 @@
+> 👉 **Just want the overview?** [Open the Onboarding Kit page](https://theappraisercoach.github.io/ai-appraiser-tools/appraiser-onboarding-kit/). **Heads up:** this tool is a small program that runs on your own computer. To get the files, go to the [main repo page](https://github.com/TheAppraiserCoach/ai-appraiser-tools), click the green **<> Code** button, then **Download ZIP**. [← Back to all tools](https://theappraisercoach.github.io/ai-appraiser-tools/)
+
 # Appraiser Office Onboarding Kit
 
 Onboard a new person into an appraisal office with one command.
