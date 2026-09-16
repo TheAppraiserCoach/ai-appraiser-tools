@@ -114,6 +114,11 @@
     padding: 2rem 1rem;
   }
   footer a { color: var(--muted); }
+  .howto { border-left: 4px solid var(--accent); }
+  .howto ol { margin: 0.5rem 0 0.5rem 1.25rem; padding: 0; }
+  .howto li { margin: 0.3rem 0; }
+  .howto .note { color: var(--muted); font-size: 0.9rem; }
+  .section-label { margin: 1.75rem 0 0.75rem; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -130,8 +135,19 @@
 
 <div class="intro">
   <h2>What this is</h2>
-  <p>A growing collection of practical tools for residential appraisers, built with AI and shared openly. Use them, fork them on GitHub, suggest improvements, build your own.</p>
-  <p>Every tool runs entirely in your browser — no signup, no data leaves your computer, no subscription required.</p>
+  <p>A growing collection of practical tools for residential appraisers, built with AI and shared openly. Use them, copy them, suggest improvements, build your own.</p>
+  <p>Nothing to install and no signup. The pages run in your browser and we never see your files.</p>
+</div>
+
+<div class="intro howto">
+  <h2>New here? How the prompt tools work</h2>
+  <ol>
+    <li>Pick a tool below and click <strong>&#128203; Copy prompt</strong> on its page.</li>
+    <li>Open <a href="https://claude.ai" target="_blank" rel="noopener">Claude.ai</a> or <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a> in another tab and start a <strong>new chat</strong>.</li>
+    <li><strong>Paste</strong> the prompt, <strong>attach</strong> your report PDF with the paperclip, and <strong>send</strong>.</li>
+    <li>Review what comes back like a reviewer would. You are still the appraiser.</li>
+  </ol>
+  <p class="note">You'll need a paid AI plan (Claude Pro or ChatGPT Plus, about $20/month). Free plans usually can't read PDFs or photos well enough. <strong>Not sure where to start?</strong> Try the 133-Step QC Reviewer on your last report.</p>
 </div>
 
 <div class="tool-grid">
@@ -190,6 +206,30 @@ inspection. Two prompts: one coaches you through building it on any
 platform (Go High Level, Synthflow, Retell, Vapi, Bland, or ElevenLabs
 + Twilio), one is a ready-to-edit script for the agent itself.</p>
   </a>
+
+</div>
+
+<h2 class="section-label">Downloads and reading</h2>
+<div class="tool-grid">
+
+  <a class="tool-card" href="https://github.com/TheAppraiserCoach/ai-appraiser-tools/tree/main/personal-os-starter">
+    <span class="arrow">&rarr;</span>
+    <h3>Personal OS Starter (download)</h3>
+    <p>A folder of plain files that gives Claude, ChatGPT, or Gemini a memory of who you are, how you work, and what you're working on, so you stop re-explaining yourself every new chat. Includes interview prompts that fill the files in for you.</p>
+  </a>
+
+  <a class="tool-card" href="./total-automation-whitepaper/">
+    <span class="arrow">&rarr;</span>
+    <h3>Automating TOTAL with AI (white paper)</h3>
+    <p>How an AI agent was taught to read and write TOTAL reports, what worked, and what didn't. Educational reading only, nothing to install.</p>
+  </a>
+
+  <a class="tool-card" href="https://github.com/TheAppraiserCoach/ai-appraiser-tools/tree/main/interactive-appraisal-report">
+    <span class="arrow">&rarr;</span>
+    <h3>Interactive Appraisal Report (developer project)</h3>
+    <p>A password-protected website version of an appraisal report for private clients, with maps, charts, photo gallery, and a Save PDF button. This is source code, so plan on a developer or an AI coding tool to set it up. See the live demo in its README first.</p>
+  </a>
+
 
   <a class="tool-card" href="./appraiser-onboarding-kit/">
     <span class="arrow">→</span>

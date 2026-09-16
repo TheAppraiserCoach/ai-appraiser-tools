@@ -1,35 +1,106 @@
 # AI Appraiser Tools
 
-Free, open-source tools for real estate appraisers, built by [The Appraiser Coach](https://www.theappraisercoach.com ).
+Free AI tools for residential appraisers, from [The Appraiser Coach](https://www.theappraisercoach.com).
 
-Every tool runs entirely in the browser — no signup, no data leaves the user's computer, no subscription required.
+---
 
-## Tools
+## 👉 Start here: [OPEN THE TOOLS](https://theappraisercoach.github.io/ai-appraiser-tools/)
 
-| Tool | What it does |
-|---|---|
-| [Depreciated Cost Calculator](./depreciated-cost-calculator/) | Drop in an appraisal PDF, get suggested adjustment ranges for GLA, basement, and garage derived from the report's own Cost Approach. |
-| [133-Step QC Reviewer (prompt template)](./qc-reviewer/) | Pre-submission QC checklist. Copy the prompt into Claude.ai or ChatGPT, attach your appraisal PDF, get severity-rated concerns with step references. Requires a paid AI subscription. |
-| [Revision Response Writer (prompt template)](./revision-writer/) | Drafts addendum-ready responses to AMC / underwriter revision requests. Categorizes each item (already addressed / correction / clarification / misunderstanding / out-of-scope) and writes in appraiser voice with appropriate standards citations. Requires a paid AI subscription. |
-| [Engagement Letter Parser (prompt template)](./engagement-letter-parser/) | Drop in an engagement letter PDF, get all the order-setup fields in a clean structured format (property, borrower, lender, AMC, fee, due date, loan type, contacts, case numbers, legal description, special instructions). Saves 5–10 minutes of typing per order. Requires a paid AI subscription. |
-| [Photo Quality Checker (prompt template, vision-required)](./photo-quality-checker/) | Drop in a completed report PDF. The AI reviews every photo and flags missing required angles, missing interior coverage (with FHA/VA escalation), condition-rating mismatches, quality-rating consistency, and photo-quality issues (blurry, dark, obstructed, watermarked stock). Severity-rated output. Requires a paid AI subscription with a vision-capable model. |
-| [Neighborhood Narrative Builder (prompt template)](./neighborhood-narrative-builder/) | Give it the subject address + the four neighborhood-character trend boxes, get suggested N/S/E/W major-road boundaries plus the Neighborhood Description and Market Conditions narratives. Third-person report voice. Marks placeholders for any specific data not provided. Requires a paid AI subscription. |
-| [Reconciliation Narrative Writer (prompt template, vision-required)](./reconciliation-narrative-writer/) | Drop in a completed report PDF or grid screenshot. Reads the adjusted grid, classifies each comp (closed / pending / active), suggests reconciliation weights summing to 100% across closed sales only, and drafts the three-paragraph reconciliation narrative. Requires a paid AI subscription with a vision-capable model. |
-| [Interactive Appraisal Report](./interactive-appraisal-report/) | A password-protected, interactive website that replaces the static PDF for private appraisal clients. Includes 15 clickable sections — value summary, neighborhood map, market analysis charts, sales comparison grid, cost approach visualization, photo gallery, building sketch, FAQ, and more. Hosted for 90 days with a built-in Save PDF button. Branded to the appraiser.  |
-| [Comp Verification (prompt template)](./comp-verification/) | Drafts verification emails to listing agents — one per agent, combining their comps. Asks about concessions, buyer-agent compensation, multiple offers, related parties, and close price/date confirmation. Paste your comps into Claude.ai or ChatGPT, get ready-to-send emails. Requires a paid AI subscription. |
-| [AI Voice Agent Builder (prompt template)](./voice-agent-builder/) | Walks you through building a phone agent that answers calls when you cannot, on the platform of your choice. Includes a build-coach prompt and a ready-to-edit agent script. Bring your own AI chat. |
+**Click the link above.** That's it. Every tool opens as a normal web page with a big button. No download, no signup, nothing to install.
 
-## Using the tools
+You do NOT need a GitHub account. You do NOT need to understand the list of folders above this page.
 
-Visit the live site:
+---
 
-**https://theappraisercoach.github.io/ai-appraiser-tools/**
+## Wait, what is this page?
 
-Each tool has its own page — drop in a PDF, get adjustments, copy the suggested narrative.
+GitHub is where software people store and share files. Think of this page as the **storage room**. The folders at the top of the screen are the raw files behind each tool.
 
-## For developers
+The **showroom** is the link above. Same tools, but they open like a regular website.
 
-Every tool is a single self-contained HTML file. No build step, no framework, no server. Just open the file in any browser and it works.
+> **Clicked a folder and saw a wall of code?** That's normal. You opened the raw file in the storage room. Come back here and use the **OPEN THE TOOLS** link instead.
 
-To run locally:
+---
 
+## How most of these tools work (3 minutes, one time)
+
+Most tools here are **prompt templates**. A prompt is a set of instructions you hand to an AI. We wrote the instructions. You bring the AI and your report.
+
+1. Click **[OPEN THE TOOLS](https://theappraisercoach.github.io/ai-appraiser-tools/)** and pick a tool.
+2. Click the **📋 Copy prompt** button on that tool's page.
+3. In another tab, open **[Claude.ai](https://claude.ai)** or **[ChatGPT](https://chatgpt.com)** and start a **new chat**.
+4. **Paste** the prompt into the message box. Don't hit send yet.
+5. **Attach** your file (paperclip icon). Usually your appraisal PDF.
+6. **Send.** Give it 30 to 90 seconds.
+7. **Read it like a reviewer, not a robot.** You are still the appraiser. Check it, fix it, then paste into TOTAL.
+
+**What you need:** a paid AI plan (Claude Pro or ChatGPT Plus, about $20/month). The free versions usually can't read PDFs or photos well enough.
+
+**Tip:** keep that chat open. Ask follow-ups like *"show me the math on concern #3."*
+
+---
+
+## Which tool do I use?
+
+| When you need to | Use this | Type |
+|---|---|---|
+| Catch problems before you submit | [133-Step QC Reviewer](https://theappraisercoach.github.io/ai-appraiser-tools/qc-reviewer/) | Prompt |
+| Check your photos against your ratings | [Photo Quality Checker](https://theappraisercoach.github.io/ai-appraiser-tools/photo-quality-checker/) | Prompt |
+| Answer an AMC or underwriter revision | [Revision Response Writer](https://theappraisercoach.github.io/ai-appraiser-tools/revision-writer/) | Prompt |
+| Set up a new order fast | [Engagement Letter Parser](https://theappraisercoach.github.io/ai-appraiser-tools/engagement-letter-parser/) | Prompt |
+| Write the neighborhood section | [Neighborhood Narrative Builder](https://theappraisercoach.github.io/ai-appraiser-tools/neighborhood-narrative-builder/) | Prompt |
+| Write the reconciliation | [Reconciliation Narrative Writer](https://theappraisercoach.github.io/ai-appraiser-tools/reconciliation-narrative-writer/) | Prompt |
+| Email agents to verify comps | [Comp Verification](https://theappraisercoach.github.io/ai-appraiser-tools/comp-verification/) | Prompt |
+| Support GLA, basement, garage adjustments | [Depreciated Cost Calculator](https://theappraisercoach.github.io/ai-appraiser-tools/depreciated-cost-calculator/) | Works on the page, no AI needed |
+| Have an AI answer your phone | [AI Voice Agent Builder](https://theappraisercoach.github.io/ai-appraiser-tools/voice-agent-builder/) | Prompt + guide |
+| Onboard a new trainee or contractor | [Onboarding Kit](https://theappraisercoach.github.io/ai-appraiser-tools/appraiser-onboarding-kit/) | Download (advanced) |
+| Give your AI a memory of you and your business | [Personal OS Starter](./personal-os-starter/) | Download |
+| Deliver a private report as a website | [Interactive Appraisal Report](./interactive-appraisal-report/) | Developer project (advanced) |
+| Read how we had AI read and write TOTAL files | [Automating TOTAL white paper](https://theappraisercoach.github.io/ai-appraiser-tools/total-automation-whitepaper/) | Read only |
+
+**New to all this? Start with the QC Reviewer.** It's the fastest "aha" in the bunch.
+
+---
+
+## The download tools (only if you need them)
+
+A few items are folders of files, not web pages. To grab them:
+
+1. Scroll to the top of this page.
+2. Click the green **`<> Code`** button.
+3. Click **Download ZIP**.
+4. Unzip it on your computer and open the folder for the tool you want. Each one has its own README with setup steps.
+
+---
+
+## Common questions
+
+**"I tried to download the reviewer and it didn't work."**
+You don't download it. Open the [QC Reviewer page](https://theappraisercoach.github.io/ai-appraiser-tools/qc-reviewer/), click **Copy prompt**, and paste it into Claude or ChatGPT.
+
+**"Do I need a GitHub account?"**
+No. Only if you want to save your own copy or suggest changes.
+
+**"Is my report data sent to you?"**
+No. The pages run in your browser. When you use a prompt, your PDF goes to whichever AI you choose (Claude or ChatGPT), under your own account.
+
+**"The AI said it can't read my PDF."**
+You're probably on a free plan or an older model. Switch to a paid plan and pick the top model.
+
+**"Can I change the prompt?"**
+Yes. Paste it into your AI, then tell it what to change. It's yours.
+
+**"Something is broken."**
+Let us know in the member community or at [theappraisercoach.com](https://www.theappraisercoach.com).
+
+---
+
+<details>
+<summary><b>For the tech-curious (skip this)</b></summary>
+
+Every browser tool is a single self-contained HTML file. No build step, no framework, no server. Download the file, double-click it, and it opens in your browser.
+
+The site above is published with GitHub Pages from the `main` branch. Fork the repo, change what you want, and turn on Pages in your fork to host your own copy.
+
+Licensed MIT. See [LICENSE](./LICENSE).
+</details>
