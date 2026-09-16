@@ -1,3 +1,5 @@
+> 👉 **How to get these files:** go to the [main repo page](https://github.com/TheAppraiserCoach/ai-appraiser-tools), click the green **<> Code** button, then **Download ZIP**. Unzip it and open the `personal-os-starter` folder. Then follow the steps below. [← Back to all tools](https://theappraisercoach.github.io/ai-appraiser-tools/)
+
 # Personal OS Starter
 
 A folder of plain markdown files that any AI can read and write. Point Claude, ChatGPT, or
