@@ -53,6 +53,7 @@ Most tools here are **prompt templates**. A prompt is a set of instructions you 
 | Write the reconciliation | [Reconciliation Narrative Writer](https://theappraisercoach.github.io/ai-appraiser-tools/reconciliation-narrative-writer/) | Prompt |
 | Email agents to verify comps | [Comp Verification](https://theappraisercoach.github.io/ai-appraiser-tools/comp-verification/) | Prompt |
 | Support GLA, basement, garage adjustments | [Depreciated Cost Calculator](https://theappraisercoach.github.io/ai-appraiser-tools/depreciated-cost-calculator/) | Works on the page, no AI needed |
+| Study for the appraiser licensing exam | [Appraiser Exam Prep](https://exam.dustinharrisos.com/) | Website, no AI needed |
 | Have an AI answer your phone | [AI Voice Agent Builder](https://theappraisercoach.github.io/ai-appraiser-tools/voice-agent-builder/) | Prompt + guide |
 | Onboard a new trainee or contractor | [Onboarding Kit](https://theappraisercoach.github.io/ai-appraiser-tools/appraiser-onboarding-kit/) | Download (advanced) |
 | Give your AI a memory of you and your business | [Personal OS Starter](./personal-os-starter/) | Download |
