@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>County Records Puller — by The Appraiser Coach</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg: #fafafa;
+    --accent: #2c5aa0;
+    --accent-bg: #f0f5ff;
+    --brand: #5a3a2a;
+    --brand-bg: #f5efe7;
+    --good: #2e7d32;
+    --warn: #c62828;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink); background: var(--bg); margin: 0; line-height: 1.5;
+  }
+  header {
+    background: white; border-bottom: 1px solid var(--line);
+    padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1.25rem;
+  }
+  header img.logo { width: 72px; height: 72px; flex-shrink: 0; border-radius: 6px; }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p  { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link { color: var(--accent); font-size: 0.9rem; text-decoration: none; }
+  header a.home-link:hover { text-decoration: underline; }
+  main { max-width: 920px; margin: 0 auto; padding: 1.5rem; }
+  section {
+    background: white; border: 1px solid var(--line); border-radius: 8px;
+    padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;
+  }
+  section h2 { margin: 0 0 0.75rem; font-size: 1.05rem; font-weight: 600; color: var(--accent); }
+  .step-num {
+    display: inline-block; background: var(--accent); color: white; border-radius: 50%;
+    width: 1.5rem; height: 1.5rem; text-align: center; line-height: 1.5rem;
+    font-size: 0.85rem; margin-right: 0.5rem;
+  }
+  .copy-zone {
+    background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 8px;
+    padding: 1.5rem; text-align: center; margin-bottom: 1.25rem;
+  }
+  .copy-zone h2 { color: var(--accent); margin-top: 0; }
+  button.copy-btn {
+    background: var(--accent); color: white; border: 0; padding: 0.85rem 1.75rem;
+    border-radius: 6px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: background 0.15s;
+  }
+  button.copy-btn:hover { background: #1d4080; }
+  button.copy-btn.copied { background: var(--good); }
+  .copy-status { margin-top: 0.75rem; font-size: 0.9rem; color: var(--good); min-height: 1.25rem; }
+  ol.steps { padding-left: 1.5rem; line-height: 1.7; }
+  ol.steps li { margin-bottom: 0.4rem; }
+  ol.steps strong { color: var(--ink); }
+  ul.qs { padding-left: 1.25rem; line-height: 1.6; }
+  ul.qs li { margin-bottom: 0.35rem; }
+  .ai-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
+  .ai-card { border: 1px solid var(--line); border-radius: 6px; padding: 0.85rem 1rem; background: #fcfcfc; }
+  .ai-card h3 { margin: 0 0 0.25rem; font-size: 0.95rem; color: var(--accent); }
+  .ai-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  details.prompt-view { border: 1px solid var(--line); border-radius: 6px; padding: 0.5rem 1rem; background: #fcfcfc; }
+  details.prompt-view summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: 0.95rem; padding: 0.25rem 0; }
+  pre.prompt {
+    background: white; border: 1px solid var(--line); border-radius: 4px; padding: 1rem;
+    margin-top: 0.75rem; max-height: 24rem; overflow: auto; font-size: 0.8rem;
+    line-height: 1.45; white-space: pre-wrap; word-wrap: break-word;
+  }
+  .note { background: var(--brand-bg); border: 1px solid #e6d6c2; border-radius: 6px; padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--brand); }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 2rem 1rem; }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  @media (max-width: 620px) { .ai-pick { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>County Records Puller</h1>
+    <p>Give it a subject address. Claude opens your county's own websites in your browser and pulls the assessor record, tax card, GIS map, plat, legal description, and ownership history into one subject data sheet, with a source link for every figure.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+
+<section>
+  <h2><span class="step-num">1</span>What this is</h2>
+  <p>Starting a report usually means ten browser tabs: the assessor, the treasurer, the GIS viewer, the recorder, the plat. This prompt hands that job to <strong>Claude in Chrome</strong>, which works inside your own browser. It finds the county, goes to the county's public sites, and collects the subject data for you.</p>
+  <p>It works in <strong>any county</strong>. It doesn't use a pre-built scraper that breaks when a county redesigns its site. Claude reads the page the way you would. If a site shows a CAPTCHA, a login, or a paywall, it stops and asks you to handle it, then continues.</p>
+  <p style="margin-bottom:0">It reads and reports only. It never buys a document, submits a form, or changes anything on a county site.</p>
+</section>
+
+<div class="copy-zone">
+  <h2>Copy the prompt</h2>
+  <p style="margin:0 0 1rem;color:var(--muted)">Paste it into Claude in Chrome, then give it the subject address.</p>
+  <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">📋 Copy prompt to clipboard</button>
+  <div class="copy-status" id="copy-status"></div>
+</div>
+
+<section>
+  <h2><span class="step-num">2</span>One-time setup</h2>
+  <ol class="steps">
+    <li><strong>Use Google Chrome</strong> on a computer (not a phone).</li>
+    <li><strong>Install the Claude extension.</strong> Go to <a href="https://claude.com/claude-in-chrome" target="_blank" rel="noopener">claude.com/claude-in-chrome</a>, add it to Chrome, and sign in with your Claude account. A paid Claude plan is required.</li>
+    <li><strong>Pin it.</strong> Click the puzzle-piece icon in Chrome's toolbar and pin Claude so it's one click away.</li>
+    <li><strong>Optional, but it saves the most time:</strong> if your county's data sits behind a login (a paid parcel viewer or a recorder account), sign in to that site in Chrome first. Claude uses the session you already have. It never sees or asks for your password.</li>
+  </ol>
+</section>
+
+<section>
+  <h2><span class="step-num">3</span>How to use it</h2>
+  <ol class="steps">
+    <li><strong>Open the Claude side panel</strong> in Chrome.</li>
+    <li><strong>Paste the prompt</strong> you copied above.</li>
+    <li><strong>Add the subject address</strong> at the bottom, for example: <em>Subject: 123 Main St, Rigby, ID 83442</em>. If you already have the parcel number (APN) from the engagement letter, add it too. It makes the search much faster.</li>
+    <li><strong>Let it work.</strong> Watch the tabs open. If it stops at a CAPTCHA or login, handle it and tell Claude "continue."</li>
+    <li><strong>Review the data sheet.</strong> It comes back with every field, the source link for each, and a list of anything it couldn't find or that conflicts between sources.</li>
+  </ol>
+  <p class="note" style="margin-top:1rem"><strong>Tip:</strong> the first run in a new county takes longest, because Claude has to find the county's sites. At the end it gives you a short "county cheat sheet" of the exact links it used. Save it, and paste it in with the address next time to go straight to the right pages.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">4</span>What you get back</h2>
+  <ul class="qs">
+    <li><strong>Identification:</strong> owner of record, owner mailing address, parcel number / APN, county, legal description, subdivision, lot and block, and the tax district</li>
+    <li><strong>Site:</strong> lot size (acres and square feet), zoning, flood zone if the GIS shows it</li>
+    <li><strong>Improvements (per the assessor):</strong> year built, living area, basement, bedrooms and bathrooms, style, garage, and outbuildings</li>
+    <li><strong>Assessment and taxes:</strong> land, improvement, and total values; tax year; annual tax; exemptions; any delinquency shown</li>
+    <li><strong>Ownership and sales history:</strong> prior owners, sale or deed dates, prices where the state discloses them, and document numbers (at least 3 years back, which is the USPAP minimum for the subject)</li>
+    <li><strong>Maps and documents:</strong> links to (and, where your browser allows, saved copies of) the GIS parcel map, the plat map, and the assessor property card</li>
+    <li><strong>A flag list:</strong> fields it couldn't find, sources that disagree, and assessor data that looks stale</li>
+  </ul>
+  <p class="note" style="margin-top:1rem">Some states, including Idaho, Texas, and Utah, don't publish sale prices in public records. Claude records the transfer and deed date, and marks the price "not disclosed by this state." Get the price from MLS or the parties.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">5</span>Read the prompt before you copy (optional)</h2>
+  <p>Want to see exactly what you're giving the AI? Expand it below.</p>
+  <details class="prompt-view">
+    <summary>Show full prompt</summary>
+    <pre class="prompt" id="prompt-display"></pre>
+  </details>
+</section>
+
+</main>
+
+<footer>
+  <p class="cta-line">Built by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a> — free for any appraiser to use. For more tools, coaching, and the community building this with us: <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">theappraisercoach.com →</a></p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Open source — <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">view source on GitHub</a>. The AI reads public county pages in your own browser, on your own login, and reports what it found with a link to each source. It does not submit, purchase, or change anything. Public records contain errors. Confirm every figure and use your own judgment before it goes in a report.</p>
+</footer>
+
+<script type="text/plain" id="county-records-prompt-source">
+# ROLE
+
+You are a research assistant for a residential real estate appraiser, working inside the appraiser's own Chrome browser. Your job: take one subject address, find that property's PUBLIC county records, and return a complete, sourced subject data sheet. Start as soon as the appraiser gives you the address.
+
+# HARD RULES
+
+1. READ ONLY. Never submit a form other than a property search, never buy or order a document, never create an account, never change any setting on any site. If a document costs money, record that it exists, its price, and where to get it, and move on.
+2. NEVER BYPASS PROTECTIONS. If you hit a CAPTCHA, a login screen, a paywall, or a "verify you are human" check, STOP. Tell the appraiser exactly which site and what they need to do, then wait for them to say "continue." Never try to solve or get around it yourself.
+3. NEVER ASK FOR PASSWORDS. If a site needs a login, the appraiser signs in themselves.
+4. NEVER GUESS. Every value on the data sheet must come from a page you actually read. If you can't find a value, write "NOT FOUND" and say where you looked. Do not fill gaps from memory, from Zillow-type estimate sites, or from inference.
+5. SOURCE EVERYTHING. Record the URL (or the site name and page, if the URL is session-based) for every value.
+6. OFFICIAL SOURCES FIRST. Use county and state government sites first: assessor, treasurer, recorder or clerk, GIS, and planning/zoning. Third-party aggregators may be used ONLY to find the parcel number or the right county site, never as the source of a reported value, unless the appraiser explicitly allows it. If you do use one, label that value "UNOFFICIAL."
+7. STAY ON THIS PROPERTY. Confirm the parcel matches the subject address before collecting anything. If more than one parcel could match (a condo, a split lot, a similar address, or a property that crosses parcels), stop and ask the appraiser which one.
+
+# STEP-BY-STEP
+
+STEP 1: IDENTIFY THE COUNTY
+- Work out which county the address is in. If the city spans more than one county, confirm with the county GIS or the state's parcel viewer before continuing.
+- If the appraiser gave you a "county cheat sheet" of links, use those links and skip ahead.
+
+STEP 2: FIND THE COUNTY'S SITES
+Search for the county's official sites (usually on a .gov, .us, or county-name domain):
+- Assessor (property records / parcel search)
+- Treasurer or tax collector (tax bills, delinquency)
+- GIS / parcel map viewer
+- Recorder or clerk (deeds, plats; many counties index these for free, even when copies cost money)
+- Planning or zoning (zoning map), if zoning isn't on the assessor or GIS record
+- Some states run one statewide parcel viewer; use it if the county points to it.
+
+STEP 3: FIND THE PARCEL
+- Search the assessor by address. If the search fails, try variations: drop the street suffix, drop the unit, spell out or abbreviate directions (N / North), try the street name only, or use the APN if the appraiser gave one.
+- Still nothing? Find the parcel on the GIS map by address and get the APN there, then search the assessor by APN.
+- Confirm the situs (property) address on the record matches the subject.
+
+STEP 4: COLLECT THE ASSESSOR / PROPERTY CARD DATA
+Owner of record; owner mailing address; APN / parcel ID (and any alternate account number); legal description (exactly as written); subdivision, lot, and block; tax district or code area; land use / property class; lot size (acres AND square feet; convert if only one is given and mark it "converted"); year built; effective year built (if shown); living area / GLA and how the county measured it (if stated); basement area and finished area; bedrooms; bathrooms (full / half); style or stories; construction quality or grade (if shown); garage type and size; outbuildings (type, size, year); land value, improvement value, total market or assessed value, and the valuation year; exemptions (such as homeowner's exemption).
+If the site has a printable property card or report, open it and save a PDF of it if the browser allows.
+
+STEP 5: COLLECT TAX DATA
+Tax year, total annual tax, any special assessments, and payment status (current / delinquent), from the treasurer's site if it's separate.
+
+STEP 6: COLLECT OWNERSHIP AND SALES HISTORY
+From the assessor's sales tab and/or the recorder's index, list every transfer you can find, newest first, going back AT LEAST 3 years (and further if the record shows it): date recorded, document type (warranty deed, quitclaim, etc.), grantor, grantee, recorded price or "not disclosed", and document or instrument number.
+Flag: any transfer within the last 3 years (USPAP requires analysis of prior subject sales within 3 years); quitclaims or transfers between related names (possibly not arm's-length); and any current listing or pending sale note on the record.
+If the state is a non-disclosure state, say so, and record deed dates and document numbers without prices.
+
+STEP 7: MAPS AND PLAT
+- GIS: open the parcel on the county GIS viewer. Record the direct link. Note zoning and any flood-zone or overlay layers the viewer offers (FEMA flood zone, wetlands, etc.). Take a screenshot of the parcel outline if you can.
+- Plat: find the recorded subdivision plat (often linked from GIS, the assessor record, or the recorder index by subdivision name). Record the plat name, book/page or document number, and the link. Save a copy only if it's free.
+- Zoning: if zoning isn't on the assessor or GIS record, check the county or city zoning map. Record the zone code and what it stands for. Note whether the property is in city limits (city zoning) or unincorporated (county zoning).
+
+STEP 8: CROSS-CHECK
+Compare the sources against each other and flag anything that disagrees (for example, GIS acreage vs. assessor acreage, or two different owner names). Flag assessor data that looks outdated: an old "last inspected" date, or improvement data that conflicts with the appraiser's notes if they gave you any.
+
+# OUTPUT FORMAT
+
+Return one report, in this order:
+
+## SUBJECT DATA SHEET
+Subject: <address as given>
+County / State: <county>, <state>
+Pulled: <today's date>
+
+A table with columns: Field | Value | Source
+(Use every field from Steps 4, 5 and 7. Write NOT FOUND for anything missing; never leave a field out.)
+
+## OWNERSHIP & SALES HISTORY
+A table: Date | Document type | Grantor → Grantee | Price | Doc # | Source
+Then one line: "Transfers within 3 years of today: <list, or 'None found'>".
+
+## MAPS & DOCUMENTS
+Links to: GIS parcel view, plat, assessor property card, tax record. Mark which ones you saved as files, and list any document that costs money (name, price, where to buy it).
+
+## FLAGS FOR THE APPRAISER
+Bullet list: fields not found (and where you looked), conflicts between sources, possible non-arm's-length transfers, stale assessor data, multi-parcel or ambiguity issues, and anything unusual on the record (liens noted, delinquent taxes, split or combined parcels, easements shown on the plat).
+
+## COUNTY CHEAT SHEET (save this for next time)
+The exact working links for this county's assessor search, treasurer, GIS viewer, recorder, and zoning map, plus any search tip that worked (for example, "search without the street suffix"). Tell the appraiser: "Paste this in with your next address in this county to skip the search step."
+
+# TONE
+
+Be brief while you work. Don't narrate every click. Speak up only when you need the appraiser (CAPTCHA, login, parcel ambiguity) or when you're done.
+
+# THE SUBJECT
+
+(The appraiser will give the address below. If they paste a county cheat sheet, use it.)
+</script>
+
+<script>
+function getPromptText() {
+  return document.getElementById("county-records-prompt-source").textContent.trim();
+}
+
+document.getElementById("prompt-display").textContent = getPromptText();
+
+async function copyPrompt() {
+  const text = getPromptText();
+  const btn = document.getElementById("copy-btn");
+  const status = document.getElementById("copy-status");
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "✓ Copied!";
+    btn.classList.add("copied");
+    status.textContent = `${text.length.toLocaleString()} characters copied. Paste into Claude in Chrome, then add your subject address.`;
+    setTimeout(() => {
+      btn.textContent = "📋 Copy prompt to clipboard";
+      btn.classList.remove("copied");
+    }, 4000);
+  } catch (err) {
+    status.textContent = "Couldn't auto-copy. Open the 'Show full prompt' section below, select all (Ctrl/Cmd+A), and copy manually.";
+  }
+}
+</script>
+
+</body>
+</html>
