@@ -48,6 +48,7 @@ Most tools here are **prompt templates**. A prompt is a set of instructions you 
 | Check your photos against your ratings | [Photo Quality Checker](https://theappraisercoach.github.io/ai-appraiser-tools/photo-quality-checker/) | Prompt |
 | Answer an AMC or underwriter revision | [Revision Response Writer](https://theappraisercoach.github.io/ai-appraiser-tools/revision-writer/) | Prompt |
 | Set up a new order fast | [Engagement Letter Parser](https://theappraisercoach.github.io/ai-appraiser-tools/engagement-letter-parser/) | Prompt |
+| Pull the subject's county records (assessor, taxes, GIS, plat, sales history) | [County Records Puller](https://theappraisercoach.github.io/ai-appraiser-tools/county-records-puller/) | Prompt for Claude in Chrome |
 | Write the neighborhood section | [Neighborhood Narrative Builder](https://theappraisercoach.github.io/ai-appraiser-tools/neighborhood-narrative-builder/) | Prompt |
 | Write the reconciliation | [Reconciliation Narrative Writer](https://theappraisercoach.github.io/ai-appraiser-tools/reconciliation-narrative-writer/) | Prompt |
 | Email agents to verify comps | [Comp Verification](https://theappraisercoach.github.io/ai-appraiser-tools/comp-verification/) | Prompt |
