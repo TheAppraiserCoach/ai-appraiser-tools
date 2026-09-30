@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Recorder That Never Lets You Forget a Promise — A Dustin OS White Paper</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg: #fafafa;
+    --accent: #2c5aa0;
+    --accent-bg: #f0f5ff;
+    --brand: #5a3a2a;
+    --brand-bg: #f5efe7;
+    --good: #2e7d32;
+    --warn: #c62828;
+    --warn-bg: #fff3e0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    margin: 0;
+    line-height: 1.6;
+  }
+  header {
+    background: white;
+    border-bottom: 1px solid var(--line);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  header img.logo { width: 72px; height: 72px; flex-shrink: 0; border-radius: 6px; }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link { color: var(--accent); font-size: 0.9rem; text-decoration: none; white-space: nowrap; }
+  header a.home-link:hover { text-decoration: underline; }
+  main { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .doc-block { background: white; border: 1px solid var(--line); border-radius: 10px; padding: 2rem 2.25rem; }
+  .meta-line { color: var(--muted); font-size: 0.9rem; margin: 0 0 1rem; }
+  h2 { color: var(--accent); font-size: 1.3rem; margin: 2rem 0 0.75rem; scroll-margin-top: 1rem; }
+  h3 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; }
+  p { margin: 0.75rem 0; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin: 0.4rem 0; }
+  code { background: #f1f1f1; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+  .toc { background: var(--accent-bg); border: 1px solid #cfe0f5; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0 1.5rem; }
+  .toc h3 { margin-top: 0; color: var(--accent); }
+  .toc ol { margin: 0; }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .disclaimer { background: var(--warn-bg); border: 1px solid #f0cfa0; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+  .disclaimer h3 { margin-top: 0; color: #a15a00; }
+  .disclaimer ul { margin-bottom: 0; }
+  .note { background: var(--brand-bg); border-left: 3px solid var(--brand); border-radius: 4px; padding: 0.75rem 1rem; margin: 1rem 0; font-size: 0.95rem; }
+  table.tradeoff { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.92rem; }
+  table.tradeoff th, table.tradeoff td { border: 1px solid var(--line); padding: 0.6rem 0.75rem; text-align: left; vertical-align: top; }
+  table.tradeoff th { background: #f4f4f4; }
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps li { counter-increment: step; position: relative; padding-left: 2.4rem; margin: 0.9rem 0; }
+  .steps li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 1.7rem; height: 1.7rem; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 2rem 1rem; }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  @media (max-width: 600px) {
+    header { padding: 1rem; flex-wrap: wrap; }
+    main { padding: 0.5rem 1rem; }
+    .doc-block { padding: 1.25rem 1.25rem; }
+  }
+  @media print {
+    header a.home-link, footer { display: none; }
+    body { background: white; }
+    .doc-block { border: none; padding: 0; }
+    main { max-width: none; padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>The Recorder That Never Lets You Forget a Promise</h1>
+    <p>A Dustin OS white paper — how a Plaud recorder, a local transcriber, and one nightly pass turned "I'll get back to you on that" into something that actually gets tracked. Educational reference only.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+
+<div class="doc-block">
+
+<p class="meta-line">Published by The Appraiser Coach. Educational reference — not a build guide, not a product release. Promised to the Appraiser AI Architects room on September 13, 2026; finally getting it out the door.</p>
+
+<p style="margin: 0.5rem 0 1rem;">
+  <a href="../dist/Dustin-OS-Plaud-Second-Brain-Whitepaper.pdf" download
+     style="display:inline-block;background:var(--accent);color:white;padding:0.5rem 1rem;border-radius:4px;text-decoration:none;font-weight:600;font-size:0.95rem;">
+    ⬇ Download as PDF
+  </a>
+  <span style="color:var(--muted);font-size:0.85rem;margin-left:0.5rem;">Formatted PDF — for sharing, archival, or posting to a community forum.</span>
+</p>
+
+<div class="disclaimer">
+  <h3>Read this first — disclaimer</h3>
+  <ul>
+    <li><strong>This is a white paper, not a software release.</strong> No source code is published here. There is no installer and no "download and run" path.</li>
+    <li><strong>No warranty, no tech support.</strong> If you build something like this, you're on your own for troubleshooting.</li>
+    <li><strong>Nothing here is legal or compliance advice.</strong> If you're a covered business under state or federal privacy law, get your own read on call-recording and AI-processing consent requirements before you touch any of this. Plaud's own terms of service govern what you may do with its device and app; read those too.</li>
+    <li><strong>None of the actual conversations described here are shared or quoted.</strong> This paper describes the plumbing, not the content that flows through it.</li>
+  </ul>
+</div>
+
+<div class="toc">
+  <h3>Contents</h3>
+  <ol>
+    <li><a href="#problem">The problem: promises made out loud, kept nowhere</a></li>
+    <li><a href="#no-upload">Why "no upload" was the actual requirement</a></li>
+    <li><a href="#layer1">Layer 1 — the recorder never asks you to do anything</a></li>
+    <li><a href="#layer2">Layer 2 — one nightly pass finds the promises</a></li>
+    <li><a href="#delivery">How it reaches you: no new app to check</a></li>
+    <li><a href="#build-it">If you want to build your own version</a></li>
+    <li><a href="#dead-ends">What we tried and dropped</a></li>
+    <li><a href="#takeaway">Take-aways for the appraiser community</a></li>
+  </ol>
+</div>
+
+<h2 id="problem">1. The problem: promises made out loud, kept nowhere</h2>
+
+<p>A working appraiser has more conversations than emails. A borrower calls about timing. An agent catches you at the property and asks for a rush. A lender asks you to look into a comp before Friday. Every one of those calls carries a small commitment, and none of them land in an inbox, a CRM, or a to-do list on their own. You either write it down in the moment — unlikely, you're driving or mid-inspection — or you trust yourself to remember it. Most of the time you do remember. It's the one time you don't that costs you a client.</p>
+
+<p>The obvious fix is "record everything and review the recordings." In practice, nobody does that. Reviewing your own calls is exactly the kind of task that feels important and never survives contact with a full calendar. A system that requires you to sit down and listen to yesterday's calls is a system that will be abandoned within two weeks. Whatever solved this had to require nothing from me after the conversation ended.</p>
+
+<h2 id="no-upload">2. Why "no upload" was the actual requirement</h2>
+
+<p>A Plaud recorder (or any wearable/desk recorder with a companion app) already solves the capture half of this: press record, talk, it syncs to the cloud. Most people's workflow stops there — the recording sits in an app, transcribed or not, and reviewing it is still a task you have to remember to do. The step that actually matters is the one nobody wants to do by hand: pulling each new recording out, running it through something that understands it, and deciding whether anything in it needs following up on.</p>
+
+<p>So the design constraint wasn't "transcribe my calls." It was: <strong>nothing about this should require me to open an app, tap export, or upload a file anywhere.</strong> If a system depends on a human remembering to feed it, it will eventually go unfed, and the whole point was to stop depending on memory in the first place.</p>
+
+<h2 id="layer1">3. Layer 1 — the recorder never asks you to do anything</h2>
+
+<p>The device syncs recordings to the cloud on its own, the way it's designed to. The part that's custom is a small watcher that runs on a schedule (hourly, in this build) and checks for anything new since the last pass. When it finds a recording:</p>
+
+<ol>
+  <li>It pulls the audio down programmatically — no phone, no export button, no manual step.</li>
+  <li>It converts it to a plain transcript. Note: not by uploading the audio to a third-party AI transcription API. It runs entirely on the local machine using an open-source speech-to-text engine (<a href="https://github.com/ggml-org/whisper.cpp" target="_blank" rel="noopener">whisper.cpp</a>, an implementation of OpenAI's Whisper model that runs offline with no per-minute cost). That choice came out of a real failure: an earlier version of this used a cloud transcription API, and it silently ate a two-hour workshop recording mid-run when the API account ran out of prepaid credit. A system meant to make you trust it less by hand cannot have a failure mode where it quietly loses a recording. Running locally means there's no bill that can run out, no vendor outage that takes down the pipeline, and no length limit on the recording.</li>
+  <li>The finished transcript gets filed with the date and the source recording's ID, and it's marked as handled so the same file is never reprocessed.</li>
+</ol>
+
+<p>At the end of this layer, every conversation you've recorded exists as searchable text, without you ever touching it. That alone is useful — "what did she actually say about the closing date" becomes a text search instead of a re-listen. But it's still just an archive. The second layer is what makes it a second brain instead of a filing cabinet.</p>
+
+<h2 id="layer2">4. Layer 2 — one nightly pass finds the promises</h2>
+
+<p>Every morning, before anything else runs, a second job looks at everything new from the day before: fresh transcripts, plus (in this build) the emails you personally sent and any working sessions you had with your own AI assistant. It asks one specific question about all of it: <strong>did I commit to doing or deciding something here — and did anyone commit something to me that I'm now waiting on?</strong></p>
+
+<p>That question matters more than it looks. A naive version of this would flag every sentence that sounds like a task and bury you in noise — "let's circle back," "I'll think about it," small talk that isn't a real commitment. The useful version is narrow on purpose:</p>
+
+<ul>
+  <li><strong>It only looks for genuine commitments</strong> — something a reasonable person would call you out for forgetting, not idle conversation.</li>
+  <li><strong>It checks what's already being tracked</strong> and drops anything that's a near-duplicate of something already sitting there, so the same promise doesn't pile up night after night.</li>
+  <li><strong>It caps how much lands per day.</strong> A handful of the most important, longest-overdue items, not a wall of text. The point is a five-minute glance, not a new inbox to dread.</li>
+  <li><strong>Anything that goes unresolved for too long ages out on its own</strong> into an archive rather than nagging forever. If it was actually important, it'll come up again.</li>
+  <li><strong>If the whole pass fails for any reason, it says so loudly</strong> rather than quietly doing nothing. A tracker that fails silently is worse than no tracker, because you stop checking it yourself once you trust it.</li>
+</ul>
+
+<h2 id="delivery">5. How it reaches you: no new app to check</h2>
+
+<p>This is the part that makes the whole thing sustainable: the output doesn't go anywhere new. It lands in the same place every other open item in this system already lives, which already feeds the daily morning brief you were reading anyway. There is no second dashboard, no separate to-do app, no notification channel to configure and then ignore. If you already have a "here's what's on your plate today" system, the fix isn't to build a parallel one for recorded promises — it's to make sure recorded promises feed the one you already check.</p>
+
+<div class="note">
+  <strong>The underlying principle, if you take nothing else from this paper:</strong> automation that requires you to remember to use it will fail exactly at the moments you need it most — when you're busy. Every step in this pipeline, from the recorder syncing itself to the transcript filing itself to the promise landing in a place you already look, was chosen because it needed nothing from me in the moment.
+</div>
+
+<h2 id="build-it">6. If you want to build your own version</h2>
+
+<p>This is an outline, not a build guide. At minimum, you'd need:</p>
+
+<ul>
+  <li><strong>A recording device with programmatic access to its own recordings</strong> — an API, an official connector, or an export you can reach without a person tapping a button each time. Plaud has one; other recorder apps increasingly do too. Read the terms of service for what you're allowed to do with your own recordings before you build anything against it.</li>
+  <li><strong>A local transcription step you control.</strong> whisper.cpp is free, offline, and has no cliff to fall off when a prepaid balance hits zero. A cloud transcription API works too, but budget for what happens when it's down or your account runs dry mid-recording — that failure should degrade gracefully, not silently lose data.</li>
+  <li><strong>A scheduled job, not a manual one.</strong> Whatever runs the "find the promises" pass has to run on its own, on a timer, with no human trigger. The moment it needs you to kick it off, you're back to the original problem.</li>
+  <li><strong>A tightly scoped prompt for the extraction step</strong> that distinguishes "a real commitment" from "a sentence that sounds like one." This is the part worth iterating on the most — too loose and you get noise you'll start ignoring; too strict and you miss the thing that actually mattered.</li>
+  <li><strong>Guardrails against runaway noise:</strong> a cap on how much surfaces per day, deduplication against what's already tracked, and an age-out so nothing nags forever.</li>
+  <li><strong>One existing place to land in.</strong> Whatever you already check every morning — that's where this should write to. Don't build a second inbox.</li>
+</ul>
+
+<h2 id="dead-ends">7. What we tried and dropped</h2>
+
+<table class="tradeoff">
+  <thead>
+    <tr><th>Approach</th><th>Why we tried it</th><th>Why we dropped it</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Cloud transcription API</td>
+      <td>Fast to stand up, no local compute needed, decent accuracy out of the box.</td>
+      <td>A metered API account ran out of prepaid credit mid-transcription and silently lost most of a long workshop recording. A system built to reduce how much you have to remember cannot itself have a failure mode where it quietly forgets. Moved to a local, offline model with no balance to run out.</td>
+    </tr>
+    <tr>
+      <td>Flagging every task-shaped sentence</td>
+      <td>Simple to build — just pattern-match on "I will," "let's," "can you."</td>
+      <td>Buried real commitments under small talk and hedged language. A tracker nobody trusts gets ignored, which defeats the entire point.</td>
+    </tr>
+    <tr>
+      <td>A separate dashboard for recorded-conversation follow-ups</td>
+      <td>Felt like it deserved its own view, since it's a distinct source.</td>
+      <td>A second place to check is a second place to forget to check. Folded into the one existing daily summary instead.</td>
+    </tr>
+    <tr>
+      <td>Reviewing recordings manually on a schedule ("Friday catch-up")</td>
+      <td>The obvious starting point — no engineering required.</td>
+      <td>Never survived a busy week. The whole project exists because this didn't work.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="takeaway">8. Take-aways for the appraiser community</h2>
+
+<ul>
+  <li><strong>The device solves capture; it doesn't solve follow-through.</strong> A recorder that syncs to an app is only half the job. The value is in what happens automatically after the recording exists, not in the recording itself.</li>
+  <li><strong>"No upload" is a design constraint, not a nice-to-have.</strong> Any workflow that needs a human to remember a manual step will eventually not get that step. Build backward from "what does this require of me after I hang up the phone" and aim for zero.</li>
+  <li><strong>Run transcription somewhere it can't run out on you.</strong> If you depend on a metered API for something you care about not losing, plan for the day the balance hits zero — or don't depend on a metered API for it.</li>
+  <li><strong>Narrow the question you ask an AI to answer.</strong> "Find anything task-shaped" produces noise. "Find a genuine commitment, made by me or to me" produces something you'll actually read.</li>
+  <li><strong>Land it somewhere you already look.</strong> The best task system is the one you're not tempted to ignore, and that's whichever one you're already checking every day.</li>
+  <li><strong>None of this replaces judgment about what actually matters.</strong> This surfaces candidates for your attention. Deciding what to do about each one is still entirely on you.</li>
+</ul>
+
+<div class="disclaimer">
+  <h3>Repeat of the disclaimer</h3>
+  <ul>
+    <li>This document describes a pattern, not a product. There is no software to download here, no installer, no source code.</li>
+    <li>If you build something based on this, you're responsible for your own compliance with recording-consent law in your state, Plaud's (or any recorder's) terms of service, and any AI vendor's terms of service you use.</li>
+    <li>Nothing in this document is legal advice. Talk to an attorney about call-recording consent requirements in your state before recording anyone else's side of a conversation.</li>
+  </ul>
+</div>
+
+</div>
+
+</main>
+
+<footer>
+  <p class="cta-line">Published by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a>. For coaching, training, and the community building workflows like this one: <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">theappraisercoach.com →</a></p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Educational reference. No source code, no installer, no warranty, no tech support. View this site's source on <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">GitHub</a>.</p>
+</footer>
+
+</body>
+</html>

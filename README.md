@@ -59,6 +59,7 @@ Most tools here are **prompt templates**. A prompt is a set of instructions you 
 | Give your AI a memory of you and your business | [Personal OS Starter](./personal-os-starter/) | Download |
 | Deliver a private report as a website | [Interactive Appraisal Report](./interactive-appraisal-report/) | Developer project (advanced) |
 | Read how we had AI read and write TOTAL files | [Automating TOTAL white paper](https://theappraisercoach.github.io/ai-appraiser-tools/total-automation-whitepaper/) | Read only |
+| Read how a recorder + local AI turns calls into tracked commitments, no upload step | [Plaud Second-Brain white paper](https://theappraisercoach.github.io/ai-appraiser-tools/plaud-second-brain-whitepaper/) | Read only |
 
 **New to all this? Start with the QC Reviewer.** It's the fastest "aha" in the bunch.
 
