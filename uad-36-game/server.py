@@ -22,9 +22,21 @@ class H(SimpleHTTPRequestHandler):
         if args and str(args[0]).startswith("POST"):
             sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
 
+    ALLOWED = ("https://game.dustinharrisos.com", "https://theappraisercoach.github.io")
+
     def end_headers(self):
         self.send_header("Cache-Control", "no-cache")
+        origin = self.headers.get("Origin", "")
+        if origin in self.ALLOWED:   # the GitHub Pages copy of the game posts here too
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Access-Control-Allow-Headers", "Content-Type")
+            self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         super().end_headers()
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def _json(self, code, obj):
         body = json.dumps(obj).encode()

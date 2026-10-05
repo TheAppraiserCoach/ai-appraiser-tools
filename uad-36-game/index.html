@@ -75,21 +75,23 @@
       <button class="btn ghost" id="b-share">📣 Share your score</button>
     </div>
     <div class="fine" id="r-best"></div>
+    <div class="fine" id="r-learn" style="display:none"><a href="#" id="a-learn" style="color:var(--gold)">Want to build tools like this with AI? →</a></div>
   </div>
 </section>
 
 <section class="screen" id="s-gate">
   <div class="panel">
-    <div style="font-size:44px;line-height:1">📋</div>
-    <div class="big" style="font-size:26px">Want the next assignment?</div>
-    <p style="margin:6px 0 12px;font-size:16px;line-height:1.4">The first two rounds are on the house. To keep going — new properties, more pests, a faster clock — leave your email. I'll also send you what I'm building for appraisers with AI. No spam, unsubscribe anytime. <span style="color:var(--muted)">— Dustin Harris, The Appraiser Coach</span></p>
+    <div style="font-size:44px;line-height:1">🛠️</div>
+    <div class="big" style="font-size:26px" id="g-title">Want to build real appraisal tools with AI?</div>
+    <p style="margin:6px 0 12px;font-size:16px;line-height:1.4" id="g-copy">This game took one evening and zero code. The same approach builds the tools I actually use every week — report checkers, comp tools, narrative writers. Leave your email and I'll send you how I do it, in plain English, plus what's coming for appraisers. No spam, unsubscribe anytime. <span style="color:var(--muted)">— Dustin Harris, The Appraiser Coach</span></p>
     <form id="gate-form" autocomplete="on">
       <input type="text" id="g-name" placeholder="First name (optional)" autocomplete="given-name">
       <input type="email" id="g-email" placeholder="Email address" required autocomplete="email" inputmode="email">
       <div class="err" id="g-err"></div>
-      <button class="btn" type="submit" id="b-gate" style="width:100%">Unlock the next assignment →</button>
+      <button class="btn" type="submit" id="b-gate" style="width:100%">Send me how it's done →</button>
     </form>
-    <div class="fine">Your personal best stays on this device either way.</div>
+    <div class="row"><button class="btn ghost" type="button" id="b-skip">No thanks, keep playing</button></div>
+    <div class="fine">One ask, once. Your personal best stays on this device either way.</div>
   </div>
 </section>
 
@@ -106,7 +108,9 @@ const CFG = {
   hotR: 36, cornerR: 46, touchR: 26,
   freeze: 1.3, invuln: 1.8, maxBites: 3,
   charges: 3, recharge: 5, stunMin: 20, knock: 90, beamLen: 230,
-  gateAfterRounds: Infinity,   // email gate OFF for the members' preview (Dustin, 2026-10-04); set to 2 to turn it back on
+  gateAfterRounds: Infinity,   // mandatory gate is OFF (Dustin, 2026-10-05); set to a number to require an email after that many rounds
+  askAfterRounds: 1,           // optional, skippable ask after this many finished rounds (shown once per device)
+  leadUrl: 'https://game.dustinharrisos.com/api/lead',
 };
 const W = 960, H = 640;
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
@@ -266,8 +270,8 @@ function makeLevel(level){
 }
 
 // ---------- state ----------
-let G = null, screen = 'title', best = null, levelToPlay = 1, rounds = 0, hasEmail = false;
-try { best = JSON.parse(localStorage.getItem('inspectionDayBest') || 'null'); rounds = +localStorage.getItem('uad36_rounds') || 0; hasEmail = !!localStorage.getItem('uad36_email'); } catch (e) {}
+let G = null, screen = 'title', best = null, levelToPlay = 1, rounds = 0, hasEmail = false, asked = false;
+try { best = JSON.parse(localStorage.getItem('inspectionDayBest') || 'null'); rounds = +localStorage.getItem('uad36_rounds') || 0; hasEmail = !!localStorage.getItem('uad36_email'); asked = localStorage.getItem('uad36_asked') === '1'; } catch (e) {}
 function newGame(level){
   const L = makeLevel(level);
   G = { L, t: 0, clock: 0, player: { x: L.start.x, y: L.start.y, r: 11, face: 1, dir: { x: 0, y: -1 } },
@@ -542,11 +546,23 @@ function showResult(){
   $('r-stats').innerHTML = [['Time on site', mmss(r.used)], ['Interruptions', G.interruptions], ['Zaps', G.zaps], ['Dog bites', G.bites]].map(([k, v]) => '<div><b>' + v + '</b>' + k + '</div>').join('');
   $('b-next').textContent = r.won ? '▶ Next assignment' : '↻ Try again';
   $('r-best').textContent = best ? 'Personal best: ' + best.score + ' pts · ' + rankFor(best.score)[1] : '';
+  $('r-learn').style.display = (!hasEmail && asked) ? '' : 'none';
+}
+let gateMandatory = false;
+function openAsk(mandatory){
+  gateMandatory = !!mandatory; screen = 'gate'; show('s-gate');
+  $('b-skip').style.display = mandatory ? 'none' : '';
+  $('g-title').textContent = mandatory ? 'Want the next assignment?' : 'Want to build real appraisal tools with AI?';
+  $('b-gate').textContent = mandatory ? 'Unlock the next assignment →' : 'Send me how it\'s done →';
+  setTimeout(() => $('g-email').focus(), 50);
 }
 function continueGame(){
-  if (!hasEmail && rounds >= CFG.gateAfterRounds) { screen = 'gate'; show('s-gate'); setTimeout(() => $('g-email').focus(), 50); return; }
+  if (!hasEmail && rounds >= CFG.gateAfterRounds) return openAsk(true);
+  if (!hasEmail && !asked && rounds >= CFG.askAfterRounds) { asked = true; try { localStorage.setItem('uad36_asked', '1'); } catch (e) {} return openAsk(false); }
   showIntro(levelToPlay);
 }
+$('b-skip').onclick = () => showIntro(levelToPlay);
+$('a-learn').onclick = e => { e.preventDefault(); openAsk(false); };
 $('b-start').onclick = () => { ac(); showIntro(1); };
 $('b-go').onclick = () => startLevel(levelToPlay);
 $('b-next').onclick = continueGame;
@@ -559,13 +575,14 @@ $('b-share').onclick = async () => {
 $('gate-form').onsubmit = async e => {
   e.preventDefault(); const email = $('g-email').value.trim(), name = $('g-name').value.trim(); $('g-err').textContent = ''; $('b-gate').disabled = true; $('b-gate').textContent = 'One sec...';
   try {
-    const res = await fetch('/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, name, score: G.result && G.result.score, level: G.L.level, won: G.result && G.result.won }) });
+    const leadUrl = (/dustinharrisos\.com$/.test(location.hostname) || location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? '/api/lead' : CFG.leadUrl;   // same-origin at home, absolute from the GitHub Pages copy
+    const res = await fetch(leadUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, name, score: G.result && G.result.score, level: G.L.level, won: G.result && G.result.won }) });
     const j = await res.json();
     if (!j.ok) throw new Error(j.error || 'Something went wrong');
     hasEmail = true; try { localStorage.setItem('uad36_email', email); } catch (e2) {}
-    flash('You\'re in. Next assignment coming up.'); showIntro(levelToPlay);
+    flash(gateMandatory ? 'You\'re in. Next assignment coming up.' : 'Got it — watch your inbox. Next assignment coming up.'); showIntro(levelToPlay);
   } catch (err) { $('g-err').textContent = err.message; }
-  $('b-gate').disabled = false; $('b-gate').textContent = 'Unlock the next assignment →';
+  $('b-gate').disabled = false; $('b-gate').textContent = gateMandatory ? 'Unlock the next assignment →' : 'Send me how it\'s done →';
 };
 function flash(msg){ const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 2600); }
 
