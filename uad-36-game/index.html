@@ -195,8 +195,8 @@ const PROPS = [
       ...fence(20, 20, 940, 580, [700, 800])],
     rooms: [{ n: 'LIVING', x: 300, y: 300, w: 180, h: 120, c: '#d9c39a' }, { n: 'KITCHEN', x: 480, y: 300, w: 180, h: 120, c: '#c9b48d' }, { n: 'BEDROOM', x: 300, y: 180, w: 180, h: 120, c: '#d9c39a' }, { n: 'BATH', x: 480, y: 180, w: 90, h: 120, c: '#bcd0dc' }, { n: 'UTILITY', x: 570, y: 180, w: 90, h: 120, c: '#b8b2a6' }],
     mats: [[372, 416, 56, 8], [592, 176, 56, 8]], drive: [702, 424, 96, 158],
-    corners: [[300, 180], [660, 180], [660, 420], [300, 420]],
-    photos: [['front', 'Front of house', 480, 470, '🏠'], ['rear', 'Rear of house', 480, 130, '🏠'], ['street', 'Street scene', 300, 606, '🛣️'], ['living', 'Living room', 400, 370, '🛋️'], ['kitchen', 'Kitchen', 600, 370, '🍳'], ['bed', 'Bedroom', 420, 250, '🛏️'], ['bath', 'Bathroom', 525, 250, '🛁'], ['furnace', 'Furnace & water heater', 615, 240, '🔥']],
+    corners: [[300, 180], [660, 180], [660, 420], [300, 420], [400, 434, 'Porch height from grade']],
+    photos: [['front', 'Front of house', 400, 606, '🏠'], ['rear', 'Rear of house', 480, 130, '🏠'], ['street', 'Street scene', 300, 606, '🛣️'], ['living', 'Living room', 400, 370, '🛋️'], ['kitchen', 'Kitchen', 600, 370, '🍳'], ['bed', 'Bedroom', 420, 250, '🛏️'], ['bath', 'Bathroom', 525, 250, '🛁'], ['furnace', 'Furnace & water heater', 615, 240, '🔥']],
     notes: [['drive', 'Cracked driveway', 720, 520, '🪨'], ['stain', 'Water stain on bedroom ceiling', 330, 210, '💧']],
     car: [760, 560], start: [740, 600], dressing: [['🌳', 120, 520, 40], ['🌳', 880, 480, 40], ['🌲', 870, 60, 36], ['🛖', 80, 60, 34], ['📬', 690, 560, 22]],
     hazards: () => [
@@ -217,8 +217,8 @@ const PROPS = [
       ...fence(20, 20, 940, 580, [700, 800])],
     rooms: [{ n: 'LIVING', x: 260, y: 290, w: 220, h: 140, c: '#d9c39a' }, { n: 'KITCHEN', x: 480, y: 290, w: 220, h: 140, c: '#c9b48d' }, { n: 'BEDROOM', x: 260, y: 150, w: 150, h: 140, c: '#d9c39a' }, { n: 'BATH', x: 410, y: 150, w: 110, h: 140, c: '#bcd0dc' }, { n: 'MUDROOM', x: 520, y: 150, w: 180, h: 140, c: '#b8b2a6' }],
     mats: [[452, 426, 56, 8], [620, 146, 56, 8]], drive: [702, 434, 96, 148],
-    corners: [[260, 150], [700, 150], [700, 430], [260, 430]],
-    photos: [['front', 'Front of house', 480, 480, '🏠'], ['rear', 'Rear of house', 480, 100, '🏠'], ['street', 'Street scene', 300, 606, '🛣️'], ['barn', 'Outbuilding', 110, 110, '🏚️'], ['living', 'Living room', 370, 370, '🛋️'], ['kitchen', 'Kitchen', 600, 380, '🍳'], ['bed', 'Bedroom', 335, 230, '🛏️'], ['bath', 'Bathroom', 465, 240, '🛁'], ['furnace', 'Furnace & water heater', 650, 220, '🔥']],
+    corners: [[260, 150], [700, 150], [700, 430], [260, 430], [480, 444, 'Porch height from grade']],
+    photos: [['front', 'Front of house', 400, 606, '🏠'], ['rear', 'Rear of house', 480, 100, '🏠'], ['street', 'Street scene', 300, 606, '🛣️'], ['barn', 'Outbuilding', 110, 110, '🏚️'], ['living', 'Living room', 370, 370, '🛋️'], ['kitchen', 'Kitchen', 600, 380, '🍳'], ['bed', 'Bedroom', 335, 230, '🛏️'], ['bath', 'Bathroom', 465, 240, '🛁'], ['furnace', 'Furnace & water heater', 650, 220, '🔥']],
     notes: [['found', 'Settling crack in foundation', 250, 460, '🧱'], ['roof', 'Missing shingles, rear slope', 560, 110, '🏚️'], ['well', 'Private well — note for lender', 860, 300, '🚰']],
     car: [760, 560], start: [740, 600], dressing: [['🌾', 120, 300, 40], ['🌾', 180, 380, 40], ['🌾', 100, 480, 40], ['🌳', 880, 480, 44], ['🌲', 880, 80, 40], ['🏚️', 110, 70, 44], ['📬', 690, 560, 22], ['🚜', 860, 180, 40]],
     hazards: () => [
@@ -240,8 +240,8 @@ const PROPS = [
       ...fence(200, 100, 860, 580, [700, 800])],
     rooms: [{ n: 'LIVING', x: 340, y: 310, w: 140, h: 110, c: '#d9c39a' }, { n: 'KITCHEN', x: 480, y: 310, w: 140, h: 110, c: '#c9b48d' }, { n: 'BEDROOM', x: 340, y: 200, w: 140, h: 110, c: '#d9c39a' }, { n: 'BATH', x: 480, y: 200, w: 140, h: 110, c: '#bcd0dc' }],
     mats: [[392, 416, 56, 8]], drive: [702, 424, 96, 158], lot: '#8f9a8a',
-    corners: [[340, 200], [620, 200], [620, 420], [340, 420]],
-    photos: [['front', 'Front of unit', 480, 470, '🏢'], ['street', 'Street scene', 320, 606, '🛣️'], ['common', 'Common area', 260, 160, '🏢'], ['parking', 'Assigned parking', 750, 480, '🅿️'], ['living', 'Living room', 410, 370, '🛋️'], ['kitchen', 'Kitchen', 550, 370, '🍳'], ['bed', 'Bedroom', 410, 250, '🛏️'], ['bath', 'Bathroom', 550, 250, '🛁']],
+    corners: [[340, 200], [620, 200], [620, 420], [340, 420], [420, 434, 'Entry height from grade']],
+    photos: [['front', 'Front of unit', 420, 606, '🏢'], ['street', 'Street scene', 320, 606, '🛣️'], ['common', 'Common area', 260, 160, '🏢'], ['parking', 'Assigned parking', 750, 480, '🅿️'], ['living', 'Living room', 410, 370, '🛋️'], ['kitchen', 'Kitchen', 550, 370, '🍳'], ['bed', 'Bedroom', 410, 250, '🛏️'], ['bath', 'Bathroom', 550, 250, '🛁']],
     notes: [['hoa', 'HOA litigation sign on the gate', 230, 540, '⚖️'], ['wh', 'Water heater past service life', 600, 230, '🚿']],
     car: [760, 560], start: [740, 600], dressing: [['🌳', 260, 260, 36], ['🌳', 800, 160, 36], ['🏢', 120, 200, 60], ['🏢', 120, 420, 60], ['🚙', 760, 400, 30], ['📬', 690, 560, 22]],
     hazards: () => [
@@ -258,7 +258,7 @@ function makeLevel(level){
   const P = PROPS[(level - 1) % PROPS.length], d = level - 1, sp = 1 + 0.08 * d;
   const L = {
     level, P, walls: P.walls, house: P.house,
-    corners: P.corners.map(([x, y]) => ({ x, y })),
+    corners: P.corners.map(([x, y, label]) => ({ x, y, label })),
     photos: P.photos.map(([id, label, x, y, e]) => ({ id, label, x, y, e })),
     notes: P.notes.map(([id, label, x, y, e]) => ({ id, label, x, y, e })),
     car: { x: P.car[0], y: P.car[1] }, start: { x: P.start[0], y: P.start[1] },
@@ -335,7 +335,7 @@ function moveEntity(ent, dx, dy, zone){
 }
 function nearestTarget(){
   const p = G.player, L = G.L, D = G.done; let bestT = null, bd = 1e9;
-  L.corners.forEach((c, i) => { if (!D.corners.has(i)) { const d = dist(p, c); if (d < CFG.cornerR && d < bd) { bd = d; bestT = { kind: 'corner', i, label: 'Laser the corner', dur: CFG.laser }; } } });
+  L.corners.forEach((c, i) => { if (!D.corners.has(i)) { const d = dist(p, c); if (d < CFG.cornerR && d < bd) { bd = d; bestT = { kind: 'corner', i, label: c.label ? 'Laser: ' + c.label : 'Laser the corner', dur: CFG.laser }; } } });
   for (const ph of L.photos) if (!D.photos.has(ph.id)) { const d = dist(p, ph); if (d < CFG.hotR && d < bd) { bd = d; bestT = { kind: 'photo', id: ph.id, label: 'Photo: ' + ph.label, dur: CFG.photo }; } }
   for (const n of L.notes) if (!D.notes.has(n.id)) { const d = dist(p, n); if (d < CFG.hotR && d < bd) { bd = d; bestT = { kind: 'note', id: n.id, label: 'Note: ' + n.label, dur: CFG.note }; } }
   if (allDone() && dist(p, L.car) < 56) bestT = { kind: 'leave', label: 'Drive away', dur: 1.0 };
@@ -387,7 +387,7 @@ function update(dt){
     if (!still || still.kind !== G.action.kind || (still.i !== undefined && still.i !== G.action.i) || (still.id !== undefined && still.id !== G.action.id)) G.action = null;
     else if (G.action.t >= G.action.dur) {
       const a = G.action; G.action = null;
-      if (a.kind === 'corner') { G.done.corners.add(a.i); SFX.laser(); pop(p.x, p.y - 30, '📐 +50'); toast('📐 Corner ' + G.done.corners.size + ' of ' + G.L.corners.length); }
+      if (a.kind === 'corner') { G.done.corners.add(a.i); SFX.laser(); pop(p.x, p.y - 30, '📐 +50'); const c = G.L.corners[a.i]; toast(c.label ? '📐 ' + c.label + ' — logged' : '📐 Corner ' + G.done.corners.size + ' of ' + G.L.corners.length); }
       if (a.kind === 'photo') { G.done.photos.add(a.id); SFX.shutter(); pop(p.x, p.y - 30, '📸 +50'); toast('📸 ' + G.L.photos.find(x => x.id === a.id).label); }
       if (a.kind === 'note') { G.done.notes.add(a.id); SFX.note(); pop(p.x, p.y - 30, '📝 +50'); toast('📝 ' + G.L.notes.find(x => x.id === a.id).label); }
       if (a.kind === 'leave') { endGame(true, 'Inspection complete. Report\'s due Monday.'); return; }
@@ -464,7 +464,7 @@ function drawWorld(){
     ctx.fillStyle = 'rgba(0,0,0,0.32)'; ctx.beginPath(); ctx.arc(x, y, 22, 0, 7); ctx.fill(); ctx.strokeStyle = '#ffe066'; ctx.lineWidth = 2.5; ctx.stroke(); ctx.lineWidth = 1; emoji(e, x, y, 24); emoji(badge, x + 16, y - 15, 15); };
   for (const ph of L.photos) spot(ph.x, ph.y, ph.e, '📸', D.photos.has(ph.id));
   for (const n of L.notes) spot(n.x, n.y, n.e, '📝', D.notes.has(n.id));
-  L.corners.forEach((c, i) => { const done = D.corners.has(i); const ox = c.x < HS.x + HS.w / 2 ? -16 : 16, oy = c.y < HS.y + HS.h / 2 ? -16 : 16; if (!done) { ctx.strokeStyle = '#ffe066'; ctx.lineWidth = 2.5; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.arc(c.x, c.y, 22, 0, 7); ctx.stroke(); ctx.setLineDash([]); ctx.lineWidth = 1; } emoji(done ? '✅' : '📐', c.x + ox, c.y + oy, done ? 14 : 22); });
+  L.corners.forEach((c, i) => { const done = D.corners.has(i); const ox = c.label ? 0 : (c.x < HS.x + HS.w / 2 ? -16 : 16), oy = c.label ? 22 : (c.y < HS.y + HS.h / 2 ? -16 : 16); if (c.label && !done) text('📏 grade', c.x, c.y + 40, 10, '#fff', 'center', true); if (!done) { ctx.strokeStyle = '#ffe066'; ctx.lineWidth = 2.5; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.arc(c.x, c.y, 22, 0, 7); ctx.stroke(); ctx.setLineDash([]); ctx.lineWidth = 1; } emoji(done ? '✅' : '📐', c.x + ox, c.y + oy, done ? 14 : 22); });
   for (const w of L.walls) { const isFence = w.x < HS.x - 20 || w.y < HS.y - 20 || w.x + w.w > HS.x + HS.w + 20 || w.y > HS.y + HS.h + 20; ctx.fillStyle = isFence ? '#a97d4b' : '#3b2a1a'; ctx.fillRect(w.x, w.y, w.w, w.h); }
   for (const [e, x, y, s] of P.dressing) emoji(e, x, y, s);
   emoji('🚗', L.car.x, L.car.y, 40, -1);
@@ -533,7 +533,7 @@ function drawHUD(){
 function show(id){ document.querySelectorAll('.screen').forEach(s => s.classList.toggle('show', s.id === id)); }
 function showTitle(){
   screen = 'title'; attract(); show('s-title');
-  $('how-text').innerHTML = ['📐 Laser all four corners', '📸 Shoot every required photo, inside and out', '📝 Note what the lender needs to know', '⚡ Your laser measure stuns pests. Three charges, they recharge.', '🚗 Everything checked off? Get to the car.'].map(l => '<div>' + l + '</div>').join('');
+  $('how-text').innerHTML = ['📐 Laser the four corners, plus the porch height from grade at the front door (new in 3.6)', '📸 Shoot every required photo, inside and out', '📝 Note what the lender needs to know', '⚡ Your laser measure stuns pests. Three charges, they recharge.', '🚗 Everything checked off? Get to the car.'].map(l => '<div>' + l + '</div>').join('');
   $('best-line').textContent = best ? 'Your best: ' + best.score + ' pts (' + rankFor(best.score)[1] + ').' : '';
 }
 function showIntro(level){
