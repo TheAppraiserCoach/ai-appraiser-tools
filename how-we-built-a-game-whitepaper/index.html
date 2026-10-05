@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>How an Appraiser Built a Video Game in One Evening — A Dustin OS White Paper</title>
-<meta name="description" content="The full story of UAD 3.6 — Ultimate Appraiser Defender: the spec, the fourteen rounds of feedback, how the AI tested it without a human, and what the same loop builds for real appraisal work.">
+<meta name="description" content="The full story of UAD 3.6 — Ultimate Appraiser Defender: the spec, the eleven rounds of feedback, how the AI tested it without a human, and what the same loop builds for real appraisal work.">
 <style>
   :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2e2; --bg:#fafafa; --accent:#2c5aa0; --accent-bg:#f0f5ff; --brand:#5a3a2a; --brand-bg:#f5efe7; --good:#2e7d32; --warn:#c62828; --warn-bg:#fff3e0; }
   * { box-sizing: border-box; }
@@ -79,7 +79,7 @@
   <ol>
     <li><a href="#idea">The idea, in the exact words it was given</a></li>
     <li><a href="#decisions">What the AI decided without being told</a></li>
-    <li><a href="#loop">Fourteen rounds of "that's confusing" — the actual log</a></li>
+    <li><a href="#loop">Eleven rounds of "that's confusing" — the actual log</a></li>
     <li><a href="#testing">How it got tested with nobody playing it</a></li>
     <li><a href="#hood">What's actually under the hood</a></li>
     <li><a href="#email">The email question, and how the answer changed three times</a></li>
@@ -118,7 +118,7 @@
 
 <p>Two of those — the single file and the knobs — are the reason the next section was possible at all.</p>
 
-<h2 id="loop">3. Fourteen rounds of "that's confusing" — the actual log</h2>
+<h2 id="loop">3. Eleven rounds of "that's confusing" — the actual log</h2>
 
 <p>What follows is the real sequence of feedback, pulled from the conversation. Dustin was traveling the whole time: airport, two flights, a layover, then home. He never saw code. Each row is one message from him and what shipped in response. Times are approximate minutes from his message to the fix being live on the link.</p>
 
@@ -129,11 +129,10 @@
 <tr><td>"I can't move. It is not clear how to move. Whatever gets zapped should die and go away for a period of time."</td><td>The hidden joystick was replaced with tap-where-you-want-to-walk and a pulsing "👆 Tap where you want to walk" prompt. Zapped pests vanish.</td><td>~15 min</td></tr>
 <tr><td>"Still says time on clock is 30. How do I fire the laser to measure and to shoot obstacles?"</td><td>One-hour clock. The action button now labels itself — 📐 MEASURE, 📸 PHOTO, 📝 NOTE — and the ⚡ ZAP button auto-aims at the nearest pest. The test harness also found the Realtor spawning on top of the player and interrupting every tap; he was moved and a three-second grace period added.</td><td>~30 min</td></tr>
 <tr><td>"I got done with the game and went back to the car and did not know how to leave and so I lost."</td><td>A steering wheel bobs over the car when everything's done, a banner says where to go, an arrow points at the car if it's off-screen, and walking onto it drives away automatically.</td><td>~12 min</td></tr>
-<tr><td>"Instead of killing the obstacles, which could be a PR problem, let's stun them so they're frozen and move away. Also there needs to be a place on the main screen that goes to how it was built. Also, why is it connected to the exam site? Can't it be its own game.dustinharrisos.com?"</td><td>Zaps now knock the pest back and freeze it in a bubble for twenty game-minutes; nothing dies. A "how this game was built" page. Its own domain.</td><td>~35 min</td></tr>
+<tr><td>"Instead of killing the obstacles, let's stun them so they're frozen and move away. Also there needs to be a place on the main screen that goes to how it was built. Also, why is it connected to the exam site? Can't it be its own game.dustinharrisos.com?"</td><td>Zaps now knock the pest back and freeze it in a bubble for twenty game-minutes; nothing dies. A "how this game was built" page. Its own domain.</td><td>~35 min</td></tr>
 <tr><td>"On the main page it should show that one second equals one minute."</td><td>Declined as written — the clock actually runs two real seconds per minute, and he had just called that pace perfect. The screen says the true number. He agreed.</td><td>—</td></tr>
 <tr><td>"Look at this as if you're a brand new person who has never seen what I do before, and improve the game so it's even more impressive."</td><td>A real title screen with the pests wandering behind it. Assignment cards ("NEW ORDER — 412 Maple St, 3 bed / 1 bath, lender needs it today"). Three property types: Rambler, Farmhouse (two dogs, two goats, a cow), Condo (HOA president, cat, tenant). Sound effects, screen shake, score pops, random one-liners. Ranks from Trainee to Review Appraiser Legend. A share button.</td><td>~90 min</td></tr>
 <tr><td>"I keep taking a picture of the front or the street and then I go around the house and find out the picture has not been taken again."</td><td>Diagnosed: the goat was eating a random finished photo on contact, and the notice was easy to miss. Mechanic removed. Street spot moved down the block. Also added a 🏠 home button he'd asked for.</td><td>~10 min</td></tr>
-<tr><td>"I'm going to share this with my members… remove the mandate to gather their email for now."</td><td>Gate off, one knob.</td><td>~3 min</td></tr>
 <tr><td>"Can you put together a GitHub repo and post to the appraisal tool section, and write me a post for Facebook?"</td><td>Published here. Post written.</td><td>~10 min</td></tr>
 <tr><td>"Maybe after the first free play a box pops up and says would you like to know more about how to create real appraisal tools with AI… therefore it's not mandatory."</td><td>The mandatory gate became a once-per-device, skippable ask after round one.</td><td>~15 min</td></tr>
 </table>
@@ -170,7 +169,7 @@
 
 <h2 id="email">6. The email question, and how the answer changed three times</h2>
 
-<p>The original note said the game should gather emails by being free "if you put your email in." That is a wall before play. In the first conversation about it the assistant suggested the wall come <em>after</em> the first round instead, so the player has a reason to want more. Dustin agreed, then while it was being built moved it to after the second round, then decided to share it with his members first and switched the gate off entirely. The next morning he reframed it: not a gate, an invitation. "Would you like to know more about how to create real appraisal tools with AI?" Optional, once, with a "no thanks, keep playing" button.</p>
+<p>The original note said the game should gather emails by being free "if you put your email in." That is a wall before play. In the first conversation about it the assistant suggested the wall come <em>after</em> the first round instead, so the player has a reason to want more. Dustin agreed, then while it was being built moved it to after the second round, then switched the gate off while his members tried it. The next morning he reframed it: not a gate, an invitation. "Would you like to know more about how to create real appraisal tools with AI?" Optional, once, with a "no thanks, keep playing" button.</p>
 
 <p>That is the right answer, and it took three wrong ones to get there. The point of writing it down is that every version was a one-knob change. The cost of being wrong was fifteen minutes, so it was fine to be wrong a few times.</p>
 
