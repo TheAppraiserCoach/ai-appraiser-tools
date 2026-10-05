@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>How an Appraiser Built a Video Game in One Evening — A Dustin OS White Paper</title>
-<meta name="description" content="The full story of UAD 3.6 — Ultimate Appraiser Defender: the spec, the eleven rounds of feedback, how the AI tested it without a human, and what the same loop builds for real appraisal work.">
+<meta name="description" content="The full story of UAD 3.6 — Ultimate Appraiser Defender: the spec, the nine rounds of feedback, how the AI tested it without a human, and what the same loop builds for real appraisal work.">
 <style>
   :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2e2; --bg:#fafafa; --accent:#2c5aa0; --accent-bg:#f0f5ff; --brand:#5a3a2a; --brand-bg:#f5efe7; --good:#2e7d32; --warn:#c62828; --warn-bg:#fff3e0; }
   * { box-sizing: border-box; }
@@ -79,7 +79,7 @@
   <ol>
     <li><a href="#idea">The idea, in the exact words it was given</a></li>
     <li><a href="#decisions">What the AI decided without being told</a></li>
-    <li><a href="#loop">Eleven rounds of "that's confusing" — the actual log</a></li>
+    <li><a href="#loop">Nine rounds of "that's confusing" — the actual log</a></li>
     <li><a href="#testing">How it got tested with nobody playing it</a></li>
     <li><a href="#hood">What's actually under the hood</a></li>
     <li><a href="#email">The email question, and how the answer changed three times</a></li>
@@ -118,7 +118,7 @@
 
 <p>Two of those — the single file and the knobs — are the reason the next section was possible at all.</p>
 
-<h2 id="loop">3. Eleven rounds of "that's confusing" — the actual log</h2>
+<h2 id="loop">3. Nine rounds of "that's confusing" — the actual log</h2>
 
 <p>What follows is the real sequence of feedback, pulled from the conversation. Dustin was traveling the whole time: airport, two flights, a layover, then home. He never saw code. Each row is one message from him and what shipped in response. Times are approximate minutes from his message to the fix being live on the link.</p>
 
@@ -133,8 +133,6 @@
 <tr><td>"On the main page it should show that one second equals one minute."</td><td>Declined as written — the clock actually runs two real seconds per minute, and he had just called that pace perfect. The screen says the true number. He agreed.</td><td>—</td></tr>
 <tr><td>"Look at this as if you're a brand new person who has never seen what I do before, and improve the game so it's even more impressive."</td><td>A real title screen with the pests wandering behind it. Assignment cards ("NEW ORDER — 412 Maple St, 3 bed / 1 bath, lender needs it today"). Three property types: Rambler, Farmhouse (two dogs, two goats, a cow), Condo (HOA president, cat, tenant). Sound effects, screen shake, score pops, random one-liners. Ranks from Trainee to Review Appraiser Legend. A share button.</td><td>~90 min</td></tr>
 <tr><td>"I keep taking a picture of the front or the street and then I go around the house and find out the picture has not been taken again."</td><td>Diagnosed: the goat was eating a random finished photo on contact, and the notice was easy to miss. Mechanic removed. Street spot moved down the block. Also added a 🏠 home button he'd asked for.</td><td>~10 min</td></tr>
-<tr><td>"Can you put together a GitHub repo and post to the appraisal tool section, and write me a post for Facebook?"</td><td>Published here. Post written.</td><td>~10 min</td></tr>
-<tr><td>"Maybe after the first free play a box pops up and says would you like to know more about how to create real appraisal tools with AI… therefore it's not mandatory."</td><td>The mandatory gate became a once-per-device, skippable ask after round one.</td><td>~15 min</td></tr>
 </table>
 
 <p>Notice what is not in that table: a single line of code, a single technical term from Dustin, a single "can you send me a screenshot of the error." Every message is a player describing what confused him. That is the whole method.</p>
