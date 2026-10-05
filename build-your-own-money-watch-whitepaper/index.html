@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your Own Rocket Money — A Dustin OS White Paper</title>
+<meta name="description" content="How a small-business owner replaced a subscription-tracking app with a read-only bank feed, a local database, and a nightly AI-built check that lands in his morning email. Generic, no code required to follow.">
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2e2; --bg:#fafafa; --accent:#2c5aa0; --accent-bg:#f0f5ff; --brand:#5a3a2a; --brand-bg:#f5efe7; --good:#2e7d32; --warn:#c62828; --warn-bg:#fff3e0; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); margin: 0; line-height: 1.6; }
+  header { background: white; border-bottom: 1px solid var(--line); padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1.25rem; }
+  header img.logo { width: 72px; height: 72px; flex-shrink: 0; border-radius: 6px; }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link { color: var(--accent); font-size: 0.9rem; text-decoration: none; white-space: nowrap; }
+  main { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .doc-block { background: white; border: 1px solid var(--line); border-radius: 10px; padding: 2rem 2.25rem; }
+  .meta-line { color: var(--muted); font-size: 0.9rem; margin: 0 0 1rem; }
+  h2 { color: var(--accent); font-size: 1.3rem; margin: 2rem 0 0.75rem; scroll-margin-top: 1rem; }
+  h3 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; }
+  p { margin: 0.75rem 0; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin: 0.4rem 0; }
+  code { background: #f1f1f1; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #f6f6f6; border: 1px solid var(--line); border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.86rem; overflow-x: auto; white-space: pre-wrap; }
+  .toc { background: var(--accent-bg); border: 1px solid #cfe0f5; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0 1.5rem; }
+  .toc h3 { margin-top: 0; color: var(--accent); }
+  .toc ol { margin: 0; }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .disclaimer { background: var(--warn-bg); border: 1px solid #f0cfa0; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+  .disclaimer h3 { margin-top: 0; color: #a15a00; }
+  .disclaimer ul { margin-bottom: 0; }
+  .note { background: var(--brand-bg); border-left: 3px solid var(--brand); border-radius: 4px; padding: 0.75rem 1rem; margin: 1rem 0; font-size: 0.95rem; }
+  table.t { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.92rem; }
+  table.t th, table.t td { border: 1px solid var(--line); padding: 0.55rem 0.7rem; text-align: left; vertical-align: top; }
+  table.t th { background: #f4f4f4; }
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps li { counter-increment: step; position: relative; padding-left: 2.4rem; margin: 0.9rem 0; }
+  .steps li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 1.7rem; height: 1.7rem; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 2rem 1rem; }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  @media (max-width: 600px) { header { padding: 1rem; flex-wrap: wrap; } main { padding: 0.5rem 1rem; } .doc-block { padding: 1.25rem 1.25rem; } }
+  @media print { header a.home-link, footer, .dl { display: none; } body { background: white; } .doc-block { border: none; padding: 0; } main { max-width: none; padding: 0; } }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>Build Your Own Rocket Money</h1>
+    <p>A Dustin OS white paper — how a small-business owner replaced a subscription-tracking app with a read-only bank feed, a local database, and a nightly check that lands in his morning email. No code required to follow.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+<div class="doc-block">
+
+<p class="meta-line">Published by The Appraiser Coach, October 2026. Educational reference, written generically so it applies to any small business, not just an appraisal office. Also used as a case study in the Idaho Innovation Center AI workshops.</p>
+
+<p class="dl" style="margin: 0.5rem 0 1rem;">
+  <a href="../dist/Build-Your-Own-Rocket-Money-Whitepaper.pdf" download style="display:inline-block;background:var(--accent);color:white;padding:0.5rem 1rem;border-radius:4px;text-decoration:none;font-weight:600;font-size:0.95rem;">⬇ Download as PDF</a>
+  <span style="color:var(--muted);font-size:0.85rem;margin-left:0.5rem;">For sharing, a workshop handout, or a forum post.</span>
+</p>
+
+<div class="disclaimer">
+  <h3>Read this first</h3>
+  <ul>
+    <li><strong>This is a pattern, not a product.</strong> There is no app to download. It describes something one person built for himself with an AI assistant, in enough detail that you could have yours build the same.</li>
+    <li><strong>It is not financial, tax, or legal advice.</strong> Connecting software to your bank accounts is your decision and your responsibility. Read your bank's terms and the terms of any service you use.</li>
+    <li><strong>No warranty, no tech support.</strong> If you build one, you own it.</li>
+  </ul>
+</div>
+
+<div class="toc">
+  <h3>Contents</h3>
+  <ol>
+    <li><a href="#why">Why replace an app that works</a></li>
+    <li><a href="#shape">The whole thing in three boxes</a></li>
+    <li><a href="#feed">Box one: the bank feed, and why not Plaid</a></li>
+    <li><a href="#store">Box two: the store on your own machine</a></li>
+    <li><a href="#check">Box three: the nightly check — what counts as a subscription</a></li>
+    <li><a href="#lands">Where it lands: nowhere new</a></li>
+    <li><a href="#built">How it got built, including the part that went wrong</a></li>
+    <li><a href="#cost">What it costs</a></li>
+    <li><a href="#tryit">If you want to build yours</a></li>
+    <li><a href="#guardrails">Guardrails you should not skip</a></li>
+  </ol>
+</div>
+
+<h2 id="why">1. Why replace an app that works</h2>
+
+<p>Apps like Rocket Money, Monarch, and Copilot do a real job: they connect to your accounts, find the charges that repeat, total them up, and tell you when something looks off. If you run one business and have four accounts, use one and stop reading.</p>
+
+<p>The case for building your own shows up when you have more than that. The person this paper is about runs five businesses out of twenty-three accounts at six banks. A consumer app sees all of that as one household. It cannot tell a payroll draw from a software subscription, it files the farm's electric bill next to a streaming service, and its "insights" are tuned to someone trying to cancel a gym membership, not someone trying to notice that a vendor quietly raised a weekly fee by twenty-six percent.</p>
+
+<p>There are three quieter reasons too. The app is itself another subscription, which is a little funny for a subscription tracker. The app holds the connection to your banks, so if it is breached or sold, that is where the exposure is. And the app is a place you have to go. A dashboard you have to remember to open is a dashboard you will stop opening.</p>
+
+<p>So the goal was narrow: know what repeats, catch double charges and price creep within a day or two, and see it in the one place that gets read every morning anyway. Nothing more.</p>
+
+<h2 id="shape">2. The whole thing in three boxes</h2>
+
+<p>Every version of this, consumer app or homemade, is the same three boxes:</p>
+
+<table class="t">
+<tr><th style="width:22%">Box</th><th>What it does</th><th style="width:30%">In this build</th></tr>
+<tr><td><strong>Bank feed</strong></td><td>Lets a program read your transactions without having your bank passwords.</td><td>SimpleFIN Bridge, a $15-a-year service.</td></tr>
+<tr><td><strong>Store</strong></td><td>Keeps every transaction somewhere you control, so you can ask questions about history.</td><td>One SQLite database file on a computer the owner already runs.</td></tr>
+<tr><td><strong>Nightly check</strong></td><td>Looks at what is new, decides if anything is worth saying, and says it where you already look.</td><td>A small Python program on a timer, writing into the owner's existing morning email.</td></tr>
+</table>
+
+<p>The important design rule, decided before anything was built: <strong>nothing in the system can write to a bank.</strong> Not a transfer, not a payment, not a cancellation. The bank feed chosen literally has no commands for that. A bug can at worst show you a wrong number. It cannot move a dollar.</p>
+
+<h2 id="feed">3. Box one: the bank feed, and why not Plaid</h2>
+
+<p>When people say "connect to my bank," they usually mean Plaid. Plaid is excellent and it is what most consumer apps use. It is also built for companies: you sign up as a developer, request a plan, and pay per connected bank per month at a price they do not publish. For one person reading their own accounts it is a lot of paperwork and an unknown bill.</p>
+
+<p>SimpleFIN Bridge does the same job for individuals. You subscribe, you log in to each of your banks on their site (they use a bank aggregator underneath, the same kind Plaid does), and when you are done you click one button that gives you a long one-time code called a <em>setup token</em>. Your own program trades that token, once, for a permanent read-only key. From then on the program asks the Bridge for transactions and the Bridge asks the banks. Your bank passwords never touch your machine. The Bridge has no write commands in its protocol at all, which is a stronger guarantee than a promise.</p>
+
+<p>Practical notes from doing it:</p>
+<ul>
+  <li>Six institutions linked in about fifteen minutes. The two-factor prompts from the banks are the slow part.</li>
+  <li>Not every account is reachable. A card that lives inside a fintech app (in this case a crypto exchange's card) could not be linked. It was skipped, not fought. One card is not worth stalling the rest.</li>
+  <li>The setup token works exactly once. If you paste it somewhere and it gets used, it is dead, and that is a feature. If the claim ever comes back "forbidden," revoke the token in the Bridge and make a new one rather than retrying.</li>
+  <li>Transactions refresh about once a day on the Bridge's side, and some banks take a couple of days to post. This is a morning-after tool, not a real-time one, and that is fine for what it is for.</li>
+</ul>
+
+<h2 id="store">4. Box two: the store on your own machine</h2>
+
+<p>Every pull from the feed lands in a single database file. There is one table of accounts and one table of transactions, keyed by the bank's own transaction id, so pulling the same window twice just updates rows instead of duplicating them. That one decision is what makes the whole thing safe to rerun: if a night's job crashes halfway, the next night simply pulls the window again.</p>
+
+<p>The first run backfilled a little over a year of history in 44-day slices, which is the Bridge's preferred request size. Nightly runs re-pull only the last 45 days, enough to catch a pending charge turning into a posted one. The file is readable only by the owner's account on that machine, and it is never copied anywhere.</p>
+
+<div class="note"><strong>The landmine worth writing down.</strong> Different feeds disagree on the sign of a number. In SimpleFIN a negative amount is money leaving. In Plaid a positive amount is money leaving. Pick one convention for your store, write it at the top of the file, and convert on the way in. Get this backwards and every report runs perfectly while showing every total inverted.</div>
+
+<h2 id="check">5. Box three: the nightly check — what counts as a subscription</h2>
+
+<p>This is the part people assume needs machine learning. It does not. A recurring charge is just a pattern you can describe in a sentence, and the sentence is the code.</p>
+
+<p><strong>A subscription is:</strong> the same payee, charged at a regular interval, for a steady amount, at least three times. "Same payee" means the bank description with the junk stripped out (store numbers, the word POS, hashes). "Regular interval" means the gaps between charges cluster around a week, two weeks, a month, a quarter, or a year. "Steady amount" means the charges do not vary by more than about a third, which is what separates a software bill from your coffee shop. Transfers, deposits, card payments, and anything that looks like moving your own money around are excluded before any of that runs.</p>
+
+<p>From there the inventory splits into two piles: <strong>subscriptions</strong> (software and services, the stuff you can cancel in five minutes) and <strong>bills and loans on autopay</strong> (payroll, insurance, lenders, utilities, anything over a certain size). Lumping those together is the mistake consumer apps make. A total of "$20,000 a month in recurring charges" is useless when $18,000 of it is payroll and the mortgage. "$2,100 a month in software, here are the top five" is a number you can act on.</p>
+
+<p>Then four checks, each a few lines:</p>
+<ol>
+  <li><strong>Double charge:</strong> the same payee, the same amount to the cent, on the same account, twice within three days. Bank fees are excluded because they legitimately repeat.</li>
+  <li><strong>New recurring charge:</strong> a pattern that qualifies as a subscription whose first charge was inside the last sixty days. This is how you find the free trial that started billing.</li>
+  <li><strong>Price jump:</strong> a subscription whose latest charge is more than twenty percent above its usual amount.</li>
+  <li><strong>Broken feed:</strong> the Bridge reported an error for a bank, which usually means that bank wants you to log in again.</li>
+</ol>
+
+<p>Each finding gets a key, and the key is remembered. You are told once. If you do nothing, it does not nag you the next morning; whatever you do about it happens in your own task list, not in the money tool.</p>
+
+<p>On the first run against real data it surfaced, in one pass: one probable double charge from a pest-control vendor, two price increases nobody had noticed, and a cloud-computing bill that had quietly started charging weekly a month earlier. That is the entire pitch for the thing in one sentence.</p>
+
+<h2 id="lands">6. Where it lands: nowhere new</h2>
+
+<p>There is no dashboard. The nightly job writes a short text file only on nights it has something to say. The owner's existing morning email, which is generated by a separate program and already carries his calendar, weather, and to-do items, looks for that file. If it exists, the email gets a small "Money" section with those lines, worded as things to check. If it does not exist, the email says nothing about money and the reader never notices the silence.</p>
+
+<p>Mondays add one line: how many subscriptions, roughly what they total, the five biggest, and the bills total separately. That is the whole reporting layer. It is deliberately boring.</p>
+
+<p>If your morning place is a Slack channel, a notes app, or a text message to yourself, use that instead. The rule is to land where you already look, not to create a new place to look.</p>
+
+<h2 id="built">7. How it got built, including the part that went wrong</h2>
+
+<p>The build itself took one afternoon with an AI assistant that can write and run code on the owner's server. The owner's part was: subscribe to the Bridge, link the banks, paste the token, and then read the first inventory and say what looked wrong. The assistant's part was everything else: the sync, the store, the rules in section 5, the timer, the hook into the morning email, and testing each piece against the live feed as it went.</p>
+
+<p>The honest part: this was the <em>second</em> attempt. The first time, three weeks earlier, the same system was designed and even coded in a chat session that did not have access to the server. It passed its tests inside that chat and then went nowhere, because the owner's one step ("subscribe and paste a token") was written into a journal as a note instead of into his to-do list as a task. He asked his assistant what to work on, was told "nothing pressing," and built a video game instead. Three weeks later he asked where the money tool was.</p>
+
+<p>Two lessons came out of that, and they are worth more than the tool:</p>
+<ul>
+  <li><strong>A handoff is not done until it is written as the other person's task, in their list, in a verb.</strong> "Still needs Dustin to subscribe" in a note is invisible. "Subscribe at this link and paste the token" in his to-do list gets done.</li>
+  <li><strong>Build on the machine where it will run.</strong> Code that passes tests somewhere else is a design, not a tool.</li>
+</ul>
+
+<p>The only real bug on the second attempt: the Bridge refused the token claim with a "forbidden" error when the request came from Python's default web client, and accepted it from a plain <code>curl</code> command. The fix was sending a normal user-agent header. It cost ten minutes and is noted here so it costs you zero.</p>
+
+<h2 id="cost">8. What it costs</h2>
+<ul>
+  <li><strong>SimpleFIN Bridge:</strong> $15 a year.</li>
+  <li><strong>A computer that is on at night:</strong> the owner already had a small home server. A Raspberry Pi, an old laptop, or a $5-a-month cloud box all work.</li>
+  <li><strong>The AI assistant:</strong> whatever you already pay for one that can run code (the owner uses Claude Code on a monthly plan).</li>
+  <li><strong>Your time:</strong> about forty-five minutes of yours across an afternoon, most of it bank logins.</li>
+</ul>
+
+<h2 id="tryit">9. If you want to build yours</h2>
+
+<ol class="steps">
+  <li><strong>Decide where it will land.</strong> The email you read every morning? A Slack channel? If you do not have a daily place, start with a plain text file and read it with your coffee.</li>
+  <li><strong>Subscribe to SimpleFIN Bridge</strong> at bridge.simplefin.org and link your accounts. Skip anything that will not connect. Do not generate the setup token yet.</li>
+  <li><strong>Describe the tool to your AI assistant</strong> in your own words. Something like the box below. Ask for it to be built on the machine that will run it, in a scratch folder, and to show you the first inventory before anything is scheduled.</li>
+  <li><strong>Generate the setup token and give it to the assistant</strong> through the tool it is building, never by pasting it into a public place. Confirm it stored the resulting key in a file only your user can read.</li>
+  <li><strong>Read the first inventory.</strong> It will be wrong in a few places: a loan filed as a subscription, a coffee shop that happens to bill like clockwork. Say so. Each correction is one line of rule.</li>
+  <li><strong>Turn on the timer only when the output is boring.</strong> If the first week's mornings have a false alarm, fix the rule, not your tolerance.</li>
+</ol>
+
+<pre>I want a private replacement for a subscription-tracking app.
+Read-only. It must never be able to move money.
+
+Bank feed: SimpleFIN Bridge (I'll give you a one-time setup token).
+Store: a local SQLite file on this machine, readable only by me.
+Nightly: pull the last 45 days, update the store, then find
+  - recurring charges (same payee, regular interval, steady amount, 3+ times),
+    split into "subscriptions" and "bills/loans on autopay",
+  - the same charge twice within 3 days,
+  - any subscription whose first charge is within 60 days,
+  - any subscription that jumped more than 20%,
+  - any bank the feed reports an error for.
+Tell me once per finding. Write findings to a file my morning
+[email / Slack / note] already reads; write nothing on quiet nights.
+Mondays: one line with totals and the five biggest subscriptions.
+Build it here, in a scratch folder, test against the live feed,
+and show me the first inventory before scheduling anything.</pre>
+
+<h2 id="guardrails">10. Guardrails you should not skip</h2>
+<ul>
+  <li><strong>Read-only or nothing.</strong> If a feed or a tool can initiate transfers, do not use it for this, no matter how convenient.</li>
+  <li><strong>The access key is a password.</strong> Keep it in one file, permissions locked to your user, never in a code repository, never in a chat log, never in a screenshot.</li>
+  <li><strong>Keep the store on a machine you control</strong> and do not sync that folder to a cloud drive by accident.</li>
+  <li><strong>Treat bank-supplied text as untrusted.</strong> Transaction descriptions and error messages come from outside. Cap their length and never feed them to anything that executes.</li>
+  <li><strong>Tell the humans.</strong> If accounts belong to a spouse or a business partner, they should know a program on your machine reads them.</li>
+  <li><strong>Silence is not success.</strong> Make the nightly job say something when the feed itself fails. A money tool that quietly stops is worse than no tool.</li>
+</ul>
+
+<div class="disclaimer">
+  <h3>Repeat of the disclaimer</h3>
+  <ul>
+    <li>Pattern, not product. No software is distributed with this paper.</li>
+    <li>Not financial, tax, or legal advice. Connecting software to financial accounts is your responsibility, including compliance with your banks' terms and any third-party service's terms.</li>
+    <li>Figures in this paper are rounded and illustrative. No account details are shared.</li>
+  </ul>
+</div>
+
+</div>
+</main>
+
+<footer>
+  <p class="cta-line">Published by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a>. For the step-by-step version with appraisal tools: the <a href="https://theappraisercoach.com/products/" target="_blank" rel="noopener">Appraiser AI Academy</a>.</p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Educational reference. No source code, no installer, no warranty, no tech support. Site source on <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">GitHub</a>.</p>
+</footer>
+
+</body>
+</html>
