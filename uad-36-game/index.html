@@ -123,7 +123,7 @@ function resize(){
   cv.style.width = VW + 'px'; cv.style.height = VH + 'px';
   cv.width = Math.floor(VW * dpr); cv.height = Math.floor(VH * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  view.hud = VW < 640 ? 60 : 44;
+  view.hud = VW < 640 ? 60 : (VW >= 1000 ? 52 : 44);
   const fit = Math.min(VW / W, (VH - view.hud) / H);
   if (fit >= 0.8) { view.mode = 'fit'; view.z = fit; }
   else { view.mode = 'cam'; const base = Math.min(VW, VH) / 420, fillH = (VH - view.hud) / H; view.z = Math.max(0.7, Math.min(1.15, Math.max(base, VH > VW ? fillH : 0))); }
@@ -299,11 +299,11 @@ function readKeys(){
   return { dx, dy };
 }
 const BTN = { act: { x: 0, y: 0 }, fire: { x: 0, y: 0 }, mute: { x: 0, y: 0 }, home: { x: 0, y: 0 }, r: 40 };
-function layoutButtons(){ const r = VW < 640 ? 34 : 40; BTN.r = r; BTN.act.x = VW - r - 22; BTN.act.y = VH - r - 26; BTN.fire.x = VW - r - 22; BTN.fire.y = VH - r * 3 - 60; BTN.mute.x = VW - 18; BTN.mute.y = view.hud + 18; BTN.home.x = 22; BTN.home.y = view.hud + 22; }
+function layoutButtons(){ const r = VW < 640 ? 34 : (isTouch ? 40 : 46); BTN.r = r; BTN.act.x = VW - r - 22; BTN.act.y = VH - r - 26; BTN.fire.x = VW - r - 22; BTN.fire.y = VH - r * 3 - 60; BTN.mute.x = VW - 18; BTN.mute.y = view.hud + 18; BTN.home.x = 22; BTN.home.y = view.hud + 22; }
 const walk = { id: null, target: null };
 function screenPt(t){ const r = cv.getBoundingClientRect(); return { x: t.clientX - r.left, y: t.clientY - r.top }; }
 function toWorldPt(p){ return { x: (p.x - view.ox) / view.z, y: (p.y - view.oy) / view.z }; }
-function nearBtn(p){ if (Math.hypot(p.x - BTN.home.x, p.y - BTN.home.y) < 24) return 'home'; if (Math.hypot(p.x - BTN.mute.x, p.y - BTN.mute.y) < 22) return 'mute'; if (!isTouch) return null; let b = null, bd = 1e9; for (const k of ['act', 'fire']) { const d = Math.hypot(p.x - BTN[k].x, p.y - BTN[k].y); if (d < BTN.r * 1.5 && d < bd) { bd = d; b = k; } } return b; }
+function nearBtn(p){ if (Math.hypot(p.x - BTN.home.x, p.y - BTN.home.y) < 24) return 'home'; if (Math.hypot(p.x - BTN.mute.x, p.y - BTN.mute.y) < 22) return 'mute'; let b = null, bd = 1e9; for (const k of ['act', 'fire']) { const d = Math.hypot(p.x - BTN[k].x, p.y - BTN[k].y); if (d < BTN.r * 1.5 && d < bd) { bd = d; b = k; } } return b; }
 function onDown(id, p){
   if (screen !== 'play') return;
   const b = nearBtn(p); if (b === 'home') { goHome(); return; } if (b === 'mute') { toggleMute(); return; } if (b) { if (b === 'fire') input.fireEdge = true; else input.actionEdge = true; return; }
@@ -316,7 +316,7 @@ cv.addEventListener('touchmove', e => { e.preventDefault(); for (const t of e.ch
 cv.addEventListener('touchend', e => { e.preventDefault(); for (const t of e.changedTouches) onUp(t.identifier); }, { passive: false });
 cv.addEventListener('touchcancel', e => { for (const t of e.changedTouches) onUp(t.identifier); });
 cv.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') return; e.preventDefault(); ac(); onDown('m', screenPt(e)); });
-cv.addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; if (e.buttons) onMove('m', screenPt(e)); });
+cv.addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; const p = screenPt(e); if (e.buttons) onMove('m', p); cv.style.cursor = screen !== 'play' ? 'default' : (nearBtn(p) ? 'pointer' : 'crosshair'); });
 cv.addEventListener('pointerup', e => { if (e.pointerType === 'touch') return; onUp('m'); });
 function toggleMute(){ muted = !muted; try { localStorage.setItem('uad36_muted', muted ? '1' : '0'); } catch (e) {} if (!muted) SFX.pop(); }
 
@@ -495,10 +495,11 @@ function drawHUD(){
     ctx.fillStyle = '#333'; ctx.fillRect(10, 30, VW - 20, 5); ctx.fillStyle = barCol; ctx.fillRect(10, 30, (VW - 20) * frac, 5);
     text(check, VW / 2, 47, 15, '#fff', 'center', true);
   } else {
-    text('⏱ ' + mmss(G.clock) + ' / ' + mmss(CFG.limit), 14, 22, 17, col, 'left', true);
-    ctx.fillStyle = '#333'; ctx.fillRect(190, 16, 150, 12); ctx.fillStyle = barCol; ctx.fillRect(190, 16, 150 * frac, 12);
-    text(check, VW / 2, 22, 17, '#fff', 'center', true);
-    text('Level ' + L.level + '   ⚡' + G.charges + '/' + CFG.charges + '   🐕 ' + hearts, VW - 40, 22, 16, '#fff', 'right', true);
+    const fs = VW >= 1000 ? 20 : 17, cy = hh / 2;
+    text('⏱ ' + mmss(G.clock) + ' / ' + mmss(CFG.limit), 14, cy, fs, col, 'left', true);
+    ctx.fillStyle = '#333'; ctx.fillRect(VW >= 1000 ? 230 : 190, cy - 6, 160, 12); ctx.fillStyle = barCol; ctx.fillRect(VW >= 1000 ? 230 : 190, cy - 6, 160 * frac, 12);
+    text(check, VW / 2, cy, fs, '#fff', 'center', true);
+    text('Level ' + L.level + '   ⚡' + G.charges + '/' + CFG.charges + '   🐕 ' + hearts, VW - 40, cy, fs - 1, '#fff', 'right', true);
   }
   text(muted ? '🔇' : '🔊', BTN.mute.x, BTN.mute.y, 16, '#fff', 'center');
   ctx.fillStyle = 'rgba(27,31,26,0.85)'; ctx.beginPath(); ctx.arc(BTN.home.x, BTN.home.y, 18, 0, 7); ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.stroke(); emoji('🏠', BTN.home.x, BTN.home.y, 18);
@@ -510,8 +511,8 @@ function drawHUD(){
     const sx = Math.max(30, Math.min(VW - 30, c.x * view.z + view.ox)), sy = Math.max(hh + 30, Math.min(VH - 30, c.y * view.z + view.oy)), ang = Math.atan2(c.y * view.z + view.oy - sy, c.x * view.z + view.ox - sx);
     ctx.save(); ctx.translate(sx, sy); ctx.rotate(ang); ctx.fillStyle = '#ffe066'; ctx.beginPath(); ctx.moveTo(22, 0); ctx.lineTo(-6, -14); ctx.lineTo(-6, 14); ctx.closePath(); ctx.fill(); ctx.restore(); emoji('🚗', sx - Math.cos(ang) * 26, sy - Math.sin(ang) * 26, 24); } }
   if (G.toast) hint = G.toast.text; if (G.freeze > 0) hint = '...';
-  if (hint) { const fs = narrow ? 14 : 15, hy = isTouch ? hh + 24 : VH - 22; ctx.font = '700 ' + fs + 'px system-ui,sans-serif'; const tw = Math.min(VW - 100, ctx.measureText(hint).width + 28), hx = isTouch ? Math.max(VW / 2, 48 + tw / 2) : VW / 2; ctx.fillStyle = 'rgba(27,31,26,0.85)'; rrect(hx - tw / 2, hy - 14, tw, 28, 8); ctx.fill(); text(hint, hx, hy, fs, '#ffe066', 'center', true); }
-  if (isTouch) {
+  if (hint) { const fs = narrow ? 14 : 18, hy = hh + (narrow ? 24 : 28); ctx.font = '700 ' + fs + 'px system-ui,sans-serif'; const tw = Math.min(VW - 100, ctx.measureText(hint).width + 28), hx = isTouch ? Math.max(VW / 2, 48 + tw / 2) : VW / 2; ctx.fillStyle = 'rgba(27,31,26,0.85)'; rrect(hx - tw / 2, hy - 14, tw, 28, 8); ctx.fill(); text(hint, hx, hy, fs, '#ffe066', 'center', true); }
+  {
     const actIcon = t ? ({ corner: '📐', photo: '📸', note: '📝', leave: '🛞' })[t.kind] : '●', actLabel = t ? ({ corner: 'MEASURE', photo: 'PHOTO', note: 'NOTE', leave: 'DRIVE' })[t.kind] : '';
     const hz = nearestHazard(), pulse = 1 + Math.sin(G.t * 7) * 0.08;
     for (const [k, b] of [['act', BTN.act], ['fire', BTN.fire]]) {
@@ -519,9 +520,11 @@ function drawHUD(){
       ctx.fillStyle = live ? 'rgba(255,224,102,0.35)' : 'rgba(255,255,255,0.18)'; ctx.beginPath(); ctx.arc(b.x, b.y, rr, 0, 7); ctx.fill(); ctx.strokeStyle = live ? '#ffe066' : 'rgba(255,255,255,0.5)'; ctx.lineWidth = live ? 3 : 1; ctx.stroke(); ctx.lineWidth = 1;
       if (k === 'act') { emoji(actIcon, b.x, b.y - (actLabel ? 4 : 0), BTN.r * (t ? 0.8 : 0.6)); if (actLabel) text(actLabel, b.x, b.y + BTN.r * 0.62, 10, '#fff', 'center', true); }
       else { emoji('⚡', b.x, b.y - 4, BTN.r * 0.8); text('ZAP ' + G.charges, b.x, b.y + BTN.r * 0.62, 10, '#fff', 'center', true); }
+      if (!isTouch) { const cap = k === 'act' ? 'SPACE' : 'F'; ctx.font = '700 11px system-ui,sans-serif'; const cw = ctx.measureText(cap).width + 12; ctx.fillStyle = 'rgba(255,255,255,0.9)'; rrect(b.x - cw / 2, b.y + BTN.r + 6, cw, 18, 5); ctx.fill(); text(cap, b.x, b.y + BTN.r + 15, 11, '#1b1f1a', 'center', true); }
     }
+    if (!isTouch) text('Arrows or click to walk  ·  SPACE measure / photo / note  ·  F zap  ·  M sound  ·  Esc home', 14, VH - 16, 13, 'rgba(255,255,255,0.7)', 'left');
   }
-  if (!G.moved && G.t > 0.5) { const msg = isTouch ? '👆 Tap where you want to walk' : 'Arrow keys to walk — or click where you want to go'; const pulse = 0.75 + Math.sin(G.t * 4) * 0.25; ctx.font = '700 18px system-ui,sans-serif'; const tw = ctx.measureText(msg).width + 32; ctx.fillStyle = 'rgba(27,31,26,' + (0.85 * pulse) + ')'; rrect(VW / 2 - tw / 2, hh + 56, tw, 40, 10); ctx.fill(); ctx.globalAlpha = pulse; text(msg, VW / 2, hh + 76, 18, '#ffe066', 'center', true); ctx.globalAlpha = 1; }
+  if (!G.moved && G.t > 0.5) { const msg = isTouch ? '👆 Tap where you want to walk' : 'Click where you want to go (or use the arrow keys)'; const pulse = 0.75 + Math.sin(G.t * 4) * 0.25; ctx.font = '700 18px system-ui,sans-serif'; const tw = ctx.measureText(msg).width + 32; ctx.fillStyle = 'rgba(27,31,26,' + (0.85 * pulse) + ')'; rrect(VW / 2 - tw / 2, hh + 56, tw, 40, 10); ctx.fill(); ctx.globalAlpha = pulse; text(msg, VW / 2, hh + 76, 18, '#ffe066', 'center', true); ctx.globalAlpha = 1; }
 }
 
 // ---------- screens (DOM) ----------
