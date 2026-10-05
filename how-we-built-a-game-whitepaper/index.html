@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How an Appraiser Built a Video Game in One Evening — A Dustin OS White Paper</title>
+<meta name="description" content="The full story of UAD 3.6 — Ultimate Appraiser Defender: the spec, the fourteen rounds of feedback, how the AI tested it without a human, and what the same loop builds for real appraisal work.">
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2e2; --bg:#fafafa; --accent:#2c5aa0; --accent-bg:#f0f5ff; --brand:#5a3a2a; --brand-bg:#f5efe7; --good:#2e7d32; --warn:#c62828; --warn-bg:#fff3e0; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); margin: 0; line-height: 1.6; }
+  header { background: white; border-bottom: 1px solid var(--line); padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1.25rem; }
+  header img.logo { width: 72px; height: 72px; flex-shrink: 0; border-radius: 6px; }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link { color: var(--accent); font-size: 0.9rem; text-decoration: none; white-space: nowrap; }
+  main { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .doc-block { background: white; border: 1px solid var(--line); border-radius: 10px; padding: 2rem 2.25rem; }
+  .meta-line { color: var(--muted); font-size: 0.9rem; margin: 0 0 1rem; }
+  h2 { color: var(--accent); font-size: 1.3rem; margin: 2rem 0 0.75rem; scroll-margin-top: 1rem; }
+  h3 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; }
+  p { margin: 0.75rem 0; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin: 0.4rem 0; }
+  code { background: #f1f1f1; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+  blockquote { margin: 1rem 0; padding: 0.6rem 1rem; border-left: 3px solid var(--brand); background: var(--brand-bg); border-radius: 4px; font-style: italic; }
+  blockquote cite { display: block; font-style: normal; color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
+  .toc { background: var(--accent-bg); border: 1px solid #cfe0f5; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0 1.5rem; }
+  .toc h3 { margin-top: 0; color: var(--accent); }
+  .toc ol { margin: 0; }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .disclaimer { background: var(--warn-bg); border: 1px solid #f0cfa0; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+  .disclaimer h3 { margin-top: 0; color: #a15a00; }
+  .disclaimer ul { margin-bottom: 0; }
+  .note { background: var(--brand-bg); border-left: 3px solid var(--brand); border-radius: 4px; padding: 0.75rem 1rem; margin: 1rem 0; font-size: 0.95rem; }
+  table.log { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  table.log th, table.log td { border: 1px solid var(--line); padding: 0.55rem 0.7rem; text-align: left; vertical-align: top; }
+  table.log th { background: #f4f4f4; }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 2rem 1rem; }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  @media (max-width: 600px) { header { padding: 1rem; flex-wrap: wrap; } main { padding: 0.5rem 1rem; } .doc-block { padding: 1.25rem 1.25rem; } }
+  @media print { header a.home-link, footer, .dl { display: none; } body { background: white; } .doc-block { border: none; padding: 0; } main { max-width: none; padding: 0; } }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>How an Appraiser Built a Video Game in One Evening</h1>
+    <p>A Dustin OS white paper — the making of <em>UAD 3.6: Ultimate Appraiser Defender</em>, and why the same loop builds real appraisal tools.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+<div class="doc-block">
+
+<p class="meta-line">Published by The Appraiser Coach, October 2026. Educational reference. The game itself is free to play at <a href="https://game.dustinharrisos.com/">game.dustinharrisos.com</a>, and its source is in this same repository.</p>
+
+<p class="dl" style="margin: 0.5rem 0 1rem;">
+  <a href="../dist/How-An-Appraiser-Built-A-Video-Game-Whitepaper.pdf" download style="display:inline-block;background:var(--accent);color:white;padding:0.5rem 1rem;border-radius:4px;text-decoration:none;font-weight:600;font-size:0.95rem;">⬇ Download as PDF</a>
+  <span style="color:var(--muted);font-size:0.85rem;margin-left:0.5rem;">For sharing or posting to a forum.</span>
+</p>
+
+<div class="disclaimer">
+  <h3>Read this first</h3>
+  <ul>
+    <li><strong>This is a story about a process, not a programming tutorial.</strong> You will not learn JavaScript here. You will learn what it feels like to have something built for you by describing it.</li>
+    <li><strong>"UAD 3.6" in the title is a joke about the appraisal form.</strong> The game is not affiliated with any software vendor, Fannie Mae, Freddie Mac, or the UAD standard.</li>
+    <li><strong>No warranty, no tech support.</strong> The code is published in this repository for anyone who wants to change the pests. If you break it, you get to keep both pieces.</li>
+  </ul>
+</div>
+
+<div class="toc">
+  <h3>Contents</h3>
+  <ol>
+    <li><a href="#idea">The idea, in the exact words it was given</a></li>
+    <li><a href="#decisions">What the AI decided without being told</a></li>
+    <li><a href="#loop">Fourteen rounds of "that's confusing" — the actual log</a></li>
+    <li><a href="#testing">How it got tested with nobody playing it</a></li>
+    <li><a href="#hood">What's actually under the hood</a></li>
+    <li><a href="#email">The email question, and how the answer changed three times</a></li>
+    <li><a href="#cost">What it cost</a></li>
+    <li><a href="#appraisal">Why this matters for appraisal tools</a></li>
+    <li><a href="#tryit">If you want to try this yourself</a></li>
+  </ol>
+</div>
+
+<h2 id="idea">1. The idea, in the exact words it was given</h2>
+
+<p>On the morning of October 4, 2026, Dustin Harris was sitting in the airport at Rome Fiumicino at the end of a two-week trip, triaging his to-do list with the AI assistant that runs his businesses. One of the items on that list had been sitting there since late September. It read, verbatim:</p>
+
+<blockquote>Create an Appraiser based video game surrounding the Appraisal inspection where you have to fight off homeowners and Realtors and measure the house while a dog is trying to bite you etc. Make it browser based and fun with progressions and something that is shareable. Use it to gather emails by making it totally free if you put your email in.<cite>— the second-brain entry, as captured from a voice note</cite></blockquote>
+
+<p>That is the entire specification. There was no design document. When the assistant asked what "measure the house" should mean in a game, Dustin answered the way an appraiser would: a laser and a tablet for the exterior, photos inside and out, notes on what you see, and you have to survive the Realtor, the dogs, the goats, the chickens, the homeowner and the neighbors. Winning meant surviving all of it in under thirty minutes, with the minutes ticking like seconds. Then levels get harder: tougher houses, more obstacles, new property types.</p>
+
+<p>The assistant laid out a plan that would fit a time budget — one level first, in a scratch folder, nothing shipped until he had played it and said it was fun — and asked for a go. The reply was three words:</p>
+
+<blockquote>Build a prototype.</blockquote>
+
+<p>The first playable version was on his phone before the connecting flight out of Amsterdam.</p>
+
+<h2 id="decisions">2. What the AI decided without being told</h2>
+
+<p>This is the part most people underestimate. A short spec only works if the thing on the other end makes a few hundred small decisions well, and makes the big ones in a way you can undo. Here is what got decided on the assistant's own judgment, before any feedback:</p>
+
+<ul>
+  <li><strong>One file.</strong> The whole game is a single HTML page, around 600 lines, no libraries, no build step, no framework. If it works on a phone's browser it works everywhere, and there is nothing to install or update.</li>
+  <li><strong>Emoji as art.</strong> The appraiser is 🕵️, the dog is 🐕, the realtor is 🧑‍💼. Every phone already has these drawn beautifully. No artist, no image files, no licensing.</li>
+  <li><strong>Top-down view, one screen per property.</strong> You can see the whole lot, so the game is about routing and timing rather than exploring.</li>
+  <li><strong>Hazards as "interruptions," not enemies.</strong> Nothing has hit points. Bumping into the Realtor costs you three minutes and a line of dialogue. That turned out to matter later.</li>
+  <li><strong>All the "feel" numbers in one place.</strong> Clock speed, dog speed, laser charges, how long a stun lasts — every one of them is a named knob at the top of the file. When Dustin later said "double the time," it was a one-number change.</li>
+  <li><strong>A scratch folder and a private link.</strong> Not the public tools repository. Nothing goes out until the person who asked for it has played it.</li>
+</ul>
+
+<p>Two of those — the single file and the knobs — are the reason the next section was possible at all.</p>
+
+<h2 id="loop">3. Fourteen rounds of "that's confusing" — the actual log</h2>
+
+<p>What follows is the real sequence of feedback, pulled from the conversation. Dustin was traveling the whole time: airport, two flights, a layover, then home. He never saw code. Each row is one message from him and what shipped in response. Times are approximate minutes from his message to the fix being live on the link.</p>
+
+<table class="log">
+<tr><th style="width:40%">What Dustin said</th><th>What changed</th><th style="width:12%">Time</th></tr>
+<tr><td>"It should be named UAD 3.6 but UAD should stand for Ultimate Appraiser… not sure what to do with the D. Also the appraiser should be able to use his laser measure as a weapon."</td><td>Renamed <em>Ultimate Appraiser Defender</em>. The laser now fires: a red beam, three charges that recharge.</td><td>~10 min</td></tr>
+<tr><td>"How can we make this mobile friendly?"</td><td>Full-screen canvas, a camera that follows you zoomed in on phones, portrait support, on-screen buttons.</td><td>~25 min</td></tr>
+<tr><td>"I can't move. It is not clear how to move. Whatever gets zapped should die and go away for a period of time."</td><td>The hidden joystick was replaced with tap-where-you-want-to-walk and a pulsing "👆 Tap where you want to walk" prompt. Zapped pests vanish.</td><td>~15 min</td></tr>
+<tr><td>"Still says time on clock is 30. How do I fire the laser to measure and to shoot obstacles?"</td><td>One-hour clock. The action button now labels itself — 📐 MEASURE, 📸 PHOTO, 📝 NOTE — and the ⚡ ZAP button auto-aims at the nearest pest. The test harness also found the Realtor spawning on top of the player and interrupting every tap; he was moved and a three-second grace period added.</td><td>~30 min</td></tr>
+<tr><td>"I got done with the game and went back to the car and did not know how to leave and so I lost."</td><td>A steering wheel bobs over the car when everything's done, a banner says where to go, an arrow points at the car if it's off-screen, and walking onto it drives away automatically.</td><td>~12 min</td></tr>
+<tr><td>"Instead of killing the obstacles, which could be a PR problem, let's stun them so they're frozen and move away. Also there needs to be a place on the main screen that goes to how it was built. Also, why is it connected to the exam site? Can't it be its own game.dustinharrisos.com?"</td><td>Zaps now knock the pest back and freeze it in a bubble for twenty game-minutes; nothing dies. A "how this game was built" page. Its own domain.</td><td>~35 min</td></tr>
+<tr><td>"On the main page it should show that one second equals one minute."</td><td>Declined as written — the clock actually runs two real seconds per minute, and he had just called that pace perfect. The screen says the true number. He agreed.</td><td>—</td></tr>
+<tr><td>"Look at this as if you're a brand new person who has never seen what I do before, and improve the game so it's even more impressive."</td><td>A real title screen with the pests wandering behind it. Assignment cards ("NEW ORDER — 412 Maple St, 3 bed / 1 bath, lender needs it today"). Three property types: Rambler, Farmhouse (two dogs, two goats, a cow), Condo (HOA president, cat, tenant). Sound effects, screen shake, score pops, random one-liners. Ranks from Trainee to Review Appraiser Legend. A share button.</td><td>~90 min</td></tr>
+<tr><td>"I keep taking a picture of the front or the street and then I go around the house and find out the picture has not been taken again."</td><td>Diagnosed: the goat was eating a random finished photo on contact, and the notice was easy to miss. Mechanic removed. Street spot moved down the block. Also added a 🏠 home button he'd asked for.</td><td>~10 min</td></tr>
+<tr><td>"I'm going to share this with my members… remove the mandate to gather their email for now."</td><td>Gate off, one knob.</td><td>~3 min</td></tr>
+<tr><td>"Can you put together a GitHub repo and post to the appraisal tool section, and write me a post for Facebook?"</td><td>Published here. Post written.</td><td>~10 min</td></tr>
+<tr><td>"Maybe after the first free play a box pops up and says would you like to know more about how to create real appraisal tools with AI… therefore it's not mandatory."</td><td>The mandatory gate became a once-per-device, skippable ask after round one.</td><td>~15 min</td></tr>
+</table>
+
+<p>Notice what is not in that table: a single line of code, a single technical term from Dustin, a single "can you send me a screenshot of the error." Every message is a player describing what confused him. That is the whole method.</p>
+
+<div class="note"><strong>The one time the assistant said no</strong> is worth a second look. "Say one second equals one minute" was a reasonable-sounding request that would have put a false number on the screen. Pushing back cost one sentence and kept the thing honest. An assistant that does everything you say, including the wrong things, is not actually saving you work.</div>
+
+<h2 id="testing">4. How it got tested with nobody playing it</h2>
+
+<p>Dustin was on a plane for most of this. So who played the game between his messages? Nobody — and the game still got tested every round, three ways:</p>
+
+<ol>
+  <li><strong>A scripted player.</strong> The assistant wrote a small robot that opens the game in an invisible browser, walks a fixed route through the whole house, measures, photographs, zaps anything close, and reports whether it won and in how many minutes. That robot caught the first balance problem (the original clock was unwinnable: the bot finished every task and died at the car) and the first level-design bug (a back door 32 pixels wide for a 26-pixel player, which the robot got wedged in). It ran after every change. If it stopped winning, something had broken.</li>
+  <li><strong>A reachability check.</strong> When three property types were added, the assistant ran a flood-fill from the starting point over every property and confirmed every corner, photo spot, note and the car could physically be reached. The Condo failed on the first try — its front door opened straight into an interior wall — and was fixed before Dustin ever saw it.</li>
+  <li><strong>Phone screenshots.</strong> The invisible browser was told to pretend to be an iPhone in portrait and landscape, tap the buttons, and take pictures. The assistant looked at the pictures. That is how it noticed the player sprite was unreadable on dark asphalt (fixed with a yellow ring), that the fire button sat exactly on the starting position, and that the hint bar was covering the player. The server didn't even have an emoji font; one got installed just so the screenshots would show what a phone shows.</li>
+</ol>
+
+<p>None of this is exotic. It is the kind of checking a careful developer would do, done automatically, in the minutes between one message and the next. It is also why the feedback loop in section 3 stayed about <em>fun</em> rather than about <em>bugs</em>.</p>
+
+<h2 id="hood">5. What's actually under the hood</h2>
+
+<p>For the curious, and so nobody thinks there is a trick:</p>
+
+<ul>
+  <li><strong>The game</strong> is one HTML file. Drawing is done on a canvas; the house, the yard, the pests and the appraiser are all drawn fresh sixty times a second. Each property is a small list: where the walls are (with door gaps), where the rooms are, where the photo spots and notes sit, and which pests live there with what speed and what lines they say. Adding a fourth property means copying one of those lists.</li>
+  <li><strong>Movement</strong> on a phone is tap-to-walk: you tap a spot, the appraiser walks there, sliding along walls. On a keyboard it's the arrow keys.</li>
+  <li><strong>The pests</strong> have three brains: chase (if you're in their zone and within range, come at you), patrol (walk the fence line), wander (chickens). The homeowner lives inside the house and never leaves; the dog lives outside and never comes in.</li>
+  <li><strong>The laser</strong> auto-aims at the nearest pest in range, draws a beam, and if it connects the pest slides away and freezes for twenty game-minutes.</li>
+  <li><strong>Sound</strong> is synthesized on the fly — a handful of beeps and sweeps — so there are no audio files to load.</li>
+  <li><strong>Hosting:</strong> on Dustin's own server behind a Cloudflare tunnel at game.dustinharrisos.com, and a static copy on GitHub Pages in this repository. A forty-line Python script serves the folder and accepts the optional email form into a local file. No database, no third-party service, no analytics.</li>
+  <li><strong>Your personal best</strong> is stored in your own browser. Nothing about play is sent anywhere unless you type your email into the optional box.</li>
+</ul>
+
+<h2 id="email">6. The email question, and how the answer changed three times</h2>
+
+<p>The original note said the game should gather emails by being free "if you put your email in." That is a wall before play. In the first conversation about it the assistant suggested the wall come <em>after</em> the first round instead, so the player has a reason to want more. Dustin agreed, then while it was being built moved it to after the second round, then decided to share it with his members first and switched the gate off entirely. The next morning he reframed it: not a gate, an invitation. "Would you like to know more about how to create real appraisal tools with AI?" Optional, once, with a "no thanks, keep playing" button.</p>
+
+<p>That is the right answer, and it took three wrong ones to get there. The point of writing it down is that every version was a one-knob change. The cost of being wrong was fifteen minutes, so it was fine to be wrong a few times.</p>
+
+<h2 id="cost">7. What it cost</h2>
+
+<ul>
+  <li><strong>Dustin's attention:</strong> roughly three hours total, in five-to-ten-minute slices across an airport, two flights and the next morning. Almost all of it was playing the game and typing one paragraph.</li>
+  <li><strong>Money:</strong> nothing beyond the AI subscription and a server he already runs. Domain, hosting, GitHub: zero marginal cost.</li>
+  <li><strong>Code written by a human:</strong> none.</li>
+</ul>
+
+<h2 id="appraisal">8. Why this matters for appraisal tools</h2>
+
+<p>A game is a deliberately silly thing to build. That is why it is a good demonstration: nobody can claim it only worked because the AI had seen a thousand examples of exactly this. Replace "laser the corners" with "check every UAD field against the engagement letter" and the loop is identical:</p>
+
+<ol>
+  <li>Describe the thing in the words you'd use with a colleague.</li>
+  <li>Ask for a prototype under a time budget, in a scratch folder, nothing shipped.</li>
+  <li>Use it. Say what's confusing. Say what's wrong. Say what you changed your mind about.</li>
+  <li>Let the assistant test between your messages so your feedback stays about the <em>work</em>, not about bugs.</li>
+  <li>Publish when it's useful, not when it's perfect. Then keep going.</li>
+</ol>
+
+<p>Every tool in this repository — the QC reviewer, the engagement-letter parser, the depreciated cost calculator — was built this way. The game just makes the method visible, because the gap between "an appraiser in an airport" and "a working video game on his phone" is too wide to explain any other way.</p>
+
+<h2 id="tryit">9. If you want to try this yourself</h2>
+
+<p>You don't need this game's code, though it's here if you want it. You need an AI assistant that can write and run code on a computer you control (at the time of writing Dustin uses Claude Code), a folder, and a thing you've wanted for years and never had time to build. Start smaller than a game. A checklist that becomes a scorecard. A letter you rewrite every week. Describe it, ask for a prototype, play with it, and type what's confusing.</p>
+
+<p>If you'd rather see it done step by step, with appraisal tools instead of goats, that's what the <a href="https://theappraisercoach.com/products/">Appraiser AI Academy</a> is for.</p>
+
+<div class="disclaimer">
+  <h3>Repeat of the disclaimer</h3>
+  <ul>
+    <li>Educational reference. The game and this paper are provided as-is, with no warranty and no support.</li>
+    <li>"UAD 3.6" is used here as a joke about the appraisal form. No affiliation with any vendor or GSE is implied.</li>
+    <li>Quotes from Dustin are his own words from the build conversation, lightly trimmed for length.</li>
+  </ul>
+</div>
+
+</div>
+</main>
+
+<footer>
+  <p class="cta-line">Published by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a>. Play the game: <a href="https://game.dustinharrisos.com/" target="_blank" rel="noopener">game.dustinharrisos.com</a>.</p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Educational reference. No warranty, no tech support. Source for the game and this site is on <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">GitHub</a>.</p>
+</footer>
+
+</body>
+</html>
