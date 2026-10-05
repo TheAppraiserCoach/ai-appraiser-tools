@@ -4,11 +4,28 @@
 Leads land in /opt/openclaw/.config/dustin-os/game-leads.jsonl, one JSON object per line.
 No third-party calls; wiring to GHL is a later step once Dustin supplies the webhook.
 """
-import json, os, re, sys, time
+import json, os, re, sys, threading, time, urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 LEADS = "/opt/openclaw/.config/dustin-os/game-leads.jsonl"
+WEBHOOK_FILE = "/opt/openclaw/.config/dustin-os/game-ghl-webhook"   # GoHighLevel inbound webhook URL (Lee, 2026-10-05); absent = store only
+
+
+def forward_to_ghl(rec):
+    """Push one lead to the GHL workflow. Runs in a thread; a failure is logged, never shown to the player."""
+    try:
+        url = open(WEBHOOK_FILE).read().strip()
+    except OSError:
+        return
+    payload = {"email": rec["email"], "first_name": rec.get("name") or "", "source": "uad36-game",
+               "tag": "uad-36-game", "score": rec.get("score"), "level": rec.get("level"), "won": rec.get("won"), "ts": rec["ts"]}
+    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            sys.stderr.write("ghl %s %s\n" % (r.status, rec["email"]))
+    except Exception as e:
+        sys.stderr.write("ghl FAILED %s: %s\n" % (rec["email"], e))
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8522
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
 _recent = {}  # ip -> last post time (light rate limit)
@@ -75,6 +92,7 @@ class H(SimpleHTTPRequestHandler):
         with open(LEADS, "a") as f:
             f.write(json.dumps(rec) + "\n")
         _recent[ip] = now
+        threading.Thread(target=forward_to_ghl, args=(rec,), daemon=True).start()
         return self._json(200, {"ok": True})
 
 
