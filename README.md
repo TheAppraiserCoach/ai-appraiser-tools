@@ -53,6 +53,8 @@ Most tools here are **prompt templates**. A prompt is a set of instructions you 
 | Write the reconciliation | [Reconciliation Narrative Writer](https://theappraisercoach.github.io/ai-appraiser-tools/reconciliation-narrative-writer/) | Prompt |
 | Email agents to verify comps | [Comp Verification](https://theappraisercoach.github.io/ai-appraiser-tools/comp-verification/) | Prompt |
 | Support GLA, basement, garage adjustments | [Depreciated Cost Calculator](https://theappraisercoach.github.io/ai-appraiser-tools/depreciated-cost-calculator/) | Works on the page, no AI needed |
+| Derive adjustments with ranges from your own MLS export | [Adjustment Lab](https://theappraisercoach.github.io/ai-appraiser-tools/adjustment-lab/) · [live demo](https://adjust.dustinharrisos.com/) (pw appraiser2026) | Download (Python) or website |
+| Read how the Adjustment Lab works and what its numbers can support | [Adjustment Lab white paper](https://theappraisercoach.github.io/ai-appraiser-tools/adjustment-lab-whitepaper/) | Read only |
 | Study for the appraiser licensing exam | [Appraiser Exam Prep](https://exam.dustinharrisos.com/) | Website, no AI needed |
 | Take a break and play (yes, really) | [UAD 3.6 — Ultimate Appraiser Defender](https://game.dustinharrisos.com/) | Game, phone or laptop, no AI needed |
 | Have an AI answer your phone | [AI Voice Agent Builder](https://theappraisercoach.github.io/ai-appraiser-tools/voice-agent-builder/) | Prompt + guide |

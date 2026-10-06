@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adjustment Lab: Market-Derived Adjustments From Your Own MLS Export — A Dustin OS White Paper</title>
+<meta name="description" content="How an appraiser with no statistics background used AI to build a tool that turns an MLS closed-sales export into dollar adjustments with confidence ranges, a market-trend line, a location map, and a comp finder — and what the numbers can and cannot support.">
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e2e2e2; --bg:#fafafa; --accent:#2c5aa0; --accent-bg:#f0f5ff; --brand:#5a3a2a; --brand-bg:#f5efe7; --good:#2e7d32; --warn:#c62828; --warn-bg:#fff3e0; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); margin: 0; line-height: 1.6; }
+  header { background: white; border-bottom: 1px solid var(--line); padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1.25rem; }
+  header img.logo { width: 72px; height: 72px; flex-shrink: 0; border-radius: 6px; }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link { color: var(--accent); font-size: 0.9rem; text-decoration: none; white-space: nowrap; }
+  main { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .doc-block { background: white; border: 1px solid var(--line); border-radius: 10px; padding: 2rem 2.25rem; }
+  .meta-line { color: var(--muted); font-size: 0.9rem; margin: 0 0 1rem; }
+  h2 { color: var(--accent); font-size: 1.3rem; margin: 2rem 0 0.75rem; scroll-margin-top: 1rem; }
+  h3 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; }
+  p { margin: 0.75rem 0; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin: 0.4rem 0; }
+  code { background: #f1f1f1; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #f6f6f6; border: 1px solid var(--line); border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.86rem; overflow-x: auto; white-space: pre-wrap; }
+  .toc { background: var(--accent-bg); border: 1px solid #cfe0f5; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0 1.5rem; }
+  .toc h3 { margin-top: 0; color: var(--accent); }
+  .toc ol { margin: 0; }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .disclaimer { background: var(--warn-bg); border: 1px solid #f0cfa0; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+  .disclaimer h3 { margin-top: 0; color: #a15a00; }
+  .disclaimer ul { margin-bottom: 0; }
+  .note { background: var(--brand-bg); border-left: 3px solid var(--brand); border-radius: 4px; padding: 0.75rem 1rem; margin: 1rem 0; font-size: 0.95rem; }
+  table.t { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.92rem; }
+  table.t th, table.t td { border: 1px solid var(--line); padding: 0.55rem 0.7rem; text-align: left; vertical-align: top; }
+  table.t th { background: #f4f4f4; }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 2rem 1rem; }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  @media (max-width: 600px) { header { padding: 1rem; flex-wrap: wrap; } main { padding: 0.5rem 1rem; } .doc-block { padding: 1.25rem 1.25rem; } }
+  @media print { header a.home-link, footer, .dl { display: none; } body { background: white; } .doc-block { border: none; padding: 0; } main { max-width: none; padding: 0; } }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>Adjustment Lab: Market-Derived Adjustments From Your Own MLS Export</h1>
+    <p>A Dustin OS white paper — the method behind the tool, what the numbers can support, and how an appraiser built it with AI in a weekend.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+<div class="doc-block">
+
+<p class="meta-line">Published by The Appraiser Coach, October 2026. The tool is live at <a href="https://adjust.dustinharrisos.com/">adjust.dustinharrisos.com</a> (password <code>appraiser2026</code>) and its source is in <a href="../adjustment-lab/">this repository</a>. Built July 2026 for a hands-on workshop; published now because people keep asking.</p>
+
+<p class="dl" style="margin: 0.5rem 0 1rem;">
+  <a href="../dist/Adjustment-Lab-Whitepaper.pdf" download style="display:inline-block;background:var(--accent);color:white;padding:0.5rem 1rem;border-radius:4px;text-decoration:none;font-weight:600;font-size:0.95rem;">⬇ Download as PDF</a>
+</p>
+
+<div class="disclaimer">
+  <h3>Read this first</h3>
+  <ul>
+    <li><strong>This is an exploratory tool, not a valuation.</strong> Nothing it produces is a substitute for appraiser judgment, and nothing here is USPAP guidance. Every adjustment it reports should be treated as a starting point to test, not a number to transcribe.</li>
+    <li><strong>The model only knows what the MLS export tells it.</strong> Section 6 lists what it cannot see. Read that section before you use a single figure.</li>
+    <li><strong>No warranty, no tech support.</strong> Source is published so you can check it, run it, and improve it.</li>
+  </ul>
+</div>
+
+<div class="toc">
+  <h3>Contents</h3>
+  <ol>
+    <li><a href="#why">The problem: "support" that isn't</a></li>
+    <li><a href="#what">What the tool does, in one walk-through</a></li>
+    <li><a href="#model">The model, in plain English</a></li>
+    <li><a href="#pipeline">The seven steps under the hood</a></li>
+    <li><a href="#numbers">What the Idaho Falls numbers actually said</a></li>
+    <li><a href="#limits">What it cannot see (the honest section)</a></li>
+    <li><a href="#built">How it was built</a></li>
+    <li><a href="#use">How to use it without getting burned</a></li>
+    <li><a href="#tryit">If you want to run it on your market</a></li>
+  </ol>
+</div>
+
+<h2 id="why">1. The problem: "support" that isn't</h2>
+
+<p>Ask ten appraisers where their garage adjustment comes from and you will get ten versions of the same answer: it's what we've always used, it's what the market seems to bear, it's somewhere between paired sales from six years ago and a number a reviewer didn't push back on. Under UAD 3.6 and the current reviewer climate, that is not going to hold. Lenders are asking for support, and "experience" is not a column in a spreadsheet.</p>
+
+<p>There are commercial services that will derive adjustments from your market's sales for a monthly fee. They work. They are also a black box, they cost money every month whether you use them or not, and your data goes to them. The question this project set out to answer was narrow: <strong>can an appraiser with no statistics background, using an AI assistant, build the same kind of analysis on his own machine, from his own MLS export, with the math visible?</strong></p>
+
+<p>The answer turned out to be yes, in about a weekend, and the result is good enough to use carefully and not good enough to use blindly. This paper is about the difference.</p>
+
+<h2 id="what">2. What the tool does, in one walk-through</h2>
+
+<p>You export closed sales from your MLS as a CSV. For the test, that was 845 sales in Idaho Falls, Idaho, from July 2024 to July 2026. You upload the file. The tool validates it, geocodes the addresses through the US Census Bureau's free geocoder, fits a model, and about ninety seconds later gives you six tabs:</p>
+
+<ul>
+  <li><strong>Ask the model.</strong> Pick a feature, get the dollar adjustment, the 95% range, and a curve showing how the contribution changes across the feature's range (a third bathroom is not worth the same as a second one).</li>
+  <li><strong>Full table.</strong> Every feature's adjustment and range on one page, ready to screenshot into a workfile.</li>
+  <li><strong>Market trend.</strong> A constant-quality price index for your market over the period, which is the time adjustment, computed the way an economist would compute it rather than from raw monthly medians.</li>
+  <li><strong>Residual map.</strong> Once size, age, and features are stripped out, which neighborhoods are selling above or below what the model expects. That is your location adjustment, drawn as a heat map.</li>
+  <li><strong>Comp finder.</strong> Enter a subject's specs and address. The tool uses its own curves to convert every candidate sale's feature differences into dollars, adds a distance penalty you control with a slider, time-adjusts each price, and ranks the comps by how little adjustment they need. The best comp is the one that needs the least fixing, not the one that happens to be closest.</li>
+  <li><strong>Data check.</strong> What the export was missing, what got excluded, and how many addresses would not geocode.</li>
+</ul>
+
+<h2 id="model">3. The model, in plain English</h2>
+
+<p>The statistical engine is a <em>generalized additive model</em>, a GAM. Here is the whole idea without the vocabulary.</p>
+
+<p>A plain regression says: price equals a fixed dollar amount per square foot, plus a fixed amount per bathroom, plus a fixed amount per year of age, and so on, every feature a straight line. Appraisers know that is false. The first 500 square feet of living area is worth more per foot than the last 500. A house built in 1950 versus 1960 is not the same gap as 2010 versus 2020. Straight lines force the model to split the difference and get every point a little wrong.</p>
+
+<p>A GAM lets each feature have its own <em>curve</em> instead of a line. The curve is learned from the data, and the model is told not to let any curve wiggle more than the sales justify. Living area, lot size, year built, and sale date get curves. Beds, baths, basement, garage spaces, fireplaces, patio/deck, central air, HOA, and view are counted or yes/no, so they get straight contributions. Garage type (none, attached, detached, carport) is treated as categories. Add every contribution together and you get a predicted price; the difference between predicted and actual is the <em>residual</em>, which is where location lives.</p>
+
+<p>Two things make this more honest than a spreadsheet of paired sales:</p>
+<ul>
+  <li><strong>Every adjustment is estimated with every other feature held constant.</strong> The bathroom adjustment is what a bathroom is worth when size, age, lot, and date are the same. That is what an adjustment is supposed to mean, and it is nearly impossible to get from hand-picked pairs.</li>
+  <li><strong>Every adjustment comes with a range.</strong> The 95% range is the model's own statement of how sure it is. A tight range means the market spoke clearly. A range that crosses zero means the market did not, and you should not pretend otherwise in a grid.</li>
+</ul>
+
+<p>The sale-date curve is the time adjustment. Because the model has already accounted for what sold (size, age, features), the date curve measures what the <em>same house</em> would have sold for over time, a constant-quality index. Raw monthly medians cannot do this; if smaller homes happen to sell one month, the median drops and it looks like the market fell.</p>
+
+<h2 id="pipeline">4. The seven steps under the hood</h2>
+
+<table class="t">
+<tr><th style="width:18%">Step</th><th>What it does</th><th style="width:30%">Why it matters</th></tr>
+<tr><td>1 Validate</td><td>Loads the CSV, checks required columns, parses dates and numbers, flags blanks and impossible values.</td><td>On the test data it caught one listing with all its square footage logged below grade and repaired it. Garbage in is the main way these models lie.</td></tr>
+<tr><td>2 Geocode</td><td>Sends street addresses (no prices) to the US Census geocoder; 94% matched.</td><td>No coordinates, no map. Unmatched sales stay in the model but off the map, never faked.</td></tr>
+<tr><td>3 Fit</td><td>Fits the GAM; refits with monotonic living-area so the curve cannot bend downward.</td><td>R² of 0.88 and a 5-fold cross-validated error of 9.3% versus 8.9% in-sample, so it is not memorizing the data.</td></tr>
+<tr><td>4 Adjustments</td><td>Reads each contribution off its curve at typical values; reports the dollar figure and the 95% range.</td><td>This is the table in section 5.</td></tr>
+<tr><td>5 Bootstrap</td><td>Refits the model 200 times on resampled data for one adjustment (fireplace) to see how wide the honest range really is.</td><td>The model's own range for fireplace was tighter than the bootstrap's. Lesson: the formal ranges are optimistic; the bootstrap is truth.</td></tr>
+<tr><td>6 Trend</td><td>Plots the constant-quality index against raw monthly medians.</td><td>Shows the mix effect in your own market.</td></tr>
+<tr><td>7 Map</td><td>Plots residuals by location; summarizes by subdivision.</td><td>Location premiums and discounts with sale counts, so you know which ones are solid.</td></tr>
+</table>
+
+<p>The web app wraps steps 1 through 4 and 6 and 7 behind an upload button and adds the comp finder. The command-line scripts are published separately so anyone can read exactly what was done.</p>
+
+<h2 id="numbers">5. What the Idaho Falls numbers actually said</h2>
+
+<p>Rounded, from 845 sales, July 2024 to July 2026. Published to show the shape of the output, not as adjustments for your market.</p>
+
+<table class="t">
+<tr><th>Feature</th><th>Adjustment</th><th>95% range</th><th>Read</th></tr>
+<tr><td>Market, trailing 12 months</td><td>+3.4% constant-quality</td><td>—</td><td>Modest, healthy. Raw medians looked flatter; that gap was mix.</td></tr>
+<tr><td>Full bath</td><td>$21,400</td><td>$11,000–$31,900</td><td>Well supported.</td></tr>
+<tr><td>Half bath</td><td>$24,600</td><td>$12,300–$36,800</td><td>Well supported (and yes, higher than a full bath in this sample; small-sample quirk, note it).</td></tr>
+<tr><td>Basement, per sq ft below grade</td><td>$60</td><td>$48–$72</td><td>Tight. Defensible.</td></tr>
+<tr><td>Garage space, each</td><td>$13,600</td><td>$4,400–$22,700</td><td>Supported; the count carries the value, the type adds little.</td></tr>
+<tr><td>Central air</td><td>$25,300</td><td>$14,200–$36,400</td><td>Supported.</td></tr>
+<tr><td>Year built, per year newer</td><td>$868</td><td>$811–$926</td><td>Tight, but see section 6: this is absorbing condition.</td></tr>
+<tr><td>Lot, per 0.1 acre (0.15–0.29 ac)</td><td>$18,750</td><td>—</td><td>Strong in this band only.</td></tr>
+<tr><td>Fireplace, each</td><td>$6,500 (bootstrap median)</td><td>$2,300–$12,500</td><td>Fuzzy. A starting point.</td></tr>
+<tr><td>Patio/deck, each</td><td>$4,300</td><td>−$1,900–$10,600</td><td>Range crosses zero. The market did not speak.</td></tr>
+<tr><td>Bedroom, each, GLA held constant</td><td>−$5,900</td><td>−$12,000–$100</td><td>Not an error; see below.</td></tr>
+<tr><td>View noted in MLS</td><td>$34,900</td><td>$14,500–$55,300</td><td>Real but measured off 56 flagged sales; the field is 93% blank.</td></tr>
+</table>
+
+<div class="note"><strong>The bedroom line is the most useful thing in the table.</strong> Holding square footage constant, an extra bedroom came out slightly negative, because at the same size, more bedrooms means smaller rooms. Bedrooms do not carry value; the square footage they occupy does. Every hedonic model behaves this way. If your grid adjusts for both GLA and bedroom count, you are double-counting, and this is the data telling you so.</div>
+
+<p>On the map, after features were stripped out, three subdivisions showed consistent premiums and three showed consistent discounts, with sale counts attached. The one with 62 sales was statistically solid; the one with the biggest premium was partly true location and partly custom-home quality the data cannot see, which is the segue to the next section.</p>
+
+<h2 id="limits">6. What it cannot see (the honest section)</h2>
+
+<ol>
+  <li><strong>No quality or condition ratings.</strong> The two biggest absences in a typical export. Their value bleeds into year built, living area, and especially the location residuals. A "premium neighborhood" on the map is partly a "well-kept houses" neighborhood.</li>
+  <li><strong>Concessions are Yes/No, not dollars.</strong> 57% of the sample had concessions of unknown size. Sold prices are not cash-equivalent. If typical concessions run $5,000 to $10,000, every adjustment carries that fog.</li>
+  <li><strong>No arm's-length screening.</strong> No REO, estate, or relocation flags in the export, so distressed sales are in the sample unmarked.</li>
+  <li><strong>The formal ranges are optimistic.</strong> The bootstrap on fireplace proved it. Treat the published 95% ranges as the narrow end of the truth.</li>
+  <li><strong>About 6% of addresses would not geocode.</strong> They are in the model, off the map.</li>
+  <li><strong>No cost approach.</strong> Replacement cost needs licensed cost data; it is not derivable from sales.</li>
+  <li><strong>Sample size was not the limit; column coverage was.</strong> 845 sales is plenty. The missing fields are what hurt.</li>
+</ol>
+
+<p>None of these are flaws in the method. They are flaws in what an MLS export contains, and they would affect a commercial service exactly the same way, except that a commercial service may not tell you.</p>
+
+<h2 id="built">7. How it was built</h2>
+
+<p>The person who built this is an appraiser of thirty years with no statistics training and no ability to write code. The AI assistant did the statistics and the code. The appraiser did three things, and they were the three things that mattered:</p>
+
+<ol>
+  <li><strong>Described the problem in appraisal terms.</strong> "I want adjustments with ranges from my own sales, a time adjustment that isn't fooled by mix, and a map of where location is doing the work." The assistant chose the GAM; the appraiser never had to.</li>
+  <li><strong>Read every number and argued with it.</strong> The negative bedroom adjustment got pushed back on and turned out to be right. The half-bath-above-full-bath result got flagged as a quirk to note. The fireplace range looked too clean and the bootstrap step exists because of that question.</li>
+  <li><strong>Insisted on the limitations section.</strong> The first draft of the report did not have one. The appraiser's instinct that "this is going in front of a reviewer someday" is what produced section 6.</li>
+</ol>
+
+<p>Timeline: the seven-step analysis and the report were a Saturday. The web app wrapping it was a Sunday. Deployment on a small home server behind a password took an evening, most of it fighting a tunnel configuration quirk that is now written down in the repository so nobody has to fight it twice. It was shown at a workshop in July 2026 and has been sitting at its URL since.</p>
+
+<p>The honest caveat about the build: the assistant that did it was running on a frontier model with a Python environment. It is not a prompt you paste into a chat window; the model has to be able to run code, see the output, and iterate. That capability is now a monthly subscription, not a research lab.</p>
+
+<h2 id="use">8. How to use it without getting burned</h2>
+
+<ul>
+  <li><strong>Use the ranges, not the point estimates.</strong> If the range crosses zero, the honest adjustment is "not supported by this data," and that is a legitimate thing to write.</li>
+  <li><strong>Reconcile against something.</strong> Paired sales, cost, your own experience. When the model and the pairs agree, you have support. When they do not, you have a question worth answering in the workfile.</li>
+  <li><strong>Say what the model could not see.</strong> One sentence in the addendum: adjustments were developed from a regression on N local sales and reconciled with paired-sales analysis; the regression does not account for condition or concession amounts. Reviewers respect that more than false precision.</li>
+  <li><strong>Re-run it quarterly.</strong> It takes two minutes. The time adjustment in particular should not be last year's.</li>
+  <li><strong>Never put the data anywhere.</strong> Your MLS license is yours. The tool runs on your machine for a reason.</li>
+</ul>
+
+<h2 id="tryit">9. If you want to run it on your market</h2>
+
+<p>Everything is in the <a href="../adjustment-lab/">adjustment-lab folder</a> of this repository: the app, the seven scripts, the example report, and a README with the exact CSV columns it expects and the commands to run it. Two hundred or more sales from one market over 18 to 24 months is the floor; 500 or more is where the ranges get useful.</p>
+
+<p>If you would rather see it working before you install anything, the live demo at <a href="https://adjust.dustinharrisos.com/">adjust.dustinharrisos.com</a> (password <code>appraiser2026</code>) will take your CSV. It is a small server and it is demo-grade; if it is slow, that is why.</p>
+
+<div class="disclaimer">
+  <h3>Repeat of the disclaimer</h3>
+  <ul>
+    <li>Exploratory tool. Not a valuation, not USPAP guidance, not a substitute for appraiser judgment.</li>
+    <li>Figures shown are from one market and one time period, rounded, for illustration only.</li>
+    <li>No warranty, no tech support. You are responsible for your MLS data license and for everything you put in a report.</li>
+  </ul>
+</div>
+
+</div>
+</main>
+
+<footer>
+  <p class="cta-line">Published by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a>. For the step-by-step version with your own market: the <a href="https://theappraisercoach.com/products/" target="_blank" rel="noopener">Appraiser AI Academy</a>.</p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Educational reference. No warranty, no tech support. Source on <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools" target="_blank" rel="noopener">GitHub</a>.</p>
+</footer>
+
+</body>
+</html>
