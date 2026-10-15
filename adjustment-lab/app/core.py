@@ -8,6 +8,8 @@ import pandas as pd
 import requests
 from pygam import LinearGAM, s, l, f
 
+import colmap
+
 CENSUS_BATCH = "https://geocoding.geo.census.gov/geocoder/locations/addressbatch"
 CENSUS_ONE = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress"
 
@@ -32,23 +34,53 @@ def _first_int(x, default=0):
     return int(m.group()) if m else default
 
 
-def load_and_validate(file_like) -> tuple[pd.DataFrame, dict]:
-    df = pd.read_csv(file_like, dtype=str)
-    report = {"rows": len(df), "columns": len(df.columns), "issues": [], "missing": {}}
-    required = list(NUM_COLS.keys()) + ["Sold Date", "Street #", "Street/Road Name",
-                                        "City", "State", "Zip Code"]
-    missing_cols = [c for c in required if c not in df.columns]
-    if missing_cols:
-        raise ValueError(f"CSV is missing required columns: {missing_cols}. "
-                         "Export must follow the MLS export recipe.")
-    for src, dst in NUM_COLS.items():
-        df[dst] = pd.to_numeric(df[src].str.replace(",", "").str.strip(), errors="coerce")
-    df["sold_date"] = pd.to_datetime(df["Sold Date"], format="%m/%d/%Y", errors="coerce")
+def _read_csv_any_encoding(file_like) -> pd.DataFrame:
+    """Flexmls exports are often Windows-1252 (e.g. a superscript ² in a column name), not UTF-8.
+    Try UTF-8 (with or without BOM) first, then cp1252, then latin-1 which never fails."""
+    last = None
+    for enc in ("utf-8-sig", "cp1252", "latin-1"):
+        try:
+            if hasattr(file_like, "seek"):
+                file_like.seek(0)
+            return pd.read_csv(file_like, dtype=str, encoding=enc)
+        except UnicodeDecodeError as e:
+            last = e
+    raise last
 
-    for c in df.columns[:40]:
-        blanks = int(df[c].isna().sum() + (df[c].astype(str).str.strip() == "").sum())
+
+def read_raw(file_like) -> pd.DataFrame:
+    """The export exactly as uploaded (all columns as text), headers tidied."""
+    df = _read_csv_any_encoding(file_like)
+    df.columns = [str(c).strip().lstrip("﻿").replace("²", "") for c in df.columns]
+    return df
+
+
+def read_columns(file_like) -> list[str]:
+    return list(read_raw(file_like).columns)
+
+
+def load_and_validate(file_like, mapping: dict | None = None) -> tuple[pd.DataFrame, dict]:
+    """Any MLS export -> the canonical frame the model needs.
+    mapping = {field: [source columns]} from colmap.guess() (optionally edited by the user)."""
+    raw = read_raw(file_like)
+    if mapping is None:
+        mapping = colmap.guess(list(raw.columns))
+    missing = colmap.missing_required(mapping)
+    if missing:
+        raise ValueError("Couldn't find a column for: " + "; ".join(missing)
+                         + ". Open the column mapping and pick them.")
+    df = colmap.apply_mapping(raw, mapping)
+    report = {"rows": len(df), "columns": len(raw.columns), "issues": [], "missing": {},
+              "mapping": {k: v for k, v in mapping.items() if v}}
+
+    for field, cols in report["mapping"].items():
+        label = colmap.FIELD_BY_KEY[field][1]
+        src = raw[[c for c in cols if c in raw.columns]]
+        if src.shape[1] == 0:
+            continue
+        blanks = int((src.isna() | (src.astype(str).apply(lambda s: s.str.strip()) == "")).all(axis=1).sum())
         if blanks:
-            report["missing"][c] = blanks
+            report["missing"][f"{label}  ←  {', '.join(cols)}"] = blanks
 
     n = len(df)
     if n < 300:
@@ -104,22 +136,31 @@ def geocode_one(address: str):
 
 
 def engineer(df: pd.DataFrame) -> pd.DataFrame:
+    """Feature columns for the GAM. colmap.apply_mapping() already builds the engineered
+    columns for any MLS export; the fallbacks below only run on a raw Flexmls frame."""
     df = df.copy()
-    df["garage_spaces"] = df.get("Garage # Stalls/Type", pd.Series(index=df.index)).apply(_first_int)
-    def gtype(x):
-        if pd.isna(x) or str(x).strip() == "":
-            return "None"
-        xs = str(x)
-        for t in ("Attached", "Detached", "Carport"):
-            if t in xs:
-                return t
-        return "Other"
-    df["garage_type"] = df.get("Garage # Stalls/Type", pd.Series(index=df.index)).apply(gtype)
-    df["fireplaces"] = df.get("Fireplace", pd.Series(index=df.index)).apply(_first_int)
-    df["patio_deck_ct"] = df.get("Patio/Deck", pd.Series(index=df.index)).apply(_first_int)
-    df["has_ac"] = df.get("Air Conditioning", pd.Series(index=df.index)).fillna("").str.contains("Central").astype(int)
-    df["hoa"] = (df.get("HOA", pd.Series(index=df.index)).fillna("No").str.strip() == "Yes").astype(int)
-    df["has_view"] = (df.get("View", pd.Series(index=df.index)).fillna("").str.strip() != "").astype(int)
+    if "garage_spaces" not in df.columns:
+        df["garage_spaces"] = df.get("Garage # Stalls/Type", pd.Series(index=df.index)).apply(_first_int)
+    if "garage_type" not in df.columns:
+        def gtype(x):
+            if pd.isna(x) or str(x).strip() == "":
+                return "None"
+            xs = str(x)
+            for t in ("Attached", "Detached", "Carport"):
+                if t in xs:
+                    return t
+            return "Other"
+        df["garage_type"] = df.get("Garage # Stalls/Type", pd.Series(index=df.index)).apply(gtype)
+    if "fireplaces" not in df.columns:
+        df["fireplaces"] = df.get("Fireplace", pd.Series(index=df.index)).apply(_first_int)
+    if "patio_deck_ct" not in df.columns:
+        df["patio_deck_ct"] = df.get("Patio/Deck", pd.Series(index=df.index)).apply(_first_int)
+    if "has_ac" not in df.columns:
+        df["has_ac"] = df.get("Air Conditioning", pd.Series(index=df.index)).fillna("").str.contains("Central").astype(int)
+    if "hoa" not in df.columns:
+        df["hoa"] = (df.get("HOA", pd.Series(index=df.index)).fillna("No").str.strip() == "Yes").astype(int)
+    if "has_view" not in df.columns:
+        df["has_view"] = (df.get("View", pd.Series(index=df.index)).fillna("").str.strip() != "").astype(int)
     df["t_days"] = (df["sold_date"] - df["sold_date"].min()).dt.days.astype(float)
     df["gla"] = df["abv_sqft"]
     # repair zero-GLA rows from Main SqFt where possible

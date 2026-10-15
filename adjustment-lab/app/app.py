@@ -1,6 +1,7 @@
 """TrueTracts-style demo — upload an MLS CSV, get adjustments, trend, map, comps.
 Built with Claude Code + Fable 5 for The Appraiser Coach."""
 import os
+import json
 import hashlib
 import numpy as np
 import pandas as pd
@@ -12,6 +13,7 @@ import folium
 import streamlit.components.v1 as components
 
 import core
+import colmap
 
 st.set_page_config(page_title="Adjustment Lab — The Appraiser Coach",
                    page_icon="📐", layout="wide")
@@ -41,7 +43,10 @@ st.caption("Upload your MLS closed-sales export → market-derived adjustments, 
 # ---------- data input ----------
 with st.sidebar:
     st.header("1 · Your data")
-    up = st.file_uploader("MLS closed-sales CSV (per the export recipe)", type=["csv", "CSV"])
+    up = st.file_uploader("MLS closed-sales export (CSV, any MLS)", type=["csv", "CSV"])
+    st.caption("Export closed sales with as many fields as your MLS offers. The app finds the "
+               "columns it needs (price, date, beds, baths, sqft, acres, year built, address) "
+               "and lets you correct any guess.")
     DEMO_PATH = os.path.join(os.path.dirname(__file__), "..", "df_step3.pkl")   # not included in the public repo (MLS data); upload your own export
     use_demo = os.path.exists(DEMO_PATH) and st.checkbox("Use demo dataset", value=up is None)
     st.markdown("---")
@@ -51,7 +56,7 @@ with st.sidebar:
 
 
 @st.cache_resource(show_spinner=False)
-def run_pipeline(file_bytes: bytes | None, demo: bool):
+def run_pipeline(file_bytes: bytes | None, demo: bool, mapping_json: str | None):
     import io
     if demo:
         demo_path = os.path.join(os.path.dirname(__file__), "..", "df_step3.pkl")
@@ -63,11 +68,18 @@ def run_pipeline(file_bytes: bytes | None, demo: bool):
         geo = {"matched": int(m.lat.notna().sum()), "total": len(m)}
         gam, m, stats = core.fit(m)
         return gam, m, stats, report, geo
-    df, report = core.load_and_validate(io.BytesIO(file_bytes))
+    mapping = json.loads(mapping_json)
+    df, report = core.load_and_validate(io.BytesIO(file_bytes), mapping)
     df, geo = core.geocode_batch(df)
     m = core.engineer(df)
     gam, m, stats = core.fit(m)
     return gam, m, stats, report, geo
+
+
+@st.cache_data(show_spinner=False)
+def read_header(file_bytes: bytes) -> list[str]:
+    import io
+    return core.read_columns(io.BytesIO(file_bytes))
 
 
 if up is not None and not use_demo:
@@ -75,12 +87,60 @@ if up is not None and not use_demo:
 elif use_demo:
     key, demo = None, True
 else:
-    st.info("Upload your MLS closed-sales CSV to begin (see README for the columns it expects).")
+    st.info("Upload a CSV or tick the demo dataset to begin.")
     st.stop()
+
+# ---------- column mapping (any MLS export) ----------
+mapping_json = None
+if not demo:
+    try:
+        columns = read_header(key)
+    except Exception as e:  # noqa: BLE001 — bad file, say so plainly
+        st.error(f"Couldn't read that file as a CSV: {e}")
+        st.stop()
+    file_id = hashlib.sha1(key).hexdigest()
+    if st.session_state.get("map_file") != file_id:
+        st.session_state["map_file"] = file_id
+        st.session_state["mapping"] = colmap.guess(columns)
+    mapping = st.session_state["mapping"]
+    missing = colmap.missing_required(mapping)
+    n_found = sum(1 for k in colmap.FIELD_BY_KEY if mapping.get(k))
+    st.subheader("2 · Columns")
+    if missing:
+        st.error("I couldn't find a column for: " + "; ".join(missing)
+                 + ". Pick the right columns below, then click Run.")
+    else:
+        st.success(f"Matched {n_found} of {len(colmap.FIELDS)} fields automatically "
+                   f"from your {len(columns)} columns. Check the guesses if the results look off.")
+    with st.expander("Column mapping — edit if a guess is wrong", expanded=bool(missing)):
+        st.caption("Each model field on the left, the column(s) from your export on the right. "
+                   "Fields that accept several columns add them together (e.g. full + 3/4 baths, "
+                   "main level + upper level sqft). Leave optional fields empty if your MLS "
+                   "doesn't have them.")
+        new_map = {}
+        left, right = st.columns(2)
+        for i, (k, label, req, kind, _p, multi, _x) in enumerate(colmap.FIELDS):
+            col = left if i % 2 == 0 else right
+            lab = ("★ " if req else "") + label
+            cur = [c for c in mapping.get(k, []) if c in columns]
+            if multi:
+                new_map[k] = col.multiselect(lab, columns, default=cur, key=f"map_{k}")
+            else:
+                opts = ["— not in my export —"] + columns
+                idx = opts.index(cur[0]) if cur else 0
+                pick = col.selectbox(lab, opts, index=idx, key=f"map_{k}")
+                new_map[k] = [pick] if pick != opts[0] else []
+        st.caption("★ required · " + colmap.ADDRESS_NOTE)
+        if st.button("Run with these columns", type="primary"):
+            st.session_state["mapping"] = new_map
+            st.rerun()
+    if missing:
+        st.stop()
+    mapping_json = json.dumps(mapping, sort_keys=True)
 
 with st.spinner("Running the pipeline — geocoding + model fit takes ~1-2 minutes on a fresh file..."):
     try:
-        gam, m, stats, report, geo = run_pipeline(key, demo)
+        gam, m, stats, report, geo = run_pipeline(key, demo, mapping_json)
     except ValueError as e:
         st.error(str(e))
         st.stop()

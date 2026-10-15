@@ -29,13 +29,19 @@ Open the address Streamlit prints (usually http://localhost:8501), enter the pas
 
 To run the seven-step pipeline instead: `cd analysis && python step1_validate.py your_export.csv`, then steps 2–7 in order. Each step writes a small file the next one reads.
 
-## The CSV it expects
+## What the upload needs (any MLS)
+Export closed sales from your MLS as CSV with as many fields as it offers. The app does not
+require particular column names: `colmap.py` guesses which column feeds each model field
+(sold price, sold date, beds, full/half baths, above-grade sqft, below-grade sqft, acres,
+year built, street number + name or a full address, city, state, zip, plus optional garage,
+fireplaces, patio/deck, air conditioning, HOA, view, subdivision) and the page shows the
+guesses in a "Column mapping" panel where the user can correct any of them before running.
+Fields that accept several columns are summed (full + 3/4 baths; main level + upper level
+sqft; finished + unfinished basement; one column per fireplace type). Tested on Flexmls
+(Snake River Regional, the Idaho Falls demo) and the Teton Board of Realtors export.
 
-A closed-sales export with these column headers (this is a standard Idaho/Flexmls export layout; rename yours to match if needed):
-
-`MLS Number, Street #, Street/Road Name, City, State, Zip Code, Subdivision, Sold Date (MM/DD/YYYY), Sold Price, List Price, Original List Price, Days on Market, Seller Conc, Bedrooms, Bathrooms, Total Half Baths, Apx Acreage, Apx Year Built, Apx Total SqFt, Abv Grade SqFt, Blw Grade SqFt, Basement SqFt`
-
-plus whatever garage, fireplace, patio/deck, AC, HOA, and view fields your MLS exports. 500+ sales from one market over 18–24 months is the sweet spot; under ~300 the ranges get wide.
+Encodings: UTF-8 or Windows-1252 (Flexmls puts a ² in some headers). Dates in any common
+format. Floor: ~200 sales from one market over 18-24 months; 300+ before the ranges mean much.
 
 ## Privacy
 
