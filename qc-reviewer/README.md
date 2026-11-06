@@ -1,10 +1,10 @@
-# 133-Step QC Reviewer
+# QC Reviewer: UAD 2.6 and UAD 3.6
 
 ## 👉 [OPEN THIS TOOL](https://theappraisercoach.github.io/ai-appraiser-tools/qc-reviewer/)
 
 **Click the link above to use it.** The file you see in this folder (`index.html`) is the raw code behind the page. You don't need to open or download it.
 
-A pre-submission QC check for 1004, 1073, 1004C, 1025, 2055, and G-PAR reports. You get severity-rated concerns with the step number each one came from.
+A pre-submission QC check for 1004, 1073, 1004C, 1025, 2055, G-PAR, and the new UAD 3.6 URAR reports (133 checks, plus 37 UAD 3.6-specific checks). You get severity-rated concerns with the step number each one came from.
 
 **How to use it**
 

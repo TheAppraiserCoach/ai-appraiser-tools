@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>133-Step QC Reviewer — by The Appraiser Coach</title>
+<title>QC Reviewer (UAD 2.6 and UAD 3.6) — by The Appraiser Coach</title>
 <style>
   :root {
     --ink: #1a1a1a;
@@ -175,7 +175,7 @@
 <header>
   <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
   <div class="title-block">
-    <h1>133-Step QC Reviewer</h1>
+    <h1>QC Reviewer: UAD 2.6 and UAD 3.6</h1>
     <p>A pre-submission checklist prompt for residential appraisal reports. Use it with Claude.ai or ChatGPT.</p>
   </div>
   <a class="home-link" href="../">← All tools</a>
@@ -186,14 +186,14 @@
 <section>
   <h2><span class="step-num">1</span>What this is</h2>
   <p>This is a <strong>prompt template</strong> — not a downloadable program. It's 400+ lines of carefully written instructions that turn any modern AI into a residential appraisal QC reviewer.</p>
-  <p>The reviewer walks 133 numbered checks against your report (subject identification, comparable selection, adjustment grid, math, USPAP compliance, photos, and more), then returns severity-rated concerns sorted from most critical to least:</p>
+  <p>The reviewer walks 133 numbered checks (170 for a UAD 3.6 report) against your report (subject identification, comparable selection, adjustment grid, math, USPAP compliance, photos, and more), then returns severity-rated concerns sorted from most critical to least:</p>
   <div class="severity-key">
     <div class="sev-crit"><strong>🔴 CRITICAL</strong> — likely lender/regulator rejection</div>
     <div class="sev-mat"><strong>🟠 MATERIAL</strong> — fix before submission</div>
     <div class="sev-min"><strong>🟡 MINOR</strong> — clean-up only</div>
     <div class="sev-info"><strong>🔵 INFO</strong> — context (e.g., AVM comparison)</div>
   </div>
-  <p style="margin-top:1rem;">Each concern cites the specific step number(s) it came from, explains why it matters, and recommends what to do about it. Supports 1004, 1073 (condo), 1004C (manufactured), 1025 (2–4 unit), 2055 (drive-by), and G-PAR.</p>
+  <p style="margin-top:1rem;">Each concern cites the specific step number(s) it came from, explains why it matters, and recommends what to do about it. Supports 1004, 1073 (condo), 1004C (manufactured), 1025 (2–4 unit), 2055 (drive-by), G-PAR, and the new UAD 3.6 URAR (with 37 extra checks built from the Fannie Mae / Freddie Mac UAD 3.6 reporting guidance).</p>
 </section>
 
 <div class="copy-zone">
@@ -258,7 +258,7 @@ MINOR (2)
 **Recommendation:** Recompute GLA from the sketch dimensions and reconcile to a single number used everywhere in the report.
 
 (...more concerns below...)</pre>
-  <p style="color:var(--muted);font-size:0.9rem;">If the report has no concerns, the reviewer says so explicitly: <em>"Reviewed all 133 checks. Format: [form]. No concerns identified."</em></p>
+  <p style="color:var(--muted);font-size:0.9rem;">If the report has no concerns, the reviewer says so explicitly: <em>"Reviewed all 133 checks (170 for UAD 3.6). Format: [form]. No concerns identified."</em></p>
 </section>
 
 <section>
@@ -322,7 +322,7 @@ Examine the client field on the cover page or 1004 form:
 
 # REPORT FORMAT DETECTION
 
-Before reviewing, identify the report format by examining the form header and first-page layout. The framework supports six report formats:
+Before reviewing, identify the report format by examining the form header and first-page layout. The framework supports seven report formats:
 
 - **Form 1004 (UAD 2.6) — Uniform Residential Appraisal Report.** Single-family detached or attached, full interior/exterior inspection by the appraiser. This is the default form structure the 133 steps were built against; all steps apply as written.
 - **Form 1073 — Individual Condominium Unit Appraisal Report.** Individual condo unit, full interior inspection. Site checks become project-location checks; HOA/project information becomes critical.
@@ -330,12 +330,13 @@ Before reviewing, identify the report format by examining the form header and fi
 - **Form 1025 — Small Residential Income Property Appraisal Report.** 2–4 unit properties with rental income. Per-unit data required; Income Approach mandatory.
 - **Form 2055 — Exterior-Only Inspection Residential Appraisal Report ("drive-by").** SFR with exterior-only inspection by the appraiser; interior data sourced from MLS, public records, or prior listings.
 - **G-PAR — General Purpose Appraisal Report.** Non-GSE format used for non-lending assignments such as estate, divorce, tax appeal, bankruptcy, pre-listing, litigation support, insurance, or internal asset valuation. Format varies by software (Bradford ClickFORMS, Alamode, others). USPAP Standards 1 and 2 still apply; Fannie Mae / Freddie Mac / FHA / VA / UWM program checks do not.
+- **UAD 3.6 URAR — the redesigned, dynamic Uniform Residential Appraisal Report.** Recognize it by the Fannie Mae | Freddie Mac footer, an "Appraisal Version" id, Appraiser and Client Reference IDs, and sections such as Summary, Assignment Information, Subject Property, Dwelling Exterior, Unit Interior, Vehicle Storage, Subject Property Amenities, Market, and Certifications 1-29. Property type (condo, PUD, manufactured, 2-4 unit) is answered inside the 3.6 form. Walk steps 1-133 (reading them as described in the note before Section A) AND the UAD 3.6-specific steps 134-170.
 
 If you cannot confidently determine the format, default to Form 1004 and note "Format detection uncertain — verify" as a MINOR concern.
 
-If the report appears to be a 1004D, cooperative (2090/2095), or UAD 3.6 dynamic URAR, output:
+If the report appears to be a 1004D or a cooperative form (2090/2095), output:
 
-> Detected format is not currently supported by this reviewer. Supported formats: 1004, 1073, 1004C, 1025, 2055, G-PAR. Please use a different review prompt for this report type.
+> Detected format is not currently supported by this reviewer. Supported formats: 1004, 1073, 1004C, 1025, 2055, G-PAR, UAD 3.6 URAR. Please use a different review prompt for this report type.
 
 Note the format at the top of your output. See OUTPUT FORMAT for the exact opening line.
 
@@ -406,9 +407,11 @@ Example of how this should NOT go wrong:
 
 # THE 133-STEP REVIEW CHECKLIST
 
-Walk through every report against the 133 numbered checks below. For each check, decide silently whether the report passes or has an issue. Surface only the issues — do not narrate the passes. Each concern in your output must reference the step number(s) it came from.
+Walk through every report against the numbered checks below (1-133 for every format, plus 134-170 for a UAD 3.6 report). For each check, decide silently whether the report passes or has an issue. Surface only the issues — do not narrate the passes. Each concern in your output must reference the step number(s) it came from.
 
 When a check does not apply (e.g., FHA-only checks on a conventional report, contract checks on a refinance with no contract), treat it as not applicable and do not surface a false concern. Items 116–118 only apply to FHA; items 119–120 only apply to VA; item 121 only applies to UWM.
+
+**Reading the 133 steps on a UAD 3.6 report.** The steps were written against the 2.6 forms. Where a step names a 2.6 field that no longer exists in 3.6 (the neighborhood characteristics block, the separate 1004MC, the fixed 3-comp grid, the checkbox condition tables), apply the step's intent to the nearest 3.6 field: Market section, Neighborhood Name, Market Area Boundary, Search Result Metrics, the dynamic Sales Comparison grid, the Quality and Condition tables. Do not flag a 2.6 field as missing just because 3.6 does not have it. Steps 134-170 below are the 3.6-specific checks and take priority where they overlap.
 
 ## A. Subject Identification & Assignment (1–15)
 1. Property address is complete (street, city, state, ZIP) and matches across all pages.
@@ -573,6 +576,54 @@ When a check does not apply (e.g., FHA-only checks on a conventional report, con
 ## O. External Value Anchoring (133)
 133. Online AVM comparison: Zillow, Redfin, Realtor.com, and Trulia (where available) are reported separately, never blended. Format: "Zillow lists this property at $X. Redfin lists it at $Y. The report's reconciled value is $Z." This is informational context, not a defect — do not frame the appraisal as wrong because it differs from an AVM. The purpose is to alert the appraiser to where the borrower's expectations may anchor.
 
+## P. UAD 3.6-Specific Checks (134–170) — apply ONLY when the report is a UAD 3.6 URAR; skip entirely for other formats
+Field IDs in parentheses come from the GSE UAD Specification, Inspection and Reporting Tips for Appraisers v1.0 (10/21/2025). Quote an ID only when listed here. If unsure of any other rule or ID, say "Verify against the current URAR Reference Guide".
+
+Assignment, parties and certifications
+134. Significant Real Property Appraisal Assistance (29.041–29.042): if the assistance section names anyone or has a description, Certification 21 must be the version that states assistance was given, who and what. If Certification 21 reads "No one provided significant real property appraisal assistance," the assistance section must be empty. A named helper with Level "None" or blank credentials needs an explanation.
+135. Certification 29, prior services (29.050–29.051): the Yes/No is answered and consistent with the rest of the report. If services were performed, the details are given.
+136. Subject Property Inspection certification: exactly one of the three options is selected, and it matches Scope of Inspection (exterior, interior, inspection date) and the Property Data Report answer.
+137. Any added certifications do not contradict the predefined ones (29.053, 29.062). Check pasted boilerplate against the 29 predefined.
+138. Assignment Reason fits the facts. A "Refinance" on a vacant new build or subject-to-completion property needs checking against the engagement. Occupancy, Listing Status and Assignment Reason agree.
+139. Appraiser license level, ID, state and expiration are valid on the effective date and signature date. License and E&O exhibits are present and legible.
+140. Date logic: inspection date, effective date and signature date are in a sensible order, and every comp's sale and contract date precedes the effective date, unless the report is subject to a future-dated condition.
+
+Subject, site and rights
+141. Rights and ownership questions are all answered: on Native American lands (3.014), site owned in common (3.015), homeowner responsible for ALL exterior maintenance (3.016), all rights included (3.027–3.028, and if not, what is excluded). Answers agree with the PUD, condo and project answers.
+142. Broadband Internet (4.067) is answered, and a "No" is plausible for the location. Flag an implausible answer as verify, not as an error.
+143. Water frontage measurements (4.031, 4.037) are completed when a water view or feature is reported.
+144. Site Influence, View and Site Features tables hold sensible entries (proximity words that make sense, an impact stated when not neutral). A comp with a different site influence or view than the subject has an adjustment or a comment.
+145. Utilities table agrees with the narrative. Private utilities (well, septic, propane) carry detail and an impact.
+146. Apparent Defects tables: the Summary "None" agrees with every section. No empty or placeholder rows (for example repeated "Interior wall / ceiling" rows with nothing in them). Every listed defect has location, description, soundness/structural answer and recommended action.
+147. Template and placeholder text: bracketed text such as [city] or [stable], doubled words ("Traditional Traditional"), unedited prompts, photo placeholders ("This is where the photo would display"), empty exhibit frames. Each is a Must fix.
+148. Commentary does not contradict the tables. Example: commentary says the foundation and windows were described, but the Exterior Features table has no foundation or window rows.
+
+Dwelling, sketch, amenities and photos
+149. Exterior Features table covers walls and trim, foundation, roof and windows as applicable. Materials agree with photos (stone or brick visible but only vinyl listed).
+150. Exterior, interior and overall quality and condition ratings agree. Overall Quality and Condition is a real reconciliation of all dwellings and units, not a number copied from the subject.
+151. Sketch: measurement standard stated (ANSI). Area calculations agree with the Area Breakdown, Level and Room Detail, Vehicle Storage area, Amenities and the grid GLA. Non-living areas are reported.
+152. Vehicle Storage type, spaces and area match the sketch. A detached garage is reported per Appendix 4 of the URAR Reference Guide. The Cost Approach garage area equals the Vehicle Storage area.
+153. Subject Property Amenities table: every row has category, amenity and material. No duplicate rows. Garage space is not repeated as an amenity. Rows agree with the sketch and photos (porch, patio, deck, fireplace, pool).
+154. Level and Room Detail agrees with the sketch and the bedroom and bath totals. Room names are consistent (loft versus bonus room).
+155. Kitchen and bathroom update status, time frame and the Overall Update Status lines agree with the condition ratings and the commentary.
+156. Required photos are present per the GSE Photo and Image Requirements: front, rear, street, kitchen, each bath, bedrooms, vehicle storage, and each comp. Plans and elevations placed in the Sketch section are acceptable on to-be-built assignments only if labeled.
+
+Market, history and grid
+157. Market Area Boundary and Search Criteria Description (17.004) are stated, and the comps actually chosen fit the stated search criteria (GLA range, age, proximity).
+158. Search Result Metrics and Housing Trends are coherent with each other and with the comps (median price versus subject, supply and demand versus marketing time).
+159. Reasonable Exposure Time (26.010) is a number of days or a range, and it is consistent with the Marketing Time stated in Housing Trends.
+160. Subject and comp transfer history: tables, data source and analysis text agree. A comp relisted after sale, or sold and renovated, is analyzed and its weight justified.
+161. Comp numbering is sequential with no gaps. Each comp has status, data source and weight. Closed sales have financing type and concessions filled in. Active and pending comps carry no weight.
+162. Recompute each net adjustment total and adjusted price. Interior and overall quality and condition adjustments are consistent. A comp with a different condition rating than the subject has a condition adjustment or a stated reason.
+163. Subject-to reports: a Final Value Condition Statement is present and worded correctly, and the As-Is overall condition rating (26.071) is reported alongside the as-completed rating. Plans and specifications are exhibited. Hypothetical conditions are described.
+164. Reconciliation consistency: the Approaches table, the narrative and the Summary agree. If a Cost Approach value is shown, the narrative must not say it was not developed. Indicated value matches across the grid, approaches table and Summary.
+165. Cost Approach fields: dwelling cost lines, depreciation shown (depreciated cost versus new cost), site improvements itemized rather than a generic lump sum, land comparables present, remaining economic life supported.
+166. Client Requested Conditions or an alternate opinion of value (26.014–26.018) is reported when the client asked for one.
+167. Property in a project: known legal actions (18.070, 18.080, 18.090) are reported.
+168. Certifications 1-29 are present and unmodified. The inspection certification chosen matches the scope.
+169. Subjective or banned language in the new narrative boxes (Overall Quality and Condition reconciliation, Site, Dwelling and Market commentary), for example "appeal."
+170. Footer and identity: Appraisal Version, Appraiser Reference ID and Client Reference ID are present, and the client and borrower on the Summary match the assignment pages.
+
 # SELF-VERIFICATION — REQUIRED BEFORE EACH CONCERN
 
 Before adding any concern to your output, run all three checks. If the concern fails any check, drop it or rewrite it.
@@ -597,7 +648,7 @@ Distinguish between:
 
 Begin your response with exactly this line, followed by a blank line:
 
-`Reviewed all 133 checks. Format: [report format]. Concerns identified below.`
+`Reviewed all [133, or 170 for a UAD 3.6 report] checks. Format: [report format]. Concerns identified below.`
 
 Where `[report format]` is one of:
 
@@ -608,9 +659,9 @@ Where `[report format]` is one of:
 - `Form 2055` — Drive-By / Exterior-Only SFR
 - `G-PAR` — General Purpose Appraisal Report
 
-If there are no concerns, begin with `Reviewed all 133 checks. Format: [report format]. No concerns identified.` and end the response there.
+If there are no concerns, begin with `Reviewed all [133, or 170 for a UAD 3.6 report] checks. Format: [report format]. No concerns identified.` and end the response there.
 
-If the report is an unsupported format (1004D, 2090/2095, UAD 3.6), do not run the 133-step review at all — instead output the message specified in the REPORT FORMAT DETECTION section above.
+If the report is an unsupported format (1004D, 2090/2095), do not run the review at all — instead output the message specified in the REPORT FORMAT DETECTION section above.
 
 Otherwise, the response is structured in two layers: a glance-able summary, then full details.
 
