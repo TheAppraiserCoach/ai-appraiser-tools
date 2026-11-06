@@ -44,7 +44,7 @@ Most tools here are **prompt templates**. A prompt is a set of instructions you 
 
 | When you need to | Use this | Type |
 |---|---|---|
-| Catch problems before you submit | [133-Step QC Reviewer](https://theappraisercoach.github.io/ai-appraiser-tools/qc-reviewer/) | Prompt |
+| Catch problems before you submit | [QC Reviewer: UAD 2.6 and 3.6](https://theappraisercoach.github.io/ai-appraiser-tools/qc-reviewer/) | Prompt |
 | Check your photos against your ratings | [Photo Quality Checker](https://theappraisercoach.github.io/ai-appraiser-tools/photo-quality-checker/) | Prompt |
 | Answer an AMC or underwriter revision | [Revision Response Writer](https://theappraisercoach.github.io/ai-appraiser-tools/revision-writer/) | Prompt |
 | Set up a new order fast | [Engagement Letter Parser](https://theappraisercoach.github.io/ai-appraiser-tools/engagement-letter-parser/) | Prompt |
