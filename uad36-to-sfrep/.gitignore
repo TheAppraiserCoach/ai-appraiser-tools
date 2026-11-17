@@ -1,0 +1,5 @@
+schema/
+samples/
+__pycache__/
+*.pyc
+out/
