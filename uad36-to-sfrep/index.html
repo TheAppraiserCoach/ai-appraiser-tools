@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UAD 3.6 to SFREP: MISMO Generator by The Appraiser Coach</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg: #fafafa;
+    --accent: #2c5aa0;
+    --accent-bg: #f0f5ff;
+    --brand: #5a3a2a;
+    --brand-bg: #f5efe7;
+    --good: #2e7d32;
+    --warn: #c62828;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    margin: 0;
+    line-height: 1.5;
+  }
+  header {
+    background: white;
+    border-bottom: 1px solid var(--line);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  header img.logo {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: 6px;
+  }
+  header .title-block { flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p  { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  header a.home-link {
+    color: var(--accent);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  header a.home-link:hover { text-decoration: underline; }
+  main { max-width: 920px; margin: 0 auto; padding: 1.5rem; }
+  section {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  section h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .step-num {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    text-align: center;
+    line-height: 1.5rem;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+  }
+  .copy-zone {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1.25rem;
+  }
+  .copy-zone h2 { color: var(--accent); margin-top: 0; }
+  button.copy-btn {
+    background: var(--accent);
+    color: white;
+    border: 0;
+    padding: 0.85rem 1.75rem;
+    border-radius: 6px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button.copy-btn:hover { background: #1d4080; }
+  button.copy-btn.copied { background: var(--good); }
+  .copy-status {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--good);
+    min-height: 1.25rem;
+  }
+  ol.steps { padding-left: 1.5rem; line-height: 1.7; }
+  ol.steps li { margin-bottom: 0.4rem; }
+  ol.steps strong { color: var(--ink); }
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem 1rem;
+    margin-top: 0.5rem;
+  }
+  .field-grid div {
+    padding: 0.4rem 0.65rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    border-left: 3px solid var(--accent);
+    background: #fcfcfc;
+  }
+  .ai-pick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+  .ai-card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    background: #fcfcfc;
+  }
+  .ai-card h3 { margin: 0 0 0.25rem; font-size: 0.95rem; color: var(--accent); }
+  .ai-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  details.prompt-view {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    background: #fcfcfc;
+  }
+  details.prompt-view summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.25rem 0;
+  }
+  pre.prompt {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    max-height: 24rem;
+    overflow: auto;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  pre.example {
+    background: #fcfcfc;
+    border: 1px solid var(--line);
+    padding: 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 2rem 1rem;
+  }
+  footer a { color: var(--muted); }
+  footer .cta-line a { color: var(--accent); font-weight: 600; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/d8/e0/e3/d8e0e38c-0d3f-0a2a-7517-6c3d9f5ea49d/mza_12912748984205638973.jpg/600x600bb.jpg" alt="The Appraiser Coach">
+  <div class="title-block">
+    <h1>UAD 3.6 to SFREP: MISMO Generator</h1>
+    <p>Turn a UAD 3.6 appraisal built in Claude into a MISMO 3.6 XML file that Appraise-It Pro can import and UCDP can accept. Free, open-source code.</p>
+  </div>
+  <a class="home-link" href="../">← All tools</a>
+</header>
+
+<main>
+
+<section>
+  <h2><span class="step-num">1</span>What this is</h2>
+  <p>Fannie Mae and Freddie Mac do not accept a report from Claude. They accept a UAD 3.6 file in MISMO 3.6 XML format. This tool is the bridge: Claude fills in the appraisal data, the generator writes the XML in the exact order the official schema requires, and then it checks the file before you ever upload it.</p>
+  <p>Appraise-It Pro (SFREP) can import MISMO 3.6 directly, so the finished file opens as an editable report. You add photos, review, sign, and deliver as usual.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">2</span>What it checks before you upload</h2>
+  <div class="field-grid">
+    <div><strong>Schema check.</strong> Validates against the official GSE UAD 3.6 schema.</div>
+    <div><strong>Link check.</strong> Every relationship must point at something that exists.</div>
+    <div><strong>Element order.</strong> Taken from the schema, so nobody has to remember it.</div>
+    <div><strong>Data dictionary.</strong> All 4,066 fields with definitions and allowed values, for Claude to read.</div>
+  </div>
+  <p class="note">The link check catches the UCDP fatal error "The 'from' label included in a RELATIONSHIP container is missing." That error happens when a source or date field is blank and the software drops the item but leaves the link behind.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">3</span>How to use it</h2>
+  <ol class="steps">
+    <li><strong>Get the code.</strong> Download this folder from GitHub. You need Python and one install: <code>pip install -r requirements.txt</code>.</li>
+    <li><strong>Download the official files.</strong> Run <code>./scripts/fetch_gse.sh</code>. It pulls the schema and 14 sample reports straight from Freddie Mac.</li>
+    <li><strong>Start from a sample.</strong> <code>python3 -m uad36mismo to-json samples/SF1_Appraisal_v1.4.xml -o report.json</code></li>
+    <li><strong>Let Claude fill it in.</strong> Give Claude <code>report.json</code>, the data dictionary, and your assignment data. Ask it to replace the sample values and keep every label paired with its relationship.</li>
+    <li><strong>Build and check.</strong> <code>python3 -m uad36mismo build report.json -o report.xml</code>. If it reports problems, paste them back to Claude and repeat.</li>
+    <li><strong>Import.</strong> In Appraise-It Pro: File, Import, MISMO. Review, add photos, sign.</li>
+  </ol>
+</section>
+
+<section>
+  <h2><span class="step-num">4</span>Honest status</h2>
+  <p><strong>Proven:</strong> all 14 official Fannie Mae and Freddie Mac sample reports (single family, condo, co-op, manufactured home, 2-4 unit, completion reports) convert to the tool's format and back with no data change, and pass schema validation.</p>
+  <p><strong>Not yet proven:</strong> a file generated by this tool has not yet been imported into Appraise-It Pro or submitted to UCDP. Test on a throwaway file first and tell us what you find. Photo handling is not built yet; SFREP documents optional MISMO 3.6 image extensions for that.</p>
+  <p>This is a tool, not a substitute for your review. You sign the report.</p>
+</section>
+
+<section>
+  <h2><span class="step-num">5</span>Get the code</h2>
+  <p><a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools/tree/main/uad36-to-sfrep" target="_blank" rel="noopener">github.com/TheAppraiserCoach/ai-appraiser-tools/uad36-to-sfrep</a> (MIT license)</p>
+</section>
+
+</main>
+
+<footer>
+  <p class="cta-line">Built by <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">The Appraiser Coach</a>, free for any appraiser to use. For more tools, coaching, and the community building this with us: <a href="https://www.theappraisercoach.com" target="_blank" rel="noopener">theappraisercoach.com →</a></p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Open source. <a href="https://github.com/TheAppraiserCoach/ai-appraiser-tools/tree/main/uad36-to-sfrep" target="_blank" rel="noopener">View the code on GitHub</a>. Official schema and sample files come from Fannie Mae and Freddie Mac and are downloaded, not included.</p>
+</footer>
+</body>
+</html>
